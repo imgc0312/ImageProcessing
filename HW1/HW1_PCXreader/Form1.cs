@@ -13,6 +13,7 @@ namespace HW1_PCXreader
     public partial class Form1 : Form
     {
         String filePath = "unset";
+        MyPCX thePCX = new MyPCX();
         public Form1()
         {
             InitializeComponent();
@@ -39,14 +40,24 @@ namespace HW1_PCXreader
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 filePath = openFileDialog1.FileName;
-                MessageBox.Show(filePath);
-
+                MessageBox.Show(filePath, "開啟檔案");
+                thePCX.from(filePath);
+                if (pictureBox1.Image != null)
+                {
+                    pictureBox1.Image.Dispose();
+                    pictureBox1.Image = null;
+                }
             }
                
             
         }
 
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
         {
 
         }
