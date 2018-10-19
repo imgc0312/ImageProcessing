@@ -23,38 +23,71 @@ namespace HW1_PCXreader
     //        B = 0;
     //    }
     //}
-    public unsafe struct PCXHeader
+    public struct PCXHeader
     {
-        public byte manufacturer;
+        public byte manufacturer ;
         public byte version;
         public byte encoding;
         public byte bitsPerPixel;
         public ushort Xmin, Ymin, Xmax, Ymax;
         public ushort Hdpi, Vdpi;
-        public fixed byte colorMap[48];
+        public byte[] colorMap ;
         public byte reserved;
         public byte nPlanes;
         public ushort bytesPerLine;
         public ushort paletteInfo;
         public ushort hScreenSize;
         public ushort vScreenSize;
-        public fixed byte filler[54];
+        public byte[] filler;
 
+        public bool set(byte[] src)
+        {
+            try
+            {
+                MyDeal.setTByBytes(ref manufacturer, src, 0);
+                MyDeal.setTByBytes(ref version, src, 1);
+                MyDeal.setTByBytes(ref encoding, src, 2);
+                MyDeal.setTByBytes(ref bitsPerPixel, src, 3);
+                MyDeal.setTByBytes(ref Xmin, src, 4);
+                MyDeal.setTByBytes(ref Ymin, src, 6);
+                MyDeal.setTByBytes(ref Xmax, src, 8);
+                MyDeal.setTByBytes(ref Ymax, src, 10);
+                MyDeal.setTByBytes(ref Hdpi, src, 12);
+                MyDeal.setTByBytes(ref Vdpi, src, 14);
+                MyDeal.setBytesByBytes(ref colorMap, src, 16, 48);
+                MyDeal.setTByBytes(ref reserved, src, 64);
+                MyDeal.setTByBytes(ref nPlanes, src, 65);
+                MyDeal.setTByBytes(ref bytesPerLine, src, 66);
+                MyDeal.setTByBytes(ref paletteInfo, src, 68);
+                MyDeal.setTByBytes(ref hScreenSize, src, 70);
+                MyDeal.setTByBytes(ref vScreenSize, src, 72);
+                MyDeal.setBytesByBytes(ref filler, src, 74, 54);
+
+            }
+            catch (Exception e)
+            {
+                Debug.Print(e.ToString());
+                return false;
+            }
+            return true;
+        }
+        
     }
 
     public class MyPCX
     {
         static int palette256Space = 768;
-        PCXHeader header = new PCXHeader();
-        byte[] data ;
-        byte[] colorPalette ;
+        static int headerSize = 128;
+        public PCXHeader header ;
+        public int width { get { return header.Xmax - header.Xmin + 1; } }
+        public int height { get { return header.Ymax - header.Ymin + 1; } }
+        public byte[] data ;
+        public byte[] colorPalette ;
+        public Pen[] palette;
 
         public MyPCX()
         {
-            header.Xmax = 0;
-            header.Xmin = 0;
-            header.Ymax = 0;
-            header.Ymin = 0;
+            
         }
 
         public MyPCX(String filePath)
@@ -89,50 +122,93 @@ namespace HW1_PCXreader
 
         void setAllByBytes(byte[] bytes, int byteSize)
         {
-            int headerSize = Marshal.SizeOf(header);
-            IntPtr buffer = Marshal.AllocHGlobal(headerSize);
-            try
-            {
-                Marshal.Copy(bytes, byteSize, buffer, headerSize);
-                Marshal.PtrToStructure(buffer, header); //set header
-                if (header.version == 5)
-                {
-                    setBytesByBytes(data, bytes, headerSize, byteSize - palette256Space - headerSize);  //set palette 
-                    setBytesByBytes(colorPalette, bytes, byteSize - palette256Space - 1, palette256Space);  //set data
-                }
-                else
-                {
-                    setBytesByBytes(data, bytes, headerSize, byteSize - headerSize);    //set data
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
+            header.set(bytes);
+            //if (header.version == 5)
+            //{
+            //    MyDeal.setBytesByBytes(data, bytes, headerSize, byteSize - palette256Space - headerSize); //set data  //set palette 
+            //    MyDeal.setBytesByBytes(colorPalette, bytes, byteSize - palette256Space - 1, palette256Space);  //set palette 
+            //}
+            //else
+            //{
+            //    MyDeal.setBytesByBytes(data, bytes, headerSize, byteSize - headerSize);    //set data
+            //}
+            MyDeal.setBytesByBytes(ref data, bytes, headerSize, byteSize - palette256Space - headerSize);  //set data
+            MyDeal.setBytesByBytes(ref colorPalette, bytes, byteSize - palette256Space , palette256Space);  //set palette 
+            setPalette();
         }
 
-        void setBytesByBytes(byte[] target, byte[] srcBytes, int StartIndex, int Size)
+        private void setPalette()
         {
-            target = new byte[Size];
-            IntPtr buffer = Marshal.AllocHGlobal(Size);
-            try
+            if (colorPalette == null)
+                return;
+            palette = new Pen[256];
+            for(int index = 0; index < 256; index ++)
             {
-                Marshal.Copy(srcBytes, StartIndex, buffer, Size);
-                Marshal.PtrToStructure(buffer, target);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
+
+                palette[index] = new Pen(Color.FromArgb(colorPalette[3 * index + 0], colorPalette[3 * index + 1], colorPalette[3 * index + 2]));
+                //palette[index].Color = Color.FromArgb(colorPalette[3 * index + 0], colorPalette[3 * index + 1], colorPalette[3 * index + 2]);
             }
         }
-
+        
         public Bitmap getView()
         {
-            Bitmap image = new Bitmap(200, 100);
+            Bitmap image = new Bitmap(width, height);
             Graphics imageGraphics = Graphics.FromImage(image);
             //write pixel by imageGraphics
+            int colored = 0;
+            if (data == null)
+            {
+                Debug.Print("data empty:getView()");
+                return null;
+            }
+            if (palette == null)
+            {
+                Debug.Print("palette empty:getView()");
+                return null;
+            }
+            for (int index = 0; index < data.Length; index++)
+            {
+                try
+                {
+                    byte one = data[index];
+                    if (one >= 0xc0) // 2 high bits set
+                    {
+                        byte two = data[++index];
+                        
+                        for (int RL = (one & 0x3f); RL > 0;)
+                        {
+                            int L = width - (colored % width);
+                            if (L < RL)
+                            {
+                                imageGraphics.DrawRectangle(palette[two], colored % width, colored / width, L, 1);
+                                RL -= L;
+                                colored += L;
+                            }
+                            else
+                            {
+                                imageGraphics.DrawRectangle(palette[two ], colored % width, colored / width, RL, 1);
+                                colored += RL;
+                                RL = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        imageGraphics.DrawRectangle(palette[one ], colored % width, colored / width, 1, 1);
+                        colored++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Print("one or two empty:getView()");
+                    return image;
+                }
+                if (colored >= width * height)
+                    break;
+            }
             return image;
         }
 
     }
+
 }
