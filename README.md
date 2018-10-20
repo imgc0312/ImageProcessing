@@ -3,10 +3,12 @@ IMAGE PROCESSING CLASS HW
 
 作業環境:
 ---
-+ C++11 <br/>
++ C# <br/>
 + Windos 7 64bits <br/>
 
 內容:
 -----
 + 1 <br/>
-> 讀取pcx擋
+> 無套件檢視pcx擋 、 直方圖 、 負片效果 等 
+> 開發中
+
