@@ -200,11 +200,40 @@ namespace HW1_PCXreader
                 }
                 catch (Exception e)
                 {
-                    Debug.Print("one or two empty:getView()");
+                    Debug.Print("one or two empty:getView() " + e.ToString());
                     return image;
                 }
                 if (colored >= width * height)
                     break;
+            }
+            return image;
+        }
+
+        public Bitmap getPalette()
+        {
+            int pleCols = 32;
+            int pleRows = 256 / pleCols;
+            int blockSize = 4;
+            Bitmap image = new Bitmap(pleCols * blockSize, pleRows*blockSize);
+            Graphics imageGraphics = Graphics.FromImage(image);
+            //write pixel by imageGraphics
+            if (palette == null)
+            {
+                Debug.Print("palette empty:getView()");
+                return null;
+            }
+            for (int index = 0; index < 256; index++)
+            {
+                try
+                {
+                    imageGraphics.DrawRectangle(palette[index], (index % pleCols) * blockSize, (index / pleCols) * blockSize, blockSize, blockSize);
+                    
+                }
+                catch (Exception e)
+                {
+                    Debug.Print("palette empty:getView() " + e.ToString());
+                    return image;
+                }
             }
             return image;
         }
