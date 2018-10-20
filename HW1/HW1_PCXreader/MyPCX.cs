@@ -213,7 +213,7 @@ namespace HW1_PCXreader
         {
             int pleCols = 32;
             int pleRows = 256 / pleCols;
-            int blockSize = 4;
+            int blockSize = 10;
             Bitmap image = new Bitmap(pleCols * blockSize, pleRows*blockSize);
             Graphics imageGraphics = Graphics.FromImage(image);
             //write pixel by imageGraphics
@@ -226,8 +226,8 @@ namespace HW1_PCXreader
             {
                 try
                 {
-                    imageGraphics.DrawRectangle(palette[index], (index % pleCols) * blockSize, (index / pleCols) * blockSize, blockSize, blockSize);
-                    
+                    //imageGraphics.DrawRectangle(palette[index], (index % pleCols) * blockSize, (index / pleCols) * blockSize, blockSize, blockSize);
+                    imageGraphics.FillRectangle(palette[index].Brush, (index % pleCols) * blockSize, (index / pleCols) * blockSize, blockSize, blockSize);
                 }
                 catch (Exception e)
                 {

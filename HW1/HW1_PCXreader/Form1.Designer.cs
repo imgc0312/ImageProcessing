@@ -33,8 +33,8 @@
             System.Windows.Forms.StatusStrip statusStrip1;
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox4;
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -45,6 +45,11 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.modeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.originalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.negativeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -54,10 +59,12 @@
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             statusStrip1.SuspendLayout();
+            groupBox3.SuspendLayout();
             groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox2
@@ -113,6 +120,7 @@
             this.tableLayoutPanel1.SetColumnSpan(statusStrip1, 2);
             statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel0,
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
             statusStrip1.Location = new System.Drawing.Point(3, 548);
@@ -136,6 +144,7 @@
             // groupBox3
             // 
             groupBox3.CausesValidation = false;
+            groupBox3.Controls.Add(this.pictureBox2);
             groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             groupBox3.Location = new System.Drawing.Point(502, 343);
             groupBox3.Name = "groupBox3";
@@ -157,15 +166,15 @@
             // 
             // chart1
             // 
-            chartArea1.AxisX.Interval = 255D;
-            chartArea1.AxisX.LabelStyle.Interval = 0D;
-            chartArea1.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea1.AxisY.LabelStyle.IsEndLabelVisible = false;
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
+            chartArea2.AxisX.Interval = 255D;
+            chartArea2.AxisX.LabelStyle.Interval = 0D;
+            chartArea2.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
+            chartArea2.AxisY.LabelStyle.IsEndLabelVisible = false;
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(3, 25);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(484, 171);
@@ -206,7 +215,8 @@
             this.tableLayoutPanel1.SetColumnSpan(this.menuStrip1, 2);
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.modeToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(3, 3);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(992, 30);
@@ -224,9 +234,49 @@
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(166, 30);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
             this.openFileToolStripMenuItem.Text = "open file";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.openFileToolStripMenuItem_Click_1);
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox2.Location = new System.Drawing.Point(3, 25);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(484, 171);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox2.TabIndex = 0;
+            this.pictureBox2.TabStop = false;
+            // 
+            // toolStripStatusLabel0
+            // 
+            this.toolStripStatusLabel0.AutoSize = false;
+            this.toolStripStatusLabel0.Name = "toolStripStatusLabel0";
+            this.toolStripStatusLabel0.Size = new System.Drawing.Size(100, 23);
+            this.toolStripStatusLabel0.Text = "Original";
+            // 
+            // modeToolStripMenuItem
+            // 
+            this.modeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.originalToolStripMenuItem,
+            this.negativeToolStripMenuItem});
+            this.modeToolStripMenuItem.Name = "modeToolStripMenuItem";
+            this.modeToolStripMenuItem.Size = new System.Drawing.Size(71, 26);
+            this.modeToolStripMenuItem.Text = "mode";
+            // 
+            // originalToolStripMenuItem
+            // 
+            this.originalToolStripMenuItem.Name = "originalToolStripMenuItem";
+            this.originalToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.originalToolStripMenuItem.Text = "Original";
+            this.originalToolStripMenuItem.Click += new System.EventHandler(this.originalToolStripMenuItem_Click);
+            // 
+            // negativeToolStripMenuItem
+            // 
+            this.negativeToolStripMenuItem.Name = "negativeToolStripMenuItem";
+            this.negativeToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.negativeToolStripMenuItem.Text = "Negative";
+            this.negativeToolStripMenuItem.Click += new System.EventHandler(this.negativeToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -244,12 +294,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
+            groupBox3.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -265,6 +317,11 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.ToolStripMenuItem modeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem originalToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem negativeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel0;
     }
 }
 

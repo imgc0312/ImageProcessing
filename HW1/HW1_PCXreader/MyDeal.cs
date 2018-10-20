@@ -190,5 +190,19 @@ namespace HW1_PCXreader
             series.Points.DataBindXY(xValue, yValue);
             return series;
         }
+
+        public static Bitmap negative(Bitmap src)
+        {
+            Bitmap output = (Bitmap)src.Clone();
+            for(int i = 0; i < output.Width ; i++)
+            {
+                for(int j = 0; j < output.Height; j++)
+                {              
+                    Color ori = output.GetPixel(i, j);
+                    output.SetPixel(i, j, Color.FromArgb(255 - ori.R, 255 - ori.G, 255 - ori.B));
+                }
+            }
+            return output;
+        }
     }
 }

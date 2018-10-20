@@ -41,8 +41,8 @@ namespace HW1_PCXreader
             "paletteInfo ",
             "H Screen Size , V Screen Size "
         };
-        
-        int selMode = 0;   // 0:origin , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        enum imgMode : int{ ORI, NEG, GRAY, R, G, B};
+        int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         int mode
         {
             get
@@ -53,17 +53,24 @@ namespace HW1_PCXreader
             {
                 selMode = value;
                 pictureBox1.Image = imgView;
+                pictureBox2.Image = pleView;
+                buildChart();
             }
         }
         Bitmap originBitmap;
+        Bitmap originPle;
+        Bitmap negativeBitmap;
+        Bitmap negativePle;
         Bitmap imgView
         {
             get
             {
                 switch (mode)
                 {
-                    case 0:
+                    case (int)imgMode.ORI:
                         return originBitmap;
+                    case (int)imgMode.NEG:
+                        return negativeBitmap;
                     default:
                         return originBitmap;
                 }
@@ -72,6 +79,28 @@ namespace HW1_PCXreader
             set
             {
                 originBitmap = new Bitmap(value);
+                negativeBitmap = MyDeal.negative(value);
+            }
+        }
+        Bitmap pleView
+        {
+            get
+            {
+                switch (mode)
+                {
+                    case (int)imgMode.ORI:
+                        return originPle;
+                    case (int)imgMode.NEG:
+                        return negativePle;
+                    default:
+                        return originPle;
+                }
+
+            }
+            set
+            {
+                originPle = new Bitmap(value);
+                negativePle = MyDeal.negative(value);
             }
         }
         Series seriesR = new Series("R");
@@ -134,8 +163,8 @@ namespace HW1_PCXreader
             }
             textBox1.Lines = PCXinfo(thePCX);
             imgView = thePCX.getView();
-            buildChart();
-            pictureBox1.Image = imgView;
+            pleView = thePCX.getPalette();
+            mode = (int)imgMode.ORI;
             MessageBox.Show(filePath, "開啟檔案");
         }
 
@@ -145,13 +174,13 @@ namespace HW1_PCXreader
             {
                 chart1.Series.Clear();
 
-                seriesR = MyDeal.buildSeries(originBitmap, (int)MyDeal.colorMode.R);
+                seriesR = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
                 chart1.Series.Add(seriesR);
 
-                seriesG = MyDeal.buildSeries(originBitmap, (int)MyDeal.colorMode.G);
+                seriesG = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
                 chart1.Series.Add(seriesG);
 
-                seriesB = MyDeal.buildSeries(originBitmap, (int)MyDeal.colorMode.B);
+                seriesB = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
                 chart1.Series.Add(seriesB);
             }
             catch(Exception e)
@@ -249,5 +278,16 @@ namespace HW1_PCXreader
             toolStripStatusLabel2.Text = "( R , G , B )";
         }
 
+        private void originalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabel0.Text = "Original";
+            mode = (int)imgMode.ORI;
+        }
+
+        private void negativeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabel0.Text = "Negative";
+            mode = (int)imgMode.NEG;
+        }
     }
 }
