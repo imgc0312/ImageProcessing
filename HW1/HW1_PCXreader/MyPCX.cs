@@ -79,11 +79,14 @@ namespace HW1_PCXreader
         static int palette256Space = 768;
         static int headerSize = 128;
         public PCXHeader header ;
-        public int width { get { return header.Xmax - header.Xmin + 1; } }
+        public int width { get { return header.Xmax - header.Xmin + 1;/*return header.bytesPerLine;*/ } }
         public int height { get { return header.Ymax - header.Ymin + 1; } }
         public byte[] data ;
         public byte[] colorPalette ;
         public Pen[] palette;
+        public static int pleCols = 32;
+        public static int pleRows = 256 / pleCols;
+        public static int blockSize = 10;
 
         public MyPCX()
         {
@@ -123,39 +126,60 @@ namespace HW1_PCXreader
         void setAllByBytes(byte[] bytes, int byteSize)
         {
             header.set(bytes);
-            //if (header.version == 5)
-            //{
-            //    MyDeal.setBytesByBytes(data, bytes, headerSize, byteSize - palette256Space - headerSize); //set data  //set palette 
-            //    MyDeal.setBytesByBytes(colorPalette, bytes, byteSize - palette256Space - 1, palette256Space);  //set palette 
-            //}
-            //else
-            //{
-            //    MyDeal.setBytesByBytes(data, bytes, headerSize, byteSize - headerSize);    //set data
-            //}
-            MyDeal.setBytesByBytes(ref data, bytes, headerSize, byteSize - palette256Space - headerSize);  //set data
-            MyDeal.setBytesByBytes(ref colorPalette, bytes, byteSize - palette256Space , palette256Space);  //set palette 
-            setPalette();
+            switch (header.nPlanes)
+            {
+                case 1:
+                    MyDeal.setBytesByBytes(ref data, bytes, headerSize, byteSize - palette256Space - headerSize);  //set data
+                    MyDeal.setBytesByBytes(ref colorPalette, bytes, byteSize - palette256Space, palette256Space);  //set palette 
+                    setPalette();
+                    break;
+                case 3:
+                    MyDeal.setBytesByBytes(ref data, bytes, headerSize, byteSize - headerSize);    //set data
+                    colorPalette = null;
+                    setPalette();
+                    break;
+                default:
+                    MyDeal.setBytesByBytes(ref data, bytes, headerSize, byteSize - palette256Space - headerSize);  //set data
+                    MyDeal.setBytesByBytes(ref colorPalette, bytes, byteSize - palette256Space, palette256Space);  //set palette 
+                    setPalette();
+                    break;
+            }
         }
 
         private void setPalette()
         {
             if (colorPalette == null)
+            {
+                palette = null;
                 return;
+            }
             palette = new Pen[256];
             for(int index = 0; index < 256; index ++)
             {
-
                 palette[index] = new Pen(Color.FromArgb(colorPalette[3 * index + 0], colorPalette[3 * index + 1], colorPalette[3 * index + 2]));
                 //palette[index].Color = Color.FromArgb(colorPalette[3 * index + 0], colorPalette[3 * index + 1], colorPalette[3 * index + 2]);
             }
         }
-        
         public Bitmap getView()
+        {
+            switch (header.nPlanes)
+            {
+                case 1:
+                    return getView1();
+                case 3:
+                    return getView3();
+                default:
+                    return getView1();
+            }
+        }
+
+        public Bitmap getView1()
         {
             Bitmap image = new Bitmap(width, height);
             Graphics imageGraphics = Graphics.FromImage(image);
             //write pixel by imageGraphics
             int colored = 0;
+            int coloredLine = 0;
             if (data == null)
             {
                 Debug.Print("data empty:getView()");
@@ -170,31 +194,24 @@ namespace HW1_PCXreader
             {
                 try
                 {
+                    if(colored >= width)
+                    {
+                        colored = 0;
+                        coloredLine++;
+                        index += header.bytesPerLine - width;//there has some null in per line
+                    }
+
                     byte one = data[index];
                     if (one >= 0xc0) // 2 high bits set
                     {
                         byte two = data[++index];
-                        
-                        for (int RL = (one & 0x3f); RL > 0;)
-                        {
-                            int L = width - (colored % width);
-                            if (L < RL)
-                            {
-                                imageGraphics.DrawRectangle(palette[two], colored % width, colored / width, L, 1);
-                                RL -= L;
-                                colored += L;
-                            }
-                            else
-                            {
-                                imageGraphics.DrawRectangle(palette[two ], colored % width, colored / width, RL, 1);
-                                colored += RL;
-                                RL = 0;
-                            }
-                        }
+                        int RL = (one & 0x3f);
+                        imageGraphics.DrawRectangle(palette[two], colored % width, coloredLine, RL, 1);
+                        colored += RL;
                     }
                     else
                     {
-                        imageGraphics.DrawRectangle(palette[one ], colored % width, colored / width, 1, 1);
+                        imageGraphics.DrawRectangle(palette[one], colored % width, coloredLine, 1, 1);
                         colored++;
                     }
                 }
@@ -203,7 +220,61 @@ namespace HW1_PCXreader
                     Debug.Print("one or two empty:getView() " + e.ToString());
                     return image;
                 }
-                if (colored >= width * height)
+                if (coloredLine >= height)
+                    break;
+            }
+            return image;
+        }
+
+        public Bitmap getView3()
+        {
+            Bitmap image = new Bitmap(width, height);
+            Graphics imageGraphics = Graphics.FromImage(image);
+            //write pixel by imageGraphics
+            int colored = 0;
+            int coloredLine = 0;
+            byte[] rowData = new byte[header.bytesPerLine * header.bytesPerLine];//there may has some null in per line end
+            if (data == null)
+            {
+                Debug.Print("data empty:getView()");
+                return null;
+            }
+            for (int index = 0; index < data.Length; index ++)
+            {
+                try
+                {
+                    byte one = data[index];
+                    if (one >= 0xc0) // 2 high bits set
+                    {
+                        byte two = data[++index];
+                        for(int i = (one & 0x3f); i > 0; i--)
+                        {
+                            rowData[colored] = two;
+                            colored++;
+                        }
+                    }
+                    else
+                    {
+                        rowData[colored] = one;
+                        colored++;
+                    }
+
+                    if(colored >=  3 * header.bytesPerLine)
+                    {
+                        for(int i = 0; i < width; i++)
+                        {
+                            imageGraphics.DrawRectangle(new Pen(Color.FromArgb(rowData[i], rowData[i + header.bytesPerLine] , rowData[i + 2 * header.bytesPerLine])), i, coloredLine, 1, 1);
+                        }
+                        colored = 0;
+                        coloredLine++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Print("colored " + colored +" :getView() " + e.ToString());
+                    return image;
+                }
+                if (coloredLine >= height)
                     break;
             }
             return image;
@@ -211,15 +282,13 @@ namespace HW1_PCXreader
 
         public Bitmap getPalette()
         {
-            int pleCols = 32;
-            int pleRows = 256 / pleCols;
-            int blockSize = 10;
             Bitmap image = new Bitmap(pleCols * blockSize, pleRows*blockSize);
             Graphics imageGraphics = Graphics.FromImage(image);
             //write pixel by imageGraphics
             if (palette == null)
             {
-                Debug.Print("palette empty:getView()");
+                if(header.nPlanes == 1) //need to use palette
+                    Debug.Print("palette empty:getView()");
                 return null;
             }
             for (int index = 0; index < 256; index++)

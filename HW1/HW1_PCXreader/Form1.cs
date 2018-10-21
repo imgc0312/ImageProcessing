@@ -41,7 +41,7 @@ namespace HW1_PCXreader
             "paletteInfo ",
             "H Screen Size , V Screen Size "
         };
-        enum imgMode : int{ ORI, NEG, GRAY, R, G, B};
+        enum imgMode : int{ ORI, NEG, GRAY, R, G, B};// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         int mode
         {
@@ -55,12 +55,29 @@ namespace HW1_PCXreader
                 pictureBox1.Image = imgView;
                 pictureBox2.Image = pleView;
                 buildChart();
+                switch (value)
+                {
+                    case (int)imgMode.ORI:
+                        toolStripStatusLabel0.Text = "Original";
+                        break;
+                    case (int)imgMode.NEG:
+                        toolStripStatusLabel0.Text = "Negative";
+                        break;
+                    case (int)imgMode.GRAY:
+                        toolStripStatusLabel0.Text = "Gray";
+                        break;
+                    default:
+                        toolStripStatusLabel0.Text = "Unknown";
+                        break;
+                }
             }
         }
         Bitmap originBitmap;
         Bitmap originPle;
         Bitmap negativeBitmap;
         Bitmap negativePle;
+        Bitmap grayBitmap;
+        Bitmap grayPle;
         Bitmap imgView
         {
             get
@@ -70,7 +87,13 @@ namespace HW1_PCXreader
                     case (int)imgMode.ORI:
                         return originBitmap;
                     case (int)imgMode.NEG:
+                        if (negativeBitmap == null)
+                            negativeBitmap = MyDeal.negative(originBitmap);
                         return negativeBitmap;
+                    case (int)imgMode.GRAY:
+                        if (grayBitmap == null)
+                            grayBitmap = MyDeal.gray(originBitmap);
+                        return grayBitmap;
                     default:
                         return originBitmap;
                 }
@@ -79,7 +102,10 @@ namespace HW1_PCXreader
             set
             {
                 originBitmap = new Bitmap(value);
-                negativeBitmap = MyDeal.negative(value);
+                negativeBitmap = null;
+                grayBitmap = null;
+                //negativeBitmap = MyDeal.negative(value);
+                //grayBitmap = MyDeal.gray(value);
             }
         }
         Bitmap pleView
@@ -91,7 +117,13 @@ namespace HW1_PCXreader
                     case (int)imgMode.ORI:
                         return originPle;
                     case (int)imgMode.NEG:
+                        if(negativePle == null)
+                            negativePle = MyDeal.negative(originPle);
                         return negativePle;
+                    case (int)imgMode.GRAY:
+                        if (grayPle == null)
+                            grayPle = MyDeal.gray(originPle);
+                        return grayPle;
                     default:
                         return originPle;
                 }
@@ -99,14 +131,42 @@ namespace HW1_PCXreader
             }
             set
             {
-                originPle = new Bitmap(value);
-                negativePle = MyDeal.negative(value);
+                if(value == null)
+                {
+                    originPle = null;
+                    negativePle = null;
+                    grayPle = null;
+                }
+                else
+                {
+                    originPle = new Bitmap(value);
+                    negativePle = null;
+                    grayPle = null;
+                    //negativePle = MyDeal.negative(value);
+                    //grayPle = MyDeal.gray(value);
+                }
+                
             }
         }
-        Series seriesR = new Series("R");
-        Series seriesG = new Series("G");
-        Series seriesB = new Series("B");
-
+        Series seriesT ;
+        Series seriesR ;
+        Series seriesG ;
+        Series seriesB ;
+        string colorLabel
+        {
+            get
+            {
+                switch (mode)
+                {
+                    case (int)imgMode.GRAY:
+                        return "( value )";
+                    case (int)imgMode.ORI:
+                    case (int)imgMode.NEG:
+                    default:
+                        return "( R , G , B )";
+                }
+            }
+        }
 
         /// <summary>
         /// function-->
@@ -132,6 +192,20 @@ namespace HW1_PCXreader
                 text += oneLine + "\r\n";
             }
             return text;
+        }
+
+        private string getColorLabel(Color get)
+        {
+            switch (mode)
+            {
+                case (int)imgMode.GRAY:
+                    return "( " + get.R + " )";
+                    break;
+                case (int)imgMode.ORI:
+                case (int)imgMode.NEG:
+                    return "( " + get.R + " , " + get.G + " , " + get.B + " )";
+            }
+            return colorLabel;
         }
 
         private string[] PCXinfo(MyPCX thePCX)
@@ -173,15 +247,27 @@ namespace HW1_PCXreader
             try
             {
                 chart1.Series.Clear();
+                if (imgView == null)
+                    return;
+                switch (mode)
+                {
+                    case (int)imgMode.GRAY:
+                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.GRAY);
+                        chart1.Series.Add(seriesT);
+                        return;
+                    case (int)imgMode.ORI:
+                    case (int)imgMode.NEG:
+                    default:
+                        seriesR = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
+                        chart1.Series.Add(seriesR);
 
-                seriesR = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
-                chart1.Series.Add(seriesR);
+                        seriesG = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
+                        chart1.Series.Add(seriesG);
 
-                seriesG = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
-                chart1.Series.Add(seriesG);
-
-                seriesB = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
-                chart1.Series.Add(seriesB);
+                        seriesB = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
+                        chart1.Series.Add(seriesB);
+                        return;
+                }
             }
             catch(Exception e)
             {
@@ -251,43 +337,98 @@ namespace HW1_PCXreader
                 if (X >= 0 && X < imgW && Y >= 0 && Y < imgH)
                 {
                     toolStripStatusLabel1.Text = "( " + X + " , " + Y + " )";
-                    if (originBitmap != null)
+                    if (imgView != null)
                     {
-                        Color color = originBitmap.GetPixel(X, Y);
-                        toolStripStatusLabel2.Text = "( " + color.R + " , " + color.G + " , " + color.B + " )";
+                        Color color = imgView.GetPixel(X, Y);
+                        toolStripStatusLabel2.Text = getColorLabel(color);
                     }
                     else
-                        toolStripStatusLabel2.Text = "( R , G , B )";
+                        toolStripStatusLabel2.Text = colorLabel;
                 }
                 else
                 {
                     toolStripStatusLabel1.Text = "( X , Y )";
-                    toolStripStatusLabel2.Text = "( R , G , B )";
+                    toolStripStatusLabel2.Text = colorLabel;
                 }
             }
             catch
             {
                 toolStripStatusLabel1.Text = "( X , Y )";
-                toolStripStatusLabel2.Text = "( R , G , B )";
+                toolStripStatusLabel2.Text = colorLabel;
             }
         }
 
         private void pictureBox1_MouseLeave(object sender, EventArgs e)
         {
             toolStripStatusLabel1.Text = "( X , Y )";
-            toolStripStatusLabel2.Text = "( R , G , B )";
+            toolStripStatusLabel2.Text = colorLabel;
         }
 
         private void originalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel0.Text = "Original";
             mode = (int)imgMode.ORI;
         }
 
         private void negativeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel0.Text = "Negative";
             mode = (int)imgMode.NEG;
         }
+
+        private void grayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mode = (int)imgMode.GRAY;
+        }
+
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            int X, Y;   //location in image
+            int boxW = pictureBox2.Width;
+            int boxH = pictureBox2.Height;
+            int imgW, imgH;
+            if (pictureBox2.Image == null)
+            {
+                imgW = boxW;
+                imgH = boxH;
+            }
+            else
+            {
+                imgW = pictureBox2.Image.Width;
+                imgH = pictureBox2.Image.Height;
+            }
+            X = e.X + (imgW - boxW) / 2;
+            Y = e.Y + (imgH - boxH) / 2;
+            try
+            {
+                if (X >= 0 && X < imgW && Y >= 0 && Y < imgH)
+                {
+                    int index = (Y / MyPCX.blockSize) * MyPCX.pleCols + (X / MyPCX.blockSize);
+                    toolStripStatusLabel1.Text = "( " + "# " + index + " )";
+                    if (pleView != null)
+                    {
+                        Color color = pleView.GetPixel(X, Y);
+                        toolStripStatusLabel2.Text = getColorLabel(color);
+                    }
+                    else
+                        toolStripStatusLabel2.Text = colorLabel;
+                }
+                else
+                {
+                    toolStripStatusLabel1.Text = "( # Number )";
+                    toolStripStatusLabel2.Text = colorLabel;
+                }
+            }
+            catch
+            {
+                toolStripStatusLabel1.Text = "( # Number )";
+                toolStripStatusLabel2.Text = colorLabel;
+            }
+        }
+
+        private void pictureBox2_MouseLeave(object sender, EventArgs e)
+        {
+            toolStripStatusLabel1.Text = "( # Number )";
+            toolStripStatusLabel2.Text = colorLabel;
+        }
+
     }
 }

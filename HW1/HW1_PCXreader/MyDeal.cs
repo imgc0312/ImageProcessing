@@ -12,7 +12,7 @@ namespace HW1_PCXreader
 {
     class MyDeal
     {
-        public enum colorMode : int { R, G, B};
+        public enum colorMode : int { R, G, B, GRAY};
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
             target = new byte[Size];
@@ -165,8 +165,11 @@ namespace HW1_PCXreader
 
         public static Series buildSeries(Bitmap view, int mode)// mode please use the MyDeal.colorMode.*
         {
+            if (view == null)
+                return null;
             Series series = new Series();
             String Name = " ??";
+            series.Color = Color.Pink;
             switch (mode)
             {
                 case (int)colorMode.R:
@@ -181,6 +184,10 @@ namespace HW1_PCXreader
                     Name = "B";
                     series.Color = Color.Blue;
                     break;
+                case (int)colorMode.GRAY:
+                    Name = "gray";
+                    series.Color = Color.DarkGray;
+                    break;
             }
             series.Name = Name;
             string[] xValue = Enumerable.Range(0, 256).ToArray().Select(x => x.ToString()).ToArray();
@@ -193,6 +200,8 @@ namespace HW1_PCXreader
 
         public static Bitmap negative(Bitmap src)
         {
+            if (src == null)
+                return null;
             Bitmap output = (Bitmap)src.Clone();
             for(int i = 0; i < output.Width ; i++)
             {
@@ -200,6 +209,23 @@ namespace HW1_PCXreader
                 {              
                     Color ori = output.GetPixel(i, j);
                     output.SetPixel(i, j, Color.FromArgb(255 - ori.R, 255 - ori.G, 255 - ori.B));
+                }
+            }
+            return output;
+        }
+
+        public static Bitmap gray(Bitmap src)
+        {
+            if (src == null)
+                return null;
+            Bitmap output = (Bitmap)src.Clone();
+            for (int i = 0; i < output.Width; i++)
+            {
+                for (int j = 0; j < output.Height; j++)
+                {
+                    Color ori = output.GetPixel(i, j);
+                    int gray = (299 * ori.R + 587 * ori.G + 114 * ori.B + 500) / 1000;
+                    output.SetPixel(i, j, Color.FromArgb(gray, gray, gray));
                 }
             }
             return output;
