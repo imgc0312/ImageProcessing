@@ -230,5 +230,34 @@ namespace HW1_PCXreader
             }
             return output;
         }
+
+        public static Bitmap selectCh(Bitmap src, int selectColor)//select channel
+        {
+            if (src == null)
+                return null;
+            Bitmap output = (Bitmap)src.Clone();
+            for (int i = 0; i < output.Width; i++)
+            {
+                for (int j = 0; j < output.Height; j++)
+                {
+                    Color ori = output.GetPixel(i, j);
+                    int value = 0;
+                    switch (selectColor)
+                    {
+                        case (int)colorMode.R:
+                            value = ori.R;
+                            break;
+                        case (int)colorMode.B:
+                            value = ori.B;
+                            break;
+                        case (int)colorMode.G:
+                            value = ori.G;
+                            break;
+                    }
+                    output.SetPixel(i, j, Color.FromArgb(value, value, value));
+                }
+            }
+            return output;
+        }
     }
 }

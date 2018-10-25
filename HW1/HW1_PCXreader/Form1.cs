@@ -41,7 +41,7 @@ namespace HW1_PCXreader
             "paletteInfo ",
             "H Screen Size , V Screen Size "
         };
-        enum imgMode : int{ ORI, NEG, GRAY, R, G, B};// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        enum imgMode : int{ ORI, NEG, GRAY, R, G, B , Size };// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         int mode
         {
@@ -53,7 +53,7 @@ namespace HW1_PCXreader
             {
                 selMode = value;
                 pictureBox1.Image = imgView;
-                pictureBox2.Image = pleView;
+                pictureBox2.Image = palView;
                 buildChart();
                 switch (value)
                 {
@@ -66,18 +66,24 @@ namespace HW1_PCXreader
                     case (int)imgMode.GRAY:
                         toolStripStatusLabel0.Text = "Gray";
                         break;
+                    case (int)imgMode.R:
+                        toolStripStatusLabel0.Text = "Red";
+                        break;
+                    case (int)imgMode.G:
+                        toolStripStatusLabel0.Text = "Green";
+                        break;
+                    case (int)imgMode.B:
+                        toolStripStatusLabel0.Text = "Blue";
+                        break;
                     default:
                         toolStripStatusLabel0.Text = "Unknown";
                         break;
                 }
             }
         }
-        Bitmap originBitmap;
-        Bitmap originPle;
-        Bitmap negativeBitmap;
-        Bitmap negativePle;
-        Bitmap grayBitmap;
-        Bitmap grayPle;
+        
+        Bitmap[] Img = new Bitmap[(int)imgMode.Size];//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        Bitmap[] Pal = new Bitmap[(int)imgMode.Size];//palette view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         Bitmap imgView
         {
             get
@@ -85,67 +91,91 @@ namespace HW1_PCXreader
                 switch (mode)
                 {
                     case (int)imgMode.ORI:
-                        return originBitmap;
+                        return Img[0];
                     case (int)imgMode.NEG:
-                        if (negativeBitmap == null)
-                            negativeBitmap = MyDeal.negative(originBitmap);
-                        return negativeBitmap;
+                        if (Img[mode] == null)
+                            Img[mode] = MyDeal.negative(Img[0]);
+                        return Img[mode];
                     case (int)imgMode.GRAY:
-                        if (grayBitmap == null)
-                            grayBitmap = MyDeal.gray(originBitmap);
-                        return grayBitmap;
+                        if (Img[mode] == null)
+                            Img[mode] = MyDeal.gray(Img[0]);
+                        return Img[mode];
+                    case (int)imgMode.R:
+                        if (Img[mode] == null)
+                            Img[mode] = MyDeal.selectCh(Img[0], (int)MyDeal.colorMode.R);
+                        return Img[mode];
+                    case (int)imgMode.B:
+                        if (Img[mode] == null)
+                            Img[mode] = MyDeal.selectCh(Img[0], (int)MyDeal.colorMode.B);
+                        return Img[mode];
+                    case (int)imgMode.G:
+                        if (Img[mode] == null)
+                            Img[mode] = MyDeal.selectCh(Img[0], (int)MyDeal.colorMode.G);
+                        return Img[mode];
                     default:
-                        return originBitmap;
+                        return Img[0];
                 }
-                
             }
             set
             {
-                originBitmap = new Bitmap(value);
-                negativeBitmap = null;
-                grayBitmap = null;
-                //negativeBitmap = MyDeal.negative(value);
-                //grayBitmap = MyDeal.gray(value);
+                if (value == null)
+                {
+                    for (int i = 0; i < (int)imgMode.Size; i++)
+                        Img[i] = null;
+                }
+                else
+                {
+                    Img[0] = new Bitmap(value); // set origin Img
+                    for (int i = 1; i < (int)imgMode.Size; i++) // clear other Img
+                        Img[i] = null;
+                }
             }
         }
-        Bitmap pleView
+        Bitmap palView
         {
             get
             {
                 switch (mode)
                 {
                     case (int)imgMode.ORI:
-                        return originPle;
+                        return Pal[0];
                     case (int)imgMode.NEG:
-                        if(negativePle == null)
-                            negativePle = MyDeal.negative(originPle);
-                        return negativePle;
+                        if(Pal[mode] == null)
+                            Pal[mode] = MyDeal.negative(Pal[0]);
+                        return Pal[mode];
                     case (int)imgMode.GRAY:
-                        if (grayPle == null)
-                            grayPle = MyDeal.gray(originPle);
-                        return grayPle;
+                        if (Pal[mode] == null)
+                            Pal[mode] = MyDeal.gray(Pal[0]);
+                        return Pal[mode];
+                    case (int)imgMode.R:
+                        if (Pal[mode] == null)
+                            Pal[mode] = MyDeal.selectCh(Pal[0], (int)MyDeal.colorMode.R);
+                        return Pal[mode];
+                    case (int)imgMode.B:
+                        if (Pal[mode] == null)
+                            Pal[mode] = MyDeal.selectCh(Pal[0], (int)MyDeal.colorMode.B);
+                        return Pal[mode];
+                    case (int)imgMode.G:
+                        if (Pal[mode] == null)
+                            Pal[mode] = MyDeal.selectCh(Pal[0], (int)MyDeal.colorMode.G);
+                        return Pal[mode];
                     default:
-                        return originPle;
+                        return Pal[0];
                 }
-
             }
             set
             {
-                if(value == null)
+                if (value == null)
                 {
-                    originPle = null;
-                    negativePle = null;
-                    grayPle = null;
+                    for (int i = 0; i < (int)imgMode.Size; i++)
+                        Pal[i] = null;
                 }
                 else
                 {
-                    originPle = new Bitmap(value);
-                    negativePle = null;
-                    grayPle = null;
-                    //negativePle = MyDeal.negative(value);
-                    //grayPle = MyDeal.gray(value);
+                    Pal[0] = new Bitmap(value); // set origin pal
+                    for (int i = 1; i < (int)imgMode.Size; i++) // clear other pal
+                        Pal[i] = null;
                 }
-                
             }
         }
         Series seriesT ;
@@ -159,6 +189,9 @@ namespace HW1_PCXreader
                 switch (mode)
                 {
                     case (int)imgMode.GRAY:
+                    case (int)imgMode.R:
+                    case (int)imgMode.G:
+                    case (int)imgMode.B:
                         return "( value )";
                     case (int)imgMode.ORI:
                     case (int)imgMode.NEG:
@@ -199,6 +232,9 @@ namespace HW1_PCXreader
             switch (mode)
             {
                 case (int)imgMode.GRAY:
+                case (int)imgMode.R:
+                case (int)imgMode.G:
+                case (int)imgMode.B:
                     return "( " + get.R + " )";
                     break;
                 case (int)imgMode.ORI:
@@ -237,7 +273,7 @@ namespace HW1_PCXreader
             }
             textBox1.Lines = PCXinfo(thePCX);
             imgView = thePCX.getView();
-            pleView = thePCX.getPalette();
+            palView = thePCX.getPalette();
             mode = (int)imgMode.ORI;
             MessageBox.Show(filePath, "開啟檔案");
         }
@@ -253,6 +289,18 @@ namespace HW1_PCXreader
                 {
                     case (int)imgMode.GRAY:
                         seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.GRAY);
+                        chart1.Series.Add(seriesT);
+                        return;
+                    case (int)imgMode.R:
+                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
+                        chart1.Series.Add(seriesT);
+                        return;
+                    case (int)imgMode.G:
+                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
+                        chart1.Series.Add(seriesT);
+                        return;
+                    case (int)imgMode.B:
+                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.ORI:
@@ -379,6 +427,21 @@ namespace HW1_PCXreader
             mode = (int)imgMode.GRAY;
         }
 
+        private void RedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mode = (int)imgMode.R;
+        }
+
+        private void GreenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mode = (int)imgMode.G;
+        }
+
+        private void BlueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mode = (int)imgMode.B;
+        }
+
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
         {
             int X, Y;   //location in image
@@ -403,9 +466,9 @@ namespace HW1_PCXreader
                 {
                     int index = (Y / MyPCX.blockSize) * MyPCX.pleCols + (X / MyPCX.blockSize);
                     toolStripStatusLabel1.Text = "( " + "# " + index + " )";
-                    if (pleView != null)
+                    if (palView != null)
                     {
-                        Color color = pleView.GetPixel(X, Y);
+                        Color color = palView.GetPixel(X, Y);
                         toolStripStatusLabel2.Text = getColorLabel(color);
                     }
                     else
