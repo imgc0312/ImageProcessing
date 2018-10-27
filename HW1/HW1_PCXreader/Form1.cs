@@ -29,17 +29,17 @@ namespace HW1_PCXreader
         }
         MyPCX thePCX = new MyPCX();
         string[] info = new string[]{
-            "File Name ",
-            "Manufacturer ",
-            "Version ",
-            "Encoding ",
-            "Bits Per Pixel ",
-            "Xmin , Xmax, Ymin, Ymax ",
-            "Hdpi , Vdpi ",
-            "nPlanes ",
-            "bytesPerLine ",
-            "paletteInfo ",
-            "H Screen Size , V Screen Size "
+            "File Name \t\t:\t",
+            "Manufacturer \t\t:\t",
+            "Version \t\t\t:\t",
+            "Encoding \t\t\t:\t",
+            "Bits Per Pixel \t\t:\t",
+            "Xmin , Xmax, Ymin, Ymax \t:\t",
+            "Hdpi , Vdpi \t\t:\t",
+            "nPlanes \t\t\t:\t",
+            "bytesPerLine \t\t:\t",
+            "paletteInfo \t\t:\t",
+            "H Screen Size , V Screen Size :\t"
         };
         enum imgMode : int{ ORI, NEG, GRAY, R, G, B , Size };// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
@@ -215,6 +215,10 @@ namespace HW1_PCXreader
             openFileDialog1.CheckFileExists = true;
             openFileDialog1.CheckPathExists = true;
             textBox1.Lines = info;
+            foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
+            {
+                item.Enabled = false;
+            }
         }
 
         private string textFromLines(string[] lines)
@@ -236,7 +240,6 @@ namespace HW1_PCXreader
                 case (int)imgMode.G:
                 case (int)imgMode.B:
                     return "( " + get.R + " )";
-                    break;
                 case (int)imgMode.ORI:
                 case (int)imgMode.NEG:
                     return "( " + get.R + " , " + get.G + " , " + get.B + " )";
@@ -248,24 +251,28 @@ namespace HW1_PCXreader
         {
             string[] newLines = new string[info.Length];
             info.CopyTo(newLines, 0);
-            newLines[0] += "\t\t:\t" + fileName;
-            newLines[1] += "\t\t:\t" + thePCX.header.manufacturer;
-            newLines[2] += "\t\t\t:\t" + thePCX.header.version;
-            newLines[3] += "\t\t\t:\t" + thePCX.header.encoding;
-            newLines[4] += "\t\t:\t" + thePCX.header.bitsPerPixel;
-            newLines[5] += "\t:\t( " + thePCX.header.Xmin + " , " +thePCX.header.Ymin + " , " + thePCX.header.Xmax + " , " + thePCX.header.Ymax + " )";
-            newLines[6] += "\t\t:\t( " + thePCX.header.Hdpi + " , " + thePCX.header.Vdpi + " )";
-            newLines[7] += "\t\t\t:\t" + thePCX.header.nPlanes;
-            newLines[8] += "\t\t:\t" + thePCX.header.bytesPerLine;
-            newLines[9] += "\t\t:\t" + thePCX.header.paletteInfo;
-            newLines[10] += ":\t( " + thePCX.header.hScreenSize + " , " + thePCX.header.vScreenSize + " )";
+            newLines[0] += "" + fileName;
+            newLines[1] += "" + thePCX.header.manufacturer;
+            newLines[2] += "" + thePCX.header.version;
+            newLines[3] += "" + thePCX.header.encoding;
+            newLines[4] += "" + thePCX.header.bitsPerPixel;
+            newLines[5] += "( " + thePCX.header.Xmin + " , " +thePCX.header.Ymin + " , " + thePCX.header.Xmax + " , " + thePCX.header.Ymax + " )";
+            newLines[6] += "( " + thePCX.header.Hdpi + " , " + thePCX.header.Vdpi + " )";
+            newLines[7] += "" + thePCX.header.nPlanes;
+            newLines[8] += "" + thePCX.header.bytesPerLine;
+            newLines[9] += "" + thePCX.header.paletteInfo;
+            newLines[10] += "( " + thePCX.header.hScreenSize + " , " + thePCX.header.vScreenSize + " )";
             return newLines;
         }
 
         private void openPCX(string filePath)
         {
             fileName = filePath;
-            thePCX.from(filePath);
+            if (!thePCX.from(filePath))
+            {
+                MessageBox.Show(filePath, "開啟失敗");
+                return;
+            }
             if (pictureBox1.Image != null)
             {
                 pictureBox1.Image.Dispose();
@@ -275,7 +282,11 @@ namespace HW1_PCXreader
             imgView = thePCX.getView();
             palView = thePCX.getPalette();
             mode = (int)imgMode.ORI;
-            MessageBox.Show(filePath, "開啟檔案");
+            MessageBox.Show(filePath, "開啟成功");
+            foreach(ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
+            {
+                item.Enabled = true;
+            }
         }
 
         private void buildChart()
