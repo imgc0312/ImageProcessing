@@ -215,7 +215,7 @@ namespace HW1_PCXreader
             openFileDialog1.CheckFileExists = true;
             openFileDialog1.CheckPathExists = true;
             textBox1.Lines = info;
-            foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
+            foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// lock image mode 
             {
                 item.Enabled = false;
             }
