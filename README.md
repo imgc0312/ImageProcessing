@@ -13,3 +13,6 @@ IMAGE PROCESSING CLASS HW
 > 無套件檢視pcx擋 、 直方圖 、 負片效果 等 <br/>
 ![HW1 demo1](view1.PNG)
 ![HW1 demo2](view2.PNG)
++ 2 <br/>
+> threshold <br/>
+> 其他 開發中 <br/>
