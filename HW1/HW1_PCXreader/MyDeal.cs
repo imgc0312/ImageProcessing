@@ -259,5 +259,80 @@ namespace HW1_PCXreader
             }
             return output;
         }
+
+        public static Bitmap threshold(Bitmap src, int bound, int channel)
+        {
+            Bitmap dst;
+            Color get,use;
+            int value;
+            int maxVal = 0;
+            if (src == null)
+                return null;
+            dst = (Bitmap)src.Clone();
+            switch (channel)
+            {
+                case 1:// R
+                    for(int i = 0; i < dst.Width; i++)
+                    {
+                        for(int j = 0; j < dst.Height; j++)
+                        {
+                            get = dst.GetPixel(i,j);
+                            value = threshold(get.R, bound, maxVal, 0);
+                            use = Color.FromArgb(get.A, value, get.G, get.B);
+                            dst.SetPixel(i, j, use);
+                        }
+                    }
+                    break;
+                case 2:// G
+                    for (int i = 0; i < dst.Width; i++)
+                    {
+                        for (int j = 0; j < dst.Height; j++)
+                        {
+                            get = dst.GetPixel(i, j);
+                            value = threshold(get.G, bound, maxVal, 0);
+                            use = Color.FromArgb(get.A, get.R, value, get.B);
+                            dst.SetPixel(i, j, use);
+                        }
+                    }
+                    break;
+                case 3:// B
+                    for (int i = 0; i < dst.Width; i++)
+                    {
+                        for (int j = 0; j < dst.Height; j++)
+                        {
+                            get = dst.GetPixel(i, j);
+                            value = threshold(get.B, bound, maxVal, 0);
+                            use = Color.FromArgb(get.A, get.R, get.G, value);
+                            dst.SetPixel(i, j, use);
+                        }
+                    }
+                    break;
+                default:
+                    for (int i = 0; i < dst.Width; i++)
+                    {
+                        for (int j = 0; j < dst.Height; j++)
+                        {
+                            get = dst.GetPixel(i, j);
+                            value = threshold(get.R, bound, maxVal, 0);
+                            use = Color.FromArgb(get.A, value, value, value);
+                            dst.SetPixel(i, j, use);
+                        }
+                    }
+                    break;
+            }
+            return dst;
+        }
+
+        public static int threshold(int input, int bound, int output, int method)
+        {
+            switch (method)
+            {
+                default:
+                    if (input < bound)
+                        return output;
+                    else
+                        return input;
+            }
+        }
     }
 }

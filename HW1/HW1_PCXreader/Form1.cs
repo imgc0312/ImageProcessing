@@ -14,8 +14,8 @@ namespace HW1_PCXreader
 {
     public partial class Form1 : Form
     {
-        string filePath = "unset";
-        string fileName
+        public string filePath = "unset";
+        public string fileName
         {
             get
             {
@@ -27,8 +27,8 @@ namespace HW1_PCXreader
                 filePath = value;
             }
         }
-        MyPCX thePCX = new MyPCX();
-        string[] info = new string[]{
+        public MyPCX thePCX = new MyPCX();
+        public string[] info = new string[]{
             "File Name \t\t:\t",
             "Manufacturer \t\t:\t",
             "Version \t\t\t:\t",
@@ -41,9 +41,9 @@ namespace HW1_PCXreader
             "paletteInfo \t\t:\t",
             "H Screen Size , V Screen Size :\t"
         };
-        enum imgMode : int{ ORI, NEG, GRAY, R, G, B , Size };// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        int mode
+        public enum imgMode : int{ ORI, NEG, GRAY, R, G, B , Size };// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        public int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        public int mode
         {
             get
             {
@@ -81,10 +81,10 @@ namespace HW1_PCXreader
                 }
             }
         }
-        
-        Bitmap[] Img = new Bitmap[(int)imgMode.Size];//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+
+        public Bitmap[] Img = new Bitmap[(int)imgMode.Size];//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         Bitmap[] Pal = new Bitmap[(int)imgMode.Size];//palette view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        Bitmap imgView
+        public Bitmap imgView
         {
             get
             {
@@ -131,7 +131,7 @@ namespace HW1_PCXreader
                 }
             }
         }
-        Bitmap palView
+        public Bitmap palView
         {
             get
             {
@@ -182,7 +182,7 @@ namespace HW1_PCXreader
         Series seriesR ;
         Series seriesG ;
         Series seriesB ;
-        string colorLabel
+        public string colorLabel
         {
             get
             {
@@ -504,5 +504,10 @@ namespace HW1_PCXreader
             toolStripStatusLabel2.Text = colorLabel;
         }
 
+        private void thresholdToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Threshold form2 = new Form_Threshold(this);
+            form2.ShowDialog();
+        }
     }
 }

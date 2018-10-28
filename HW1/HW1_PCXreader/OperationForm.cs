@@ -14,8 +14,8 @@ namespace HW1_PCXreader
 {
     public partial class OperationForm : Form
     {
-        protected string filePath = "unset";
-        protected string fileName
+        public string filePath = "unset";
+        public string fileName
         {
             get
             {
@@ -27,8 +27,8 @@ namespace HW1_PCXreader
                 filePath = value;
             }
         }
-        protected MyPCX thePCX = new MyPCX();
-        protected string[] info = new string[]{
+        public MyPCX thePCX = new MyPCX();
+        public string[] info = new string[]{
             "File Name \t\t:\t",
             "Manufacturer \t\t:\t",
             "Version \t\t\t:\t",
@@ -42,8 +42,9 @@ namespace HW1_PCXreader
             "H Screen Size , V Screen Size :\t"
         };
         public enum imgMode : int { ORI, NEG, GRAY, R, G, B, Size };// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        protected int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        protected int mode
+        public int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        public int chUse = 0x7;// channel use binary number ARGB
+        public virtual int mode
         {
             get
             {
@@ -57,31 +58,39 @@ namespace HW1_PCXreader
                 {
                     case (int)imgMode.ORI:
                         toolStripStatusLabel0.Text = "Original";
+                        chUse = 0x7;
                         break;
                     case (int)imgMode.NEG:
                         toolStripStatusLabel0.Text = "Negative";
+                        chUse = 0x7;
                         break;
                     case (int)imgMode.GRAY:
                         toolStripStatusLabel0.Text = "Gray";
+                        chUse = 0x4;
                         break;
                     case (int)imgMode.R:
                         toolStripStatusLabel0.Text = "Red";
+                        chUse = 0x4;
                         break;
                     case (int)imgMode.G:
                         toolStripStatusLabel0.Text = "Green";
+                        chUse = 0x4;
                         break;
                     case (int)imgMode.B:
                         toolStripStatusLabel0.Text = "Blue";
+                        chUse = 0x4;
                         break;
                     default:
                         toolStripStatusLabel0.Text = "Unknown";
+                        chUse = 0x7;
                         break;
                 }
             }
         }
 
         protected Bitmap[] Img = new Bitmap[(int)imgMode.Size];//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        protected Bitmap imgView
+        protected Bitmap OutImg = null;//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
+        public Bitmap imgView
         {
             get
             {
@@ -128,11 +137,23 @@ namespace HW1_PCXreader
                 }
             }
         }
+        public Bitmap outView
+        {
+            get
+            {
+                return OutImg;
+            }
+            set
+            {
+                OutImg = value;
+                pictureBox2.Image = OutImg;
+            }
+        }
         protected Series seriesT;
         protected Series seriesR;
         protected Series seriesG;
         protected Series seriesB;
-        protected string colorLabel
+        public string colorLabel
         {
             get
             {
@@ -150,6 +171,20 @@ namespace HW1_PCXreader
                 }
             }
         }
+        private bool dataClear = true;//data is clear
+        protected virtual bool openEnable
+        {
+            get
+            {
+                return dataClear;
+            }
+            set
+            {
+                dataClear = value;
+                openFileToolStripMenuItem.Enabled = value;
+                clearToolStripMenuItem.Enabled = !value;
+            }
+        }
 
         /// <summary>
         /// function-->
@@ -158,13 +193,43 @@ namespace HW1_PCXreader
         public OperationForm()
         {
             InitializeComponent();
+            initialForm();
+            openEnable = true;
+        }
+
+        public OperationForm(Form1 form1)
+        {
+            InitializeComponent();
+            initialForm();
+
+            for (int i = 0; i < form1.Img.Length; i++)
+            {
+                if (form1.Img[i] == null)
+                    Img[i] = null;
+                else
+                    Img[i] = (Bitmap)form1.Img[i].Clone();
+            }
+            mode = form1.mode;
+            if(imgView != null)
+            {
+                foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
+                {
+                    item.Enabled = true;
+                }
+                openEnable = false;
+            }
+
+        }
+
+        protected void initialForm()
+        {
             //openFileDialog Setting
             openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "PCX file(*.pcx)|*.pcx";
             openFileDialog1.Title = "Select a PCX file";
             openFileDialog1.CheckFileExists = true;
             openFileDialog1.CheckPathExists = true;
-            
+
             //set mode tag in menu item
             originalToolStripMenuItem.Tag = imgMode.ORI;
             negativeToolStripMenuItem.Tag = imgMode.NEG;
@@ -178,6 +243,7 @@ namespace HW1_PCXreader
             {
                 item.Enabled = false;
             }
+            openEnable = true;
         }
 
         protected string textFromLines(string[] lines)
@@ -227,6 +293,7 @@ namespace HW1_PCXreader
             {
                 item.Enabled = true;
             }
+            openEnable = false;
         }
 
         protected void buildChart(Chart chart1)
@@ -234,36 +301,36 @@ namespace HW1_PCXreader
             try
             {
                 chart1.Series.Clear();
-                if (imgView == null)
+                if (outView == null)
                     return;
                 switch (mode)
                 {
                     case (int)imgMode.GRAY:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.GRAY);
+                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.GRAY);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.R:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
+                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.R);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.G:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
+                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.G);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.B:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
+                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.B);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.ORI:
                     case (int)imgMode.NEG:
                     default:
-                        seriesR = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
+                        seriesR = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.R);
                         chart1.Series.Add(seriesR);
 
-                        seriesG = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
+                        seriesG = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.G);
                         chart1.Series.Add(seriesG);
 
-                        seriesB = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
+                        seriesB = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.B);
                         chart1.Series.Add(seriesB);
                         return;
                 }
@@ -307,9 +374,10 @@ namespace HW1_PCXreader
                 if (X >= 0 && X < imgW && Y >= 0 && Y < imgH)
                 {
                     toolStripStatusLabel1.Text = "( " + X + " , " + Y + " )";
-                    if (imgView != null)
+                    Bitmap view = (Bitmap)here.Image;
+                    if (view != null)
                     {
-                        Color color = imgView.GetPixel(X, Y);
+                        Color color = view.GetPixel(X, Y);
                         toolStripStatusLabel2.Text = getColorLabel(color);
                     }
                     else
@@ -340,7 +408,7 @@ namespace HW1_PCXreader
             mode = (int)here.Tag;
         }
 
-        protected void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        protected virtual void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileToolStripMenuItem.Enabled = true;
             clearToolStripMenuItem.Enabled = false;
@@ -350,6 +418,7 @@ namespace HW1_PCXreader
             {
                 item.Enabled = false;
             }
+            openEnable = true;
         }
     }
 }
