@@ -9,3 +9,4 @@ C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\De
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.pdb
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.OperationForm.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Threshold.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Resize.resources

@@ -21,20 +21,20 @@ namespace HW1_PCXreader
             set
             {
                 base.mode = value;
+                
                 try
                 {
                     trackBar1.Value = 0;
                     trackBar2.Value = 0;
                     trackBar3.Value = 0;
-                    groupBox5.Enabled = ((chUse & 0x4) > 0);//aRgb
-                    groupBox6.Enabled = ((chUse & 0x2) > 0);//arGb
-                    groupBox7.Enabled = ((chUse & 0x1) > 0);//argB
+                    groupBox5.Enabled = (chUse >= 1);
+                    groupBox6.Enabled = (chUse >= 2);
+                    groupBox7.Enabled = (chUse >= 3);
                 }
-                catch(Exception e)
+                catch
                 {
-                    Debug.Print(e.ToString());
+
                 }
-                
 
             }
         }
@@ -60,14 +60,14 @@ namespace HW1_PCXreader
                     }
                     else
                     {
-                        groupBox5.Enabled = ((chUse & 0x4) > 0);//aRgb
-                        groupBox6.Enabled = ((chUse & 0x2) > 0);//arGb
-                        groupBox7.Enabled = ((chUse & 0x1) > 0);//argB
+                        groupBox5.Enabled = (chUse >= 1);
+                        groupBox6.Enabled = (chUse >= 2);
+                        groupBox7.Enabled = (chUse >= 3);
                     }
                 }
-                catch (Exception e)
+                catch
                 {
-                    Debug.Print(e.ToString());
+                   
                 }
                 
             }
@@ -86,7 +86,14 @@ namespace HW1_PCXreader
             thresholdToolStripMenuItem.Enabled = false;
             openEnable = openEnable;
         }
-       
+
+        public Form_Threshold(OperationForm form1) : base(form1)
+        {
+            InitializeComponent();
+            thresholdToolStripMenuItem.Enabled = false;
+            openEnable = openEnable;
+        }
+
         protected override void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             base.clearToolStripMenuItem_Click(sender, e);
@@ -129,7 +136,7 @@ namespace HW1_PCXreader
             if (here.Tag.Equals("CH1"))
             {
                 textBox1.Text = here.Value.ToString();
-                if (chUse == 0x4)// only one channel mode
+                if (chUse == 1)// only one channel mode
                     targetCh = -1;
                 else
                     targetCh = 1;
@@ -151,11 +158,6 @@ namespace HW1_PCXreader
                 trackBar2.Value = 0;
             }
             outView = MyDeal.threshold(imgView, here.Value, targetCh);
-        }
-
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            outView = imgView;
         }
 
         private void pictureBox2_Paint(object sender, PaintEventArgs e)

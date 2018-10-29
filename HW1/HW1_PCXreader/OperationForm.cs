@@ -43,7 +43,7 @@ namespace HW1_PCXreader
         };
         public enum imgMode : int { ORI, NEG, GRAY, R, G, B, Size };// 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         public int selMode = (int)imgMode.ORI;   // 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        public int chUse = 0x7;// channel use binary number ARGB
+        public int chUse = 3;// channel use amount
         public virtual int mode
         {
             get
@@ -58,31 +58,31 @@ namespace HW1_PCXreader
                 {
                     case (int)imgMode.ORI:
                         toolStripStatusLabel0.Text = "Original";
-                        chUse = 0x7;
+                        chUse = 3;
                         break;
                     case (int)imgMode.NEG:
                         toolStripStatusLabel0.Text = "Negative";
-                        chUse = 0x7;
+                        chUse = 3;
                         break;
                     case (int)imgMode.GRAY:
                         toolStripStatusLabel0.Text = "Gray";
-                        chUse = 0x4;
+                        chUse = 1;
                         break;
                     case (int)imgMode.R:
                         toolStripStatusLabel0.Text = "Red";
-                        chUse = 0x4;
+                        chUse = 1;
                         break;
                     case (int)imgMode.G:
                         toolStripStatusLabel0.Text = "Green";
-                        chUse = 0x4;
+                        chUse = 1;
                         break;
                     case (int)imgMode.B:
                         toolStripStatusLabel0.Text = "Blue";
-                        chUse = 0x4;
+                        chUse = 1;
                         break;
                     default:
                         toolStripStatusLabel0.Text = "Unknown";
-                        chUse = 0x7;
+                        chUse = 1;
                         break;
                 }
             }
@@ -218,7 +218,23 @@ namespace HW1_PCXreader
                 }
                 openEnable = false;
             }
+        }
 
+        public OperationForm(OperationForm form)// if this inherit old operated image
+        {
+            InitializeComponent();
+            initialForm();
+            mode = form.mode;
+            Img[mode] = form.outView;
+            pictureBox1.Image = imgView;
+            if (imgView != null)
+            {
+                foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
+                {
+                    item.Enabled = false; // if this inherit old operated image
+                }
+                openEnable = false;
+            }
         }
 
         protected void initialForm()
@@ -419,6 +435,23 @@ namespace HW1_PCXreader
                 item.Enabled = false;
             }
             openEnable = true;
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            outView = imgView;
+        }
+
+        private void thresholdToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Threshold form2 = new Form_Threshold(this);
+            form2.ShowDialog();
+        }
+
+        private void resizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Resize form2 = new Form_Resize(this);
+            form2.ShowDialog();
         }
     }
 }

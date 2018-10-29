@@ -323,7 +323,7 @@ namespace HW1_PCXreader
             return dst;
         }
 
-        public static int threshold(int input, int bound, int output, int method)
+        private static int threshold(int input, int bound, int output, int method)
         {
             switch (method)
             {
@@ -332,6 +332,46 @@ namespace HW1_PCXreader
                         return output;
                     else
                         return input;
+            }
+        }
+
+        public static Bitmap resize(Bitmap src, double rate)
+        {
+            if (src == null)
+                return null;
+            int newWidth = Convert.ToInt32(src.Width * rate);
+            int newHeight = Convert.ToInt32(src.Height * rate);
+            Bitmap dst = new Bitmap(newWidth, newHeight, src.PixelFormat);
+            for(int i = 0; i < newWidth; i++)
+            {
+                for(int j = 0; j < newHeight; j++)
+                {
+                    dst.SetPixel(i, j, getPixel(src, i/rate, j/rate, 0));
+                }
+            }
+            return dst;
+        }
+
+        private static Color getPixel(Bitmap src, double x, double y, int method)
+        {
+            if(src == null)
+                return Color.Empty;
+            int tx = 0;
+            int ty = 0;
+            switch (method)
+            {
+                default://鄰近取值法 
+                    tx = Convert.ToInt32(x);
+                    ty = Convert.ToInt32(y);
+                    if (tx < 0)
+                        tx = 0;
+                    else if (tx >= src.Width)
+                        tx = src.Width - 1;
+                    if (ty < 0)
+                        ty = 0;
+                    else if (ty >= src.Height)
+                        ty = src.Height - 1;
+                    return src.GetPixel(tx, ty);
             }
         }
     }

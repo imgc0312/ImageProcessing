@@ -509,5 +509,11 @@ namespace HW1_PCXreader
             Form_Threshold form2 = new Form_Threshold(this);
             form2.ShowDialog();
         }
+
+        private void resizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Resize form2 = new Form_Resize(this);
+            form2.ShowDialog();
+        }
     }
 }

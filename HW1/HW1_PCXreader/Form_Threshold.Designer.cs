@@ -61,10 +61,6 @@
             // 
             this.groupBox4.Controls.Add(this.tableLayoutPanel1);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
-            // 
             // pictureBox2
             // 
             this.pictureBox2.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox2_Paint);
