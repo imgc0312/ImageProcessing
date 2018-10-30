@@ -454,4 +454,5 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
     }
+
 }

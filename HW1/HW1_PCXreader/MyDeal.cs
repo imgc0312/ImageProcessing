@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace HW1_PCXreader
 {
     class MyDeal
     {
+        public static ProgressMonitor progress = new ProgressMonitor();
         public enum colorMode : int { R, G, B, GRAY};
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
@@ -334,21 +337,36 @@ namespace HW1_PCXreader
                         return input;
             }
         }
-
         public static Bitmap resize(Bitmap src, double rate)
         {
+            return resize(src, rate, null);
+        }
+        public static Bitmap resize(Bitmap src, double rate, ProgressMonitor monitor)
+        {
+            
             if (src == null)
                 return null;
+            if (monitor == null)
+                monitor = progress;
+            monitor.start(); // start view progress
+
             int newWidth = Convert.ToInt32(src.Width * rate);
             int newHeight = Convert.ToInt32(src.Height * rate);
+            
+            int progressCurrent = 0;
+            int progressEnd = newWidth * newHeight;
+
             Bitmap dst = new Bitmap(newWidth, newHeight, src.PixelFormat);
             for(int i = 0; i < newWidth; i++)
             {
                 for(int j = 0; j < newHeight; j++)
                 {
                     dst.SetPixel(i, j, getPixel(src, i/rate, j/rate, 0));
+                    progressCurrent++;
+                    monitor.OnValueChanged( new ValueEventArgs() { value = (double)progressCurrent / progressEnd});
                 }
             }
+            monitor.fine();
             return dst;
         }
 
@@ -373,6 +391,79 @@ namespace HW1_PCXreader
                         ty = src.Height - 1;
                     return src.GetPixel(tx, ty);
             }
+        }
+    }
+
+    /// <summary>
+    /// other class-->
+    /// </summary>
+
+    public class ValueEventArgs : EventArgs //for progressbar
+    {
+        public double value { set; get; }
+        public int percent { get { return Convert.ToInt32(value * 100); } }
+    }
+
+    public delegate void ValueChangedEventHandler(object sender, ValueEventArgs e);
+
+    public class ProgressMonitor
+    {
+        private event ValueChangedEventHandler ValueChanged; //change event
+        public double current = 0;
+        public ProgressBar view { get; set; }
+        int tryTime = 0;
+        public ProgressMonitor()
+        {
+            ValueChanged = new ValueChangedEventHandler(ValueChangeMethod);
+            view = null;
+        }
+
+        public ProgressMonitor(ProgressBar view)
+        {
+            ValueChanged = new ValueChangedEventHandler(ValueChangeMethod);
+            this.view = view;
+        }
+
+        public void start()
+        {
+            current = 0;
+            if (view != null)
+            {
+                view.Value = 0;
+                view.Visible = true;
+                //Debug.Print("progress : start" + tryTime);
+            }          
+        }
+
+        public void fine()
+        {
+            current = 1.0;
+            if (view != null)
+            {
+                view.Value = 100;
+                view.Visible = false;
+                //Debug.Print("progress : fine" + tryTime);
+                //tryTime++;
+            }  
+        }
+
+        public void OnValueChanged(ValueEventArgs e)
+        {
+            if (this.ValueChanged != null)
+            {
+                this.ValueChanged(this, e);
+            }
+        }
+
+        public void ValueChangeMethod(object sender, ValueEventArgs e)
+        {
+            current = e.value;
+            if (view != null)
+            {
+                view.Value = e.percent;
+                //Debug.Print("progress : " + view.Value);
+            }
+            //Debug.Print("progress : change");
         }
     }
 }

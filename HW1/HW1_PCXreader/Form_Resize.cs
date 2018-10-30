@@ -36,7 +36,11 @@ namespace HW1_PCXreader
         }
 
         protected Bitmap tempView = null;
-        
+
+        protected ProgressMonitor progress = new ProgressMonitor();
+        /// <summary>
+        /// function-->
+        /// </summary>
         public Form_Resize() : base()
         {
             InitializeComponent();
@@ -59,9 +63,17 @@ namespace HW1_PCXreader
         {
             openEnable = openEnable;
             resizeToolStripMenuItem.Enabled = false;
-            checkedListBox1.SetItemChecked(1, true);
-            checkedListBox2.SetItemChecked(1, true);
+            radioButton2.Checked = true;
+            radioButton5.Checked = true;
             setInfo();
+            progress.view = progressBar1;
+            progress.view.Visible = false;
+        }
+        protected override void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            base.clearToolStripMenuItem_Click(sender, e);
+            radioButton2.Checked = true;
+            radioButton5.Checked = true;
         }
 
         private void setInfo()
@@ -91,76 +103,45 @@ namespace HW1_PCXreader
             textBox1.Lines = newLines;
         }
 
-        private void checkedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            CheckedListBox here = (CheckedListBox)sender;
-            if (e.CurrentValue == CheckState.Checked) return;
-            for (int i = 0; i < here.Items.Count; i++)
-            {
-                here.SetSelected(i, false);
-                here.SetItemChecked(i, false);
-            }
-            e.NewValue = CheckState.Checked;
-
-            int select = -1;
-            double rate = 1.0;
-            select = e.Index;
-            foreach (int i in checkedListBox1.CheckedIndices)
-            {
-                select = i;
-                Debug.Print(i.ToString());
-            }
-            
-            
-            switch (select)
-            {
-                case 0:
-                    rate = 0.5;
-                    break;
-                case 1:
-                    rate = 1.0;
-                    break;
-                case 2:
-                    rate = 2.0;
-                    break;
-                default:
-                    rate = 1.0;
-                    break;
-            }
-            tempView = MyDeal.resize(imgView, rate);
-
-            select = e.Index;
-            Debug.Print("++");
-            foreach (int i in checkedListBox2.CheckedIndices)
-            {
-                select = i;
-                Debug.Print(i.ToString());
-            }
-            Debug.Print("--");
-            
-            switch (select)
-            {
-                case 0:
-                    rate = 0.5;
-                    break;
-                case 1:
-                    rate = 1.0;
-                    break;
-                case 2:
-                    rate = 2.0;
-                    break;
-                default:
-                    rate = 1.0;
-                    break;
-            }
-            outView = MyDeal.resize(tempView, rate);
-            
-            Debug.Print("==");
-        }
-
         private void pictureBox2_Paint(object sender, PaintEventArgs e)
         {
             setInfo();
         }
+
+        private void radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton here = (RadioButton)sender;
+            if (here.Checked)
+                resize();
+        }
+
+        public void resize()
+        {
+            progress.start();
+            double[] rate = { 0.5, 1.0, 2.0 };
+            int choose = 1;
+            foreach (RadioButton select in groupBox5.Controls)
+            {
+                if (select.Checked)
+                    choose = select.TabIndex;
+            }
+            if ((choose < 0) || (choose > 2))
+                choose = 1;
+            progress.fine();
+            tempView = MyDeal.resize(imgView, rate[choose], progress);
+            progress.start();
+            foreach (RadioButton select in groupBox6.Controls)
+            {
+                if (select.Checked)
+                    choose = select.TabIndex;
+            }
+            if ((choose < 0) || (choose > 2))
+                choose = 1;
+            progress.fine();
+            outView = MyDeal.resize(tempView, rate[choose], progress);
+
+        }
+
+        
     }
 }
