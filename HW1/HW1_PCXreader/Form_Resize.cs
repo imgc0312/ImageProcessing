@@ -128,7 +128,7 @@ namespace HW1_PCXreader
             if ((choose < 0) || (choose > 2))
                 choose = 1;
             progress.fine();
-            tempView = MyDeal.resize(imgView, rate[choose], progress);
+            tempView = MyDeal.resize(imgView, rate[choose], MyDeal.valueMethod.Near, progress);
             progress.start();
             foreach (RadioButton select in groupBox6.Controls)
             {
@@ -138,7 +138,7 @@ namespace HW1_PCXreader
             if ((choose < 0) || (choose > 2))
                 choose = 1;
             progress.fine();
-            outView = MyDeal.resize(tempView, rate[choose], progress);
+            outView = MyDeal.resize(tempView, rate[choose], MyDeal.valueMethod.Near, progress);
 
         }
 

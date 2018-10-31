@@ -66,6 +66,7 @@
     <Compile Include="Form_Threshold.Designer.cs">
       <DependentUpon>Form_Threshold.cs</DependentUpon>
     </Compile>
+    <Compile Include="MyMat.cs" />
     <Compile Include="OperationForm.cs">
       <SubType>Form</SubType>
     </Compile>

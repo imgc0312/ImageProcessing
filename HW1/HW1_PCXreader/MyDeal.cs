@@ -16,6 +16,7 @@ namespace HW1_PCXreader
     {
         public static ProgressMonitor progress = new ProgressMonitor();
         public enum colorMode : int { R, G, B, GRAY};
+        public enum valueMethod : int { Near, Linear }//取值法: 鄰近取直, 線性插值 
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
             target = new byte[Size];
@@ -79,6 +80,53 @@ namespace HW1_PCXreader
             }
             
         }
+
+        //public static double[] countFreqsT(Bitmap view, int ch)// R freqency
+        //{
+        //    if (ch < 0 || ch >= 3) {
+        //        Debug.Print("countFreqsT(): wrong ch -> " + ch);
+        //        return null;
+        //    }
+        //    FreqsRecord freqs = new FreqsRecord();
+        //    for (int i = 0; i < 256; i++)
+        //    {
+        //        freqs.f[i] = 0;
+        //    }
+        //    try
+        //    {
+        //        MyMat viewMat = new MyMat(view);
+        //        int size = view.Width * view.Height;
+        //        viewMat.runAll(
+        //            new DealBGR<FreqsRecord>(
+        //                delegate (ref byte B, ref byte G, ref byte R, ref FreqsRecord records)
+        //                {
+        //                    records.f[R]++;
+        //                }
+        //            ), ref freqs);
+        //        for (int i = 0; i < 256; i++)
+        //        {
+        //            freqs.f[i] /= size;
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Debug.Print(e.ToString());
+        //    }
+        //    return freqs.f;
+        //}
+
+        //public class FreqsRecord
+        //{
+        //    public double[] f ;
+        //    public FreqsRecord()
+        //    {
+        //        f = new double[256];
+        //        for (int i = 0; i < 256; i++)
+        //        {
+        //            f[i] = 0;
+        //        }
+        //    }
+        //}
 
         public static double[] countFreqsR(Bitmap view)// R freqency
         {
@@ -339,9 +387,9 @@ namespace HW1_PCXreader
         }
         public static Bitmap resize(Bitmap src, double rate)
         {
-            return resize(src, rate, null);
+            return resize(src, rate, valueMethod.Near, null);
         }
-        public static Bitmap resize(Bitmap src, double rate, ProgressMonitor monitor)
+        public static Bitmap resize(Bitmap src, double rate, valueMethod method, ProgressMonitor monitor)
         {
             
             if (src == null)
@@ -357,23 +405,48 @@ namespace HW1_PCXreader
             int progressEnd = newWidth * newHeight;
 
             Bitmap dst = new Bitmap(newWidth, newHeight, src.PixelFormat);
-            for(int i = 0; i < newWidth; i++)
+
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            
+            unsafe
             {
-                for(int j = 0; j < newHeight; j++)
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                byte[] use = null;
+                for (int i = 0; i < newWidth; i++)
                 {
-                    dst.SetPixel(i, j, getPixel(src, i/rate, j/rate, 0));
-                    progressCurrent++;
-                    monitor.OnValueChanged( new ValueEventArgs() { value = (double)progressCurrent / progressEnd});
+                    for (int j = 0; j < newHeight; j++)
+                    {
+                        use = getPixel(srcData, i / rate, j / rate, method);
+                        if(use != null)
+                        {
+                            dstPtr[0] = use[0];
+                            dstPtr[1] = use[1];
+                            dstPtr[2] = use[2];
+                            dstPtr += 3;
+                        }
+                        else
+                        {
+                            Debug.Print("getPixel Empty");
+                        }
+                        progressCurrent++;
+                        monitor.OnValueChanged(new ValueEventArgs() { value = (double)progressCurrent / progressEnd });
+                    }
+                    dstPtr += skipByte;
                 }
+
             }
+            src.UnlockBits(srcData);
+            dst.UnlockBits(dstData);
             monitor.fine();
             return dst;
         }
 
-        private static Color getPixel(Bitmap src, double x, double y, int method)
+        private static byte[] getPixel(BitmapData src, double x, double y, valueMethod method)
         {
-            if(src == null)
-                return Color.Empty;
+            byte[] color = new byte[3];
+
             int tx = 0;
             int ty = 0;
             switch (method)
@@ -389,9 +462,22 @@ namespace HW1_PCXreader
                         ty = 0;
                     else if (ty >= src.Height)
                         ty = src.Height - 1;
-                    return src.GetPixel(tx, ty);
+                    break;
             }
+
+            unsafe
+            {
+                byte* ptr = (byte*)(src.Scan0);
+                ptr += ty * src.Stride;
+                ptr += tx * 3;
+                color[0] = ptr[0];
+                color[1] = ptr[1];
+                color[2] = ptr[2];
+            }
+            return color;
+
         }
+        
     }
 
     /// <summary>
@@ -411,7 +497,7 @@ namespace HW1_PCXreader
         private event ValueChangedEventHandler ValueChanged; //change event
         public double current = 0;
         public ProgressBar view { get; set; }
-        int tryTime = 0;
+        //int tryTime = 0;
         public ProgressMonitor()
         {
             ValueChanged = new ValueChangedEventHandler(ValueChangeMethod);
