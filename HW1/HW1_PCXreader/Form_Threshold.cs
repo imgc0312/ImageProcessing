@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using static HW1_PCXreader.MyDeal;
 
 namespace HW1_PCXreader
 {
@@ -24,6 +25,7 @@ namespace HW1_PCXreader
                 
                 try
                 {
+                    comboBox1.SelectedIndex = 0;
                     trackBar1.Value = 0;
                     trackBar2.Value = 0;
                     trackBar3.Value = 0;
@@ -57,12 +59,14 @@ namespace HW1_PCXreader
                         groupBox5.Enabled = false;
                         groupBox6.Enabled = false;
                         groupBox7.Enabled = false;
+                        groupBox8.Enabled = false;
                     }
                     else
                     {
                         groupBox5.Enabled = (chUse >= 1);
                         groupBox6.Enabled = (chUse >= 2);
                         groupBox7.Enabled = (chUse >= 3);
+                        groupBox8.Enabled = true;
                     }
                 }
                 catch
@@ -73,30 +77,65 @@ namespace HW1_PCXreader
             }
         }
 
+        public enum ThresholdMethod : int { ABSOLUTE , OTSU};
+        private ThresholdMethod _selectMethod = ThresholdMethod.ABSOLUTE;
+        public ThresholdMethod selectMethod
+        {
+            get { return _selectMethod; }
+            set
+            {
+                _selectMethod = value;
+                switch (value)
+                {
+                    case ThresholdMethod.ABSOLUTE:
+                        openEnable = openEnable;
+                        break;
+                    case ThresholdMethod.OTSU:
+                        groupBox5.Enabled = false;
+                        groupBox6.Enabled = false;
+                        groupBox7.Enabled = false;
+                        int[] threshs = MyDeal.OTSU(imgView);
+                        trackBar1.Value = threshs[2];//R
+                        trackBar2.Value = threshs[1];//G
+                        trackBar3.Value = threshs[0];//B
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// function-->
+        /// </summary>
+
         public Form_Threshold() : base()
         {
             InitializeComponent();
-            thresholdToolStripMenuItem.Enabled = false;
-            openEnable = openEnable;
+            initialForm();
         }
 
         public Form_Threshold(Form1 form1) : base(form1)
         {
             InitializeComponent();
-            thresholdToolStripMenuItem.Enabled = false;
-            openEnable = openEnable;
+            initialForm();
         }
 
         public Form_Threshold(OperationForm form1) : base(form1)
         {
             InitializeComponent();
-            thresholdToolStripMenuItem.Enabled = false;
+            initialForm();
+        }
+
+        protected new void initialForm()
+        {
             openEnable = openEnable;
+            thresholdToolStripMenuItem.Enabled = false;
+            comboBox1.SelectedIndex = 0;
         }
 
         protected override void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             base.clearToolStripMenuItem_Click(sender, e);
+            comboBox1.SelectedIndex = 0;
         }
 
         private void textBox_TextChanged(object sender, EventArgs e)
@@ -132,37 +171,54 @@ namespace HW1_PCXreader
         private void trackBar_ValueChanged(object sender, EventArgs e)
         {
             TrackBar here = (TrackBar)sender;
-            int targetCh = -1;
+            if (chUse == 1)
+            {// only one channel mode
+                if (here.Tag.Equals("CH1"))
+                {
+                    trackBar2.Value = 0;
+                    trackBar3.Value = 0;
+                    outView = MyDeal.threshold(imgView, here.Value, colorMode.GRAY);
+                }
+            }
+            else
+            {
+                int[] thresholds = new int[3];
+                thresholds[2] = trackBar1.Value;//R
+                thresholds[1] = trackBar2.Value;//G
+                thresholds[0] = trackBar3.Value;//B
+                outView = MyDeal.threshold(imgView, thresholds);
+            }
             if (here.Tag.Equals("CH1"))
             {
                 textBox1.Text = here.Value.ToString();
-                if (chUse == 1)// only one channel mode
-                    targetCh = -1;
-                else
-                    targetCh = 1;
-                trackBar2.Value = 0;// not support muilty channel threshold
-                trackBar3.Value = 0;
             }
             else if (here.Tag.Equals("CH2"))
             {
                 textBox2.Text = here.Value.ToString();
-                targetCh = 2;
-                trackBar1.Value = 0;// not support muilty channel threshold
-                trackBar3.Value = 0;
             }
             else if (here.Tag.Equals("CH3"))
             {
                 textBox3.Text = here.Value.ToString();
-                targetCh = 3;
-                trackBar1.Value = 0;// not support muilty channel threshold
-                trackBar2.Value = 0;
             }
-            outView = MyDeal.threshold(imgView, here.Value, targetCh);
         }
 
         private void pictureBox2_Paint(object sender, PaintEventArgs e)
         {
             buildChart(chart1);
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox here = (ComboBox)sender;
+            switch (here.SelectedIndex)
+            {
+                case 0:
+                    selectMethod = ThresholdMethod.ABSOLUTE;
+                    break;
+                case 1:
+                    selectMethod = ThresholdMethod.OTSU;
+                    break;
+            }
         }
     }
 }

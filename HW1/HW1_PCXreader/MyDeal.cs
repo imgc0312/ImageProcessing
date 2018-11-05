@@ -16,7 +16,7 @@ namespace HW1_PCXreader
     {
         public static ProgressMonitor progress = new ProgressMonitor();
         public enum colorMode : int { R, G, B, GRAY};
-        public enum valueMethod : int { Near, Linear }//取值法: 鄰近取直, 線性插值 
+        public enum valueMethod : int { Near, Linear}//取值法: 鄰近取直, 線性插值 
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
             target = new byte[Size];
@@ -60,91 +60,56 @@ namespace HW1_PCXreader
             target = BitConverter.ToUInt16(srcBytes, StartIndex);
         }
 
-        public static double[] countFreqs(Bitmap view)//default to use R ch
+        public static double[] countFreqs(Bitmap view)//default to use all ch
         {
-            return countFreqsR(view);
+            return countFreqsT(view, colorMode.GRAY);
         }
-
-        public static double[] countFreqs(Bitmap view , int color)// color please use the MyDeal.colorMode.*
-        {
-            switch (color)
-            {
-                case (int)colorMode.R:
-                    return countFreqsR(view);
-                case (int)colorMode.G:
-                    return countFreqsG(view);
-                case (int)colorMode.B:
-                    return countFreqsB(view);
-                default:
-                    return countFreqsR(view);
-            }
-            
-        }
-
-        //public static double[] countFreqsT(Bitmap view, int ch)// R freqency
-        //{
-        //    if (ch < 0 || ch >= 3) {
-        //        Debug.Print("countFreqsT(): wrong ch -> " + ch);
-        //        return null;
-        //    }
-        //    FreqsRecord freqs = new FreqsRecord();
-        //    for (int i = 0; i < 256; i++)
-        //    {
-        //        freqs.f[i] = 0;
-        //    }
-        //    try
-        //    {
-        //        MyMat viewMat = new MyMat(view);
-        //        int size = view.Width * view.Height;
-        //        viewMat.runAll(
-        //            new DealBGR<FreqsRecord>(
-        //                delegate (ref byte B, ref byte G, ref byte R, ref FreqsRecord records)
-        //                {
-        //                    records.f[R]++;
-        //                }
-        //            ), ref freqs);
-        //        for (int i = 0; i < 256; i++)
-        //        {
-        //            freqs.f[i] /= size;
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Debug.Print(e.ToString());
-        //    }
-        //    return freqs.f;
-        //}
-
-        //public class FreqsRecord
-        //{
-        //    public double[] f ;
-        //    public FreqsRecord()
-        //    {
-        //        f = new double[256];
-        //        for (int i = 0; i < 256; i++)
-        //        {
-        //            f[i] = 0;
-        //        }
-        //    }
-        //}
-
-        public static double[] countFreqsR(Bitmap view)// R freqency
+        
+        public static double[] countFreqsT(Bitmap view, colorMode channel)// freqency
         {
             double[] freqs = new double[256];
+            BitmapData srcData = view.LockBits(MyF.bound(view), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             for (int i = 0; i < 256; i++)
             {
                 freqs[i] = 0;
             }
             try
             {
-                int size = view.Width * view.Height;
-                for (int i = 0; i < view.Width; i++)
+                int skipByte = srcData.Stride - srcData.Width * 3;
+                int size = srcData.Width * srcData.Height;
+                int byteOffset = 0;
+                switch (channel)
                 {
-                    for (int j = 0; j < view.Height; j++)
+                    case colorMode.R:
+                        byteOffset = 2;
+                        break;
+                    case colorMode.G:
+                        byteOffset = 1;
+                        break;
+                    case colorMode.B:
+                        byteOffset = 0;
+                        break;
+                    case colorMode.GRAY:
+                    default:
+                        byteOffset = 0;
+                        break;
+                }
+                unsafe
+                {
+                    byte* srcPtr = (byte*)(srcData.Scan0);
+
+                    for (int i = 0; i < srcData.Width; i++)
                     {
-                        freqs[view.GetPixel(i, j).R] ++;
+                        for (int j = 0; j < srcData.Height; j++)
+                        {
+                            freqs[srcPtr[byteOffset]]++;
+                            srcPtr += 3;
+                        }
+                        srcPtr += skipByte;
                     }
                 }
+                
+                
                 for (int i = 0; i < 256; i++)
                 {
                     freqs[i] /= size;
@@ -154,67 +119,49 @@ namespace HW1_PCXreader
             {
                 Debug.Print(e.ToString());
             }
+            view.UnlockBits(srcData);
             return freqs;
         }
 
-        public static double[] countFreqsG(Bitmap view)// G freqency
+        public static int[] countFreqsAll(Bitmap src)// use for OTSU
         {
-            double[] freqs = new double[256];
-            for (int i = 0; i < 256; i++)
+            int[] freqs = new int[256 * 3];
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            for (int i = 0; i < 256 * 3; i++)
             {
                 freqs[i] = 0;
             }
             try
             {
-                int size = view.Width * view.Height;
-                for (int i = 0; i < view.Width; i++)
+                int skipByte = srcData.Stride - srcData.Width * 3;
+                int size = srcData.Width * srcData.Height;
+                unsafe
                 {
-                    for (int j = 0; j < view.Height; j++)
+                    byte* srcPtr = (byte*)(srcData.Scan0);
+
+                    for (int i = 0; i < srcData.Width; i++)
                     {
-                        freqs[view.GetPixel(i, j).G]++;
+                        for (int j = 0; j < srcData.Height; j++)
+                        {
+                            freqs[ 0 + srcPtr[0]]++;
+                            freqs[256 + srcPtr[1]]++;
+                            freqs[512 + srcPtr[2]]++;
+                            srcPtr += 3;
+                        }
+                        srcPtr += skipByte;
                     }
                 }
-                for (int i = 0; i < 256; i++)
-                {
-                    freqs[i] /= size;
-                }
+                
             }
             catch (Exception e)
             {
                 Debug.Print(e.ToString());
             }
-            return freqs;
-        }
-        public static double[] countFreqsB(Bitmap view)// B freqency
-        {
-            double[] freqs = new double[256];
-            for (int i = 0; i < 256; i++)
-            {
-                freqs[i] = 0;
-            }
-            try
-            {
-                int size = view.Width * view.Height;
-                for (int i = 0; i < view.Width; i++)
-                {
-                    for (int j = 0; j < view.Height; j++)
-                    {
-                        freqs[view.GetPixel(i, j).B]++;
-                    }
-                }
-                for (int i = 0; i < 256; i++)
-                {
-                    freqs[i] /= size;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Print(e.ToString());
-            }
+            src.UnlockBits(srcData);
             return freqs;
         }
 
-        public static Series buildSeries(Bitmap view, int mode)// mode please use the MyDeal.colorMode.*
+        public static Series buildSeries(Bitmap view, colorMode mode)// mode please use the MyDeal.colorMode.*
         {
             if (view == null)
                 return null;
@@ -223,19 +170,19 @@ namespace HW1_PCXreader
             series.Color = Color.Pink;
             switch (mode)
             {
-                case (int)colorMode.R:
+                case colorMode.R:
                     Name = "R";
                     series.Color = Color.Red;
                     break;
-                case (int)colorMode.G:
+                case colorMode.G:
                     Name = "G";
                     series.Color = Color.Green;
                     break;
-                case (int)colorMode.B:
+                case colorMode.B:
                     Name = "B";
                     series.Color = Color.Blue;
                     break;
-                case (int)colorMode.GRAY:
+                case colorMode.GRAY:
                     Name = "gray";
                     series.Color = Color.DarkGray;
                     break;
@@ -243,7 +190,7 @@ namespace HW1_PCXreader
             series.Name = Name;
             string[] xValue = Enumerable.Range(0, 256).ToArray().Select(x => x.ToString()).ToArray();
             double[] yValue;
-            yValue = MyDeal.countFreqs(view, mode);
+            yValue = MyDeal.countFreqsT(view, mode);
             series.ChartType = SeriesChartType.Column;
             series.Points.DataBindXY(xValue, yValue);
             return series;
@@ -311,84 +258,168 @@ namespace HW1_PCXreader
             return output;
         }
 
-        public static Bitmap threshold(Bitmap src, int bound, int channel)
+        public static Bitmap threshold(Bitmap src, int[] threshs)
         {
             Bitmap dst;
-            Color get,use;
-            int value;
-            int maxVal = 0;
+            byte maxVal = 0;
             if (src == null)
                 return null;
             dst = (Bitmap)src.Clone();
-            switch (channel)
+
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            
+            unsafe
             {
-                case 1:// R
-                    for(int i = 0; i < dst.Width; i++)
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* srcPtr = (byte*)(srcData.Scan0);
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                for (int i = 0; i < dstData.Width; i++)
+                {
+                    for (int j = 0; j < dstData.Height; j++)
                     {
-                        for(int j = 0; j < dst.Height; j++)
-                        {
-                            get = dst.GetPixel(i,j);
-                            value = threshold(get.R, bound, maxVal, 0);
-                            use = Color.FromArgb(get.A, value, get.G, get.B);
-                            dst.SetPixel(i, j, use);
-                        }
+                        dstPtr[0] = threshold(srcPtr[0], threshs[0], maxVal, 0);
+                        dstPtr[1] = threshold(srcPtr[1], threshs[1], maxVal, 0);
+                        dstPtr[2] = threshold(srcPtr[2], threshs[2], maxVal, 0);
+                        srcPtr += 3;
+                        dstPtr += 3;
                     }
-                    break;
-                case 2:// G
-                    for (int i = 0; i < dst.Width; i++)
-                    {
-                        for (int j = 0; j < dst.Height; j++)
-                        {
-                            get = dst.GetPixel(i, j);
-                            value = threshold(get.G, bound, maxVal, 0);
-                            use = Color.FromArgb(get.A, get.R, value, get.B);
-                            dst.SetPixel(i, j, use);
-                        }
-                    }
-                    break;
-                case 3:// B
-                    for (int i = 0; i < dst.Width; i++)
-                    {
-                        for (int j = 0; j < dst.Height; j++)
-                        {
-                            get = dst.GetPixel(i, j);
-                            value = threshold(get.B, bound, maxVal, 0);
-                            use = Color.FromArgb(get.A, get.R, get.G, value);
-                            dst.SetPixel(i, j, use);
-                        }
-                    }
-                    break;
-                default:
-                    for (int i = 0; i < dst.Width; i++)
-                    {
-                        for (int j = 0; j < dst.Height; j++)
-                        {
-                            get = dst.GetPixel(i, j);
-                            value = threshold(get.R, bound, maxVal, 0);
-                            use = Color.FromArgb(get.A, value, value, value);
-                            dst.SetPixel(i, j, use);
-                        }
-                    }
-                    break;
+                    srcPtr += skipByte;
+                    dstPtr += skipByte;
+                }
+
             }
+            src.UnlockBits(srcData);
+            dst.UnlockBits(dstData);
             return dst;
         }
 
-        private static int threshold(int input, int bound, int output, int method)
+        public static Bitmap threshold(Bitmap src, int thresh, colorMode channel)
+        {
+            Bitmap dst;
+            byte maxVal = 0;
+            int byteOffset = 0;
+            if (src == null)
+                return null;
+            dst = (Bitmap)src.Clone();
+
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            switch (channel)
+            {
+                case colorMode.R:
+                    byteOffset = 2;
+                    break;
+                case colorMode.G:
+                    byteOffset = 1;
+                    break;
+                case colorMode.B:
+                    byteOffset = 0;
+                    break;
+                case colorMode.GRAY:
+                default:
+                    byteOffset = -1;
+                    break;
+            }
+            unsafe
+            {
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* srcPtr = (byte*)(srcData.Scan0);
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                for (int i = 0; i < dstData.Width; i++)
+                {
+                    for (int j = 0; j < dstData.Height; j++)
+                    {
+                        if(byteOffset < 0)
+                        {
+                            dstPtr[0] = threshold(srcPtr[0], thresh, maxVal, 0);
+                            dstPtr[1] = threshold(srcPtr[1], thresh, maxVal, 0);
+                            dstPtr[2] = threshold(srcPtr[2], thresh, maxVal, 0);
+                        }
+                        else
+                        {
+                            dstPtr[byteOffset] = threshold(srcPtr[byteOffset], thresh, maxVal, 0);
+                        }
+                        srcPtr += 3;
+                        dstPtr += 3;
+                    }
+                    srcPtr += skipByte;
+                    dstPtr += skipByte;
+                }
+
+            }
+            src.UnlockBits(srcData);
+            dst.UnlockBits(dstData);
+            return dst;
+        }
+
+        private static byte threshold(byte input, int thresh, byte maxVal, int method)
         {
             switch (method)
             {
                 default:
-                    if (input < bound)
-                        return output;
+                    if (input < thresh)
+                        return maxVal;
                     else
                         return input;
             }
         }
+
+        public static int[] OTSU(Bitmap src)
+        {
+            int[] threshs = new int[3];
+            int[] allFreqs = countFreqsAll(src);
+            int pixSize = src.Width * src.Height;
+            threshs[0] = OTSU(ref allFreqs, 0, pixSize);
+            threshs[1] = OTSU(ref allFreqs, 256, pixSize);
+            threshs[2] = OTSU(ref allFreqs, 512, pixSize);
+            return threshs;
+        }
+
+        private static int OTSU(ref int[] histogram, int start, int pixSize)
+        {
+            int answer = 0;
+            int sum = 0;//all weight sum
+            int wA = 0; // local A size
+            int wB = 0; // local B size
+            int sA = 0; // local A weight sum
+            double mA = 0;  // local A dis
+            double mB = 0;  // local B dis
+            double curVar = 0;  // current var
+            double maxVar = 0;  //maximun var 
+            int thresh1 = 0;  // Lower thresh
+            int thresh2 = 0;  // Higher thresh
+            for (int index = 1; index < 256; index++)
+            {
+                sum += index * histogram[start + index];
+            }
+            for (int index = 0; index < 256; index++)
+            {
+                wA += histogram[start + index];
+                wB = pixSize - wA;
+                if ((wA == 0) || (wB == 0))
+                    continue;
+                sA += index * histogram[start + index];
+                mA = (double)sA / wA;
+                mB = (double)(sum - sA) / wB;
+                curVar = wA * wB * (mA - mB) * (mA - mB);
+                if(curVar >= maxVar)
+                {
+                    thresh1 = index;
+                    if (curVar > maxVar)
+                        thresh2 = index;
+                    maxVar = curVar;
+                }
+            }
+            answer = Convert.ToInt32((double)(thresh1 + thresh2)/2);
+            return answer;
+        }
+
         public static Bitmap resize(Bitmap src, double rate)
         {
             return resize(src, rate, valueMethod.Near, null);
         }
+
         public static Bitmap resize(Bitmap src, double rate, valueMethod method, ProgressMonitor monitor)
         {
             

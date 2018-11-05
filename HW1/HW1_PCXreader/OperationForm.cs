@@ -322,31 +322,31 @@ namespace HW1_PCXreader
                 switch (mode)
                 {
                     case (int)imgMode.GRAY:
-                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.GRAY);
+                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.GRAY);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.R:
-                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.R);
+                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.R);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.G:
-                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.G);
+                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.G);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.B:
-                        seriesT = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.B);
+                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.B);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.ORI:
                     case (int)imgMode.NEG:
                     default:
-                        seriesR = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.R);
+                        seriesR = MyDeal.buildSeries(outView, MyDeal.colorMode.R);
                         chart1.Series.Add(seriesR);
 
-                        seriesG = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.G);
+                        seriesG = MyDeal.buildSeries(outView, MyDeal.colorMode.G);
                         chart1.Series.Add(seriesG);
 
-                        seriesB = MyDeal.buildSeries(outView, (int)MyDeal.colorMode.B);
+                        seriesB = MyDeal.buildSeries(outView, MyDeal.colorMode.B);
                         chart1.Series.Add(seriesB);
                         return;
                 }

@@ -34,7 +34,7 @@ namespace HW1_PCXreader
             "Version \t\t\t:\t",
             "Encoding \t\t\t:\t",
             "Bits Per Pixel \t\t:\t",
-            "Xmin , Xmax, Ymin, Ymax \t:\t",
+            "Xmin , Ymin, Xmax, Ymax \t:\t",
             "Hdpi , Vdpi \t\t:\t",
             "nPlanes \t\t\t:\t",
             "bytesPerLine \t\t:\t",
@@ -299,31 +299,31 @@ namespace HW1_PCXreader
                 switch (mode)
                 {
                     case (int)imgMode.GRAY:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.GRAY);
+                        seriesT = MyDeal.buildSeries(imgView, MyDeal.colorMode.GRAY);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.R:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
+                        seriesT = MyDeal.buildSeries(imgView, MyDeal.colorMode.R);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.G:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
+                        seriesT = MyDeal.buildSeries(imgView, MyDeal.colorMode.G);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.B:
-                        seriesT = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
+                        seriesT = MyDeal.buildSeries(imgView, MyDeal.colorMode.B);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.ORI:
                     case (int)imgMode.NEG:
                     default:
-                        seriesR = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.R);
+                        seriesR = MyDeal.buildSeries(imgView, MyDeal.colorMode.R);
                         chart1.Series.Add(seriesR);
 
-                        seriesG = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.G);
+                        seriesG = MyDeal.buildSeries(imgView, MyDeal.colorMode.G);
                         chart1.Series.Add(seriesG);
 
-                        seriesB = MyDeal.buildSeries(imgView, (int)MyDeal.colorMode.B);
+                        seriesB = MyDeal.buildSeries(imgView, MyDeal.colorMode.B);
                         chart1.Series.Add(seriesB);
                         return;
                 }
