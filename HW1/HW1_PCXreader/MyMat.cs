@@ -17,142 +17,99 @@ namespace HW1_PCXreader
             return new Rectangle(0, 0, src.Width, src.Height);
         }
     }
-    /** 以下 not use now**/
-    delegate void DealBGR<T>(ref byte B, ref byte G, ref byte R, ref T objects);
-
+   
     class MyMat
     {
-        public int lineByte { get { return width * 3; } }
-        public int stride {
-            get {
-                if ((lineByte % 4) > 0)
-                    return lineByte + 4 - (lineByte % 4);
-                else
-                    return lineByte;
+        public double[,] data;
+        public double this[int row,int col]
+        {
+            get
+            {
+                return data[row, col];
+            }
+            set
+            {
+                data[row, col] = value;
             }
         }
-        public int width { get; set; }
-        public int height { get; set; }
-        private Bitmap src;
+        public int rows { get { return data.GetLength(0); } }
+        public int cols { get { return data.GetLength(1); } }
+
+        /// <summary>
+        /// function-->
+        /// </summary>
 
         public MyMat()
         {
-            width = 0;
-            height = 0;
-            src = null;
+            data = new double[0, 0];
+        }
+        public MyMat(int rows, int cols)
+        {
+            data = new double[rows, cols];
         }
 
-        public MyMat(Bitmap img)
+        /// <summary>
+        /// val-->
+        /// </summary>
+        public static MyMat NULL() { return new MyMat(); }
+        public static MyMat ROTATE(int degrees)
         {
-            this.width = img.Width;
-            this.height = img.Height;
-            src = img;
+            double rad = Math.PI * degrees / 180.0;
+            return ROTATE(rad);
         }
-
-        public byte[] getPixel(int x, int y)
+        public static MyMat ROTATE (double rad)
         {
-            if(src == null)
-            {
-                throw new Exception("MyMat getPixel(): data null");
-            }
-            BitmapData data = src.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-            byte[] output = new byte[3];
-            if ((x < 0) || (x >= width) || (y < 0) || (y >= height))
-            {
-                throw new Exception("MyMat getPixel(): (x,y) out of bound");
-            }
-            unsafe
-            {
-                byte* ptr = (byte*)(data.Scan0);
-                ptr += y * stride;
-                ptr += x * 3;
-                output[0] = ptr[0];
-                output[1] = ptr[1];
-                output[2] = ptr[2];
-            }
-            src.UnlockBits(data);
+            MyMat output = new MyMat(2, 2);
+            output[0, 0] = Math.Cos(rad);
+            output[1, 0] = Math.Sin(rad);
+            output[0, 1] = -1.0 * output[1, 0];
+            output[1, 1] = output[0, 0];
+            return output;
+        }
+        public static MyMat MIRROR(int degrees)
+        {
+            double rad = Math.PI * degrees / 180.0;
+            return MIRROR(rad);
+        }
+        public static MyMat MIRROR(double rad)
+        {
+            MyMat output = new MyMat(2, 2);
+            output[0, 0] = Math.Cos(2 * rad);
+            output[1, 0] = Math.Sin(2 * rad);
+            output[0, 1] = output[1, 0];
+            output[1, 1] = -1.0 * output[0, 0];
             return output;
         }
 
-        public void setPixel(int x, int y, byte[] bgr)
+        /// <summary>
+        /// operate-->
+        /// </summary>
+        public static MyMat mul(MyMat left, MyMat right)
         {
-            if (src == null)
+            if(left.cols == 0 || left.rows == 0 || right.cols == 0 || right.rows == 0)
             {
-                throw new Exception("MyMat setPixel(): data null");
+                Debug.Print(" MyMat mul : " + left.cols + " " + left.rows + " " + right.cols + " " + right.rows);
+                return MyMat.NULL();
             }
-            if (bgr.Length != 3)
-                throw new Exception("MyMat setPixel(): bgr.Length != 3");
-            if((x < 0) || (x >= width) || (y < 0) || (y >= height))
+            if(left.cols != right.rows)
             {
-                throw new Exception("MyMat setPixel(): (x,y) out of bound");
+                Debug.Print(" MyMat mul : left.cols != right.rows");
+                return MyMat.NULL();
             }
-            BitmapData data = src.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-
-            unsafe
+            MyMat output = new MyMat(left.rows, right.cols);
+            for(int i = 0; i < output.rows; i++)
             {
-                byte* ptr = (byte*)(data.Scan0);
-                ptr += y * stride;
-                ptr += x * 3;
-                ptr[0] = bgr[0];
-                ptr[1] = bgr[1];
-                ptr[2] = bgr[2];
-            }
-            src.UnlockBits(data);
-        }
-
-        public void runAll<T>(DealBGR<T> method, ref T objects)
-        {
-            if (src == null)
-            {
-                throw new Exception("MyMat runAll(): data null");
-            }
-            BitmapData data = src.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-
-            unsafe
-            {
-                byte* ptr = (byte*)(data.Scan0);
-                for (int i = 0; i < data.Height; i++)
+                for(int j = 0; j < output.cols; j++)
                 {
-                    for (int j = 0; j < data.Width; j++)
+                    output[i, j] = 0;
+                    for (int k = 0; k < left.cols; k++)
                     {
-                        // write the logic implementation here
-                        method(ref ptr[0],ref ptr[1],ref ptr[2], ref objects);   
-                        ptr += 3;
+                        output[i, j] += left[i, k] * right[k, j];
                     }
-                    ptr += data.Stride - data.Width * 3;
                 }
             }
-            src.UnlockBits(data);
-        }
-
-        public byte[] getData()
-        {
-            if (src == null)
-            {
-                throw new Exception("MyMat runAll(): data null");
-            }
-            BitmapData data = src.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-            byte[] output = new byte[width * height * 3];
-            unsafe
-            {
-                byte* ptr = (byte*)(data.Scan0);
-                int skipByte = data.Stride - data.Width * 3; ;
-                for (int i = 0, cur = 0; i < data.Height; i++)
-                {
-                    for(int j = 0; j < (data.Width * 3); j++)
-                    {
-                        output[cur] = ptr[0];
-                        cur++;
-                        ptr++;
-                    }
-
-                    ptr += skipByte;
-                }
-            }
-            src.UnlockBits(data);
             return output;
         }
-
     }
 
 }

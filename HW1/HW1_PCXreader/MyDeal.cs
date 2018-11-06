@@ -16,7 +16,10 @@ namespace HW1_PCXreader
     {
         public static ProgressMonitor progress = new ProgressMonitor();
         public enum colorMode : int { R, G, B, GRAY};
-        public enum valueMethod : int { Near, Linear}//取值法: 鄰近取直, 線性插值 
+        public enum valueMethod : int { Nearly, Linear}//取值法: 鄰近取直, 線性插值 
+        public enum RotateMethod : int { posi, nega };
+        public enum TransforMethod : int { Rotate, Mirror };
+
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
             target = new byte[Size];
@@ -383,10 +386,10 @@ namespace HW1_PCXreader
             int wA = 0; // local A size
             int wB = 0; // local B size
             int sA = 0; // local A weight sum
-            double mA = 0;  // local A dis
-            double mB = 0;  // local B dis
-            double curVar = 0;  // current var
-            double maxVar = 0;  //maximun var 
+            double mA = 0;  // local A Average
+            double mB = 0;  // local B Average
+            double curVar = 0;  // current Variance
+            double maxVar = 0;  //maximun Variance 
             int thresh1 = 0;  // Lower thresh
             int thresh2 = 0;  // Higher thresh
             for (int index = 1; index < 256; index++)
@@ -417,7 +420,7 @@ namespace HW1_PCXreader
 
         public static Bitmap resize(Bitmap src, double rate)
         {
-            return resize(src, rate, valueMethod.Near, null);
+            return resize(src, rate, valueMethod.Nearly, null);
         }
 
         public static Bitmap resize(Bitmap src, double rate, valueMethod method, ProgressMonitor monitor)
@@ -474,15 +477,244 @@ namespace HW1_PCXreader
             return dst;
         }
 
+        public static Bitmap rotate(Bitmap src, int angle, RotateMethod method)
+        {
+            switch (method)
+            {
+                case RotateMethod.posi:
+                    return rotate_positive(src, angle, null);
+                case RotateMethod.nega:
+                default:
+                    return rotate_negative(src, angle, null);
+            }
+        }
+
+        public static Bitmap rotate(Bitmap src, int angle, RotateMethod method, ProgressMonitor monitor)
+        {
+            switch (method)
+            {
+                case RotateMethod.posi:
+                    return rotate_positive(src, angle, monitor);
+                case RotateMethod.nega:
+                default:
+                    return rotate_negative(src, angle, monitor);
+            }
+        }
+
+        public static Bitmap rotate_positive(Bitmap src, int angle, ProgressMonitor monitor)
+        {
+
+            if (src == null)
+                return null;
+            if (monitor == null)
+                monitor = progress;
+            monitor.start(); // start view progress
+
+            int width = src.Width;
+            int hight = src.Height;
+            double[] Centroid = { width / 2, hight / 2};
+
+            int progressCurrent = 0;
+            int progressEnd = width * hight;
+
+            Bitmap dst = new Bitmap(width, hight, src.PixelFormat);
+
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            
+            unsafe
+            {
+                
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* srcPtr = (byte*)(srcData.Scan0);
+                byte[] use = new byte[3];
+                MyMat rotateMat = MyMat.ROTATE(angle);
+                MyMat baseMat = new MyMat(2, 1);
+                MyMat dirMat;
+                for (int j = 0; j < hight; j++)
+                {
+                    baseMat[1, 0] = (double)j - Centroid[1];
+                    for (int i = 0; i < width; i++)
+                    {
+                        baseMat[0, 0] = (double)i - Centroid[0];
+
+                        use[0] = srcPtr[0];
+                        use[1] = srcPtr[1];
+                        use[2] = srcPtr[2];
+                        dirMat = MyMat.mul(rotateMat, baseMat);
+                        
+                        if (dirMat.rows != 2)
+                        {
+                            Debug.Print("dirMat.rows != 2" + dirMat.rows);
+                            break;
+                        }
+                        setPixel(dstData, dirMat[0, 0] + Centroid[0], dirMat[1, 0] + Centroid[1], use);
+
+                        srcPtr += 3;
+                        progressCurrent++;
+                        monitor.OnValueChanged(new ValueEventArgs() { value = (double)progressCurrent / progressEnd });
+                    }
+                    srcPtr += skipByte;
+                }
+
+            }
+            src.UnlockBits(srcData);
+            dst.UnlockBits(dstData);
+            monitor.fine();
+            return dst;
+        }
+
+        public static Bitmap rotate_negative(Bitmap src, int angle, ProgressMonitor monitor)
+        {
+            return linearTransfor(src, angle, TransforMethod.Rotate, monitor);
+        }
+
+        public static Bitmap mirror(Bitmap src, int angle)
+        {
+            return linearTransfor(src, angle, TransforMethod.Mirror, null);
+        }
+
+        public static Bitmap mirror(Bitmap src, int angle, ProgressMonitor monitor)
+        {
+            return linearTransfor(src, angle, TransforMethod.Mirror, monitor);
+        }
+
+        public static Bitmap linearTransfor(Bitmap src, int angle, TransforMethod method, ProgressMonitor monitor)
+        {
+
+            if (src == null)
+                return null;
+            if (monitor == null)
+                monitor = progress;
+            monitor.start(); // start view progress
+
+            int width = src.Width;
+            int hight = src.Height;
+            double[] Centroid = { width / 2, hight / 2 };
+
+            int progressCurrent = 0;
+            int progressEnd = width * hight;
+
+            Bitmap dst = new Bitmap(width, hight, src.PixelFormat);
+
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+
+            unsafe
+            {
+
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                byte[] use = null;
+                MyMat tranforMat = null;
+                switch (method)
+                {
+                    case TransforMethod.Mirror:
+                        tranforMat = MyMat.MIRROR(-1 * angle);
+                        break;
+                    case TransforMethod.Rotate:
+                    default:
+                        tranforMat = MyMat.ROTATE(-1 * angle);
+                        break;
+                }
+                MyMat baseMat = new MyMat(2, 1);
+                MyMat dirMat;
+                for (int j = 0; j < hight; j++)
+                {
+                    baseMat[1, 0] = (double)j - Centroid[1];
+                    for (int i = 0; i < width; i++)
+                    {
+                        baseMat[0, 0] = (double)i - Centroid[0];
+                        dirMat = MyMat.mul(tranforMat, baseMat);
+
+                        use = getPixel(srcData, dirMat[0, 0] + Centroid[0], dirMat[1, 0] + Centroid[1], valueMethod.Nearly);
+                        dstPtr[0] = use[0];
+                        dstPtr[1] = use[1];
+                        dstPtr[2] = use[2];
+
+                        dstPtr += 3;
+                        progressCurrent++;
+                        monitor.OnValueChanged(new ValueEventArgs() { value = (double)progressCurrent / progressEnd });
+                    }
+                    dstPtr += skipByte;
+                }
+
+            }
+            src.UnlockBits(srcData);
+            dst.UnlockBits(dstData);
+            monitor.fine();
+            return dst;
+        }
+
         private static byte[] getPixel(BitmapData src, double x, double y, valueMethod method)
         {
             byte[] color = new byte[3];
-
-            int tx = 0;
-            int ty = 0;
+            if ((x < -0.5) || (x > (src.Width -0.5)) || (y < -0.5) || (y > (src.Height -0.5)))//out of bound
+                return color;
             switch (method)
             {
+                case valueMethod.Linear:
+                    double rw = Math.Ceiling(x) - x; // right color weight
+                    double lw = 1.0 - rw; // left color weight
+                    double uw = Math.Ceiling(y) - y; // upper color weight
+                    double dw = 1.0 - uw; // downer color weight
+                    int lx = Convert.ToInt32(Math.Floor(x));    //left x
+                    int rx = Convert.ToInt32(Math.Ceiling(x));  //right x
+                    int ly = Convert.ToInt32(Math.Floor(y));    //downer y
+                    int ry = Convert.ToInt32(Math.Ceiling(y));  //upper y
+
+                    if (lx < 0)
+                        lx = 0;
+                    else if (lx >= src.Width)
+                        lx = src.Width - 1;
+                    if (ly < 0)
+                        ly = 0;
+                    else if (ly >= src.Height)
+                        ly = src.Height - 1;
+                    if (rx < 0)
+                        rx = 0;
+                    else if (rx >= src.Width)
+                        rx = src.Width - 1;
+                    if (ry < 0)
+                        ry = 0;
+                    else if (ry >= src.Height)
+                        ry = src.Height - 1;
+
+                    double[] tColor = new double[3];
+                    unsafe
+                    {
+                        byte* ptr = (byte*)(src.Scan0);
+                        int offset = 0;
+                        // pix 00
+                        offset = ly * src.Stride + lx * 3;
+                        tColor[0] = ptr[offset + 0] * lw * dw;
+                        tColor[1] = ptr[offset + 1] * lw * dw;
+                        tColor[2] = ptr[offset + 2] * lw * dw;
+                        //pix 01
+                        offset += (rx - lx) * 3;
+                        tColor[0] += ptr[offset + 0] * rw * dw;
+                        tColor[1] += ptr[offset + 1] * rw * dw;
+                        tColor[2] += ptr[offset + 2] * rw * dw;
+                        // pix 10
+                        offset = ry * src.Stride + lx * 3;
+                        tColor[0] += ptr[offset + 0] * lw * uw;
+                        tColor[1] += ptr[offset + 1] * lw * uw;
+                        tColor[2] += ptr[offset + 2] * lw * uw;
+                        //pix 11
+                        offset += (rx - lx) * 3;
+                        tColor[0] += ptr[offset + 0] * rw * uw;
+                        tColor[1] += ptr[offset + 1] * rw * uw;
+                        tColor[2] += ptr[offset + 2] * rw * uw;
+                    }
+                    color[0] = Convert.ToByte(tColor[0]);
+                    color[1] = Convert.ToByte(tColor[1]);
+                    color[2] = Convert.ToByte(tColor[2]);
+                    break;
+                    //////////////////
+                case valueMethod.Nearly:
                 default://鄰近取值法 
+                    int tx = 0;
+                    int ty = 0;
                     tx = Convert.ToInt32(x);
                     ty = Convert.ToInt32(y);
                     if (tx < 0)
@@ -493,23 +725,51 @@ namespace HW1_PCXreader
                         ty = 0;
                     else if (ty >= src.Height)
                         ty = src.Height - 1;
+
+                    unsafe
+                    {
+                        byte* ptr = (byte*)(src.Scan0);
+                        ptr += ty * src.Stride;
+                        ptr += tx * 3;
+                        color[0] = ptr[0];
+                        color[1] = ptr[1];
+                        color[2] = ptr[2];
+                    }
                     break;
             }
 
+            return color;
+        }
+
+        private static bool setPixel(BitmapData dst, double x, double y, byte[] color)
+        {
+            if(color.Length != 3)
+            {
+                Debug.Print("setPixel : color not 3byte");
+                return false;
+            }
+            int tx = 0;
+            int ty = 0;
+            tx = Convert.ToInt32(x);
+            ty = Convert.ToInt32(y);
+            if ((tx < 0) || (tx >= dst.Width) || (ty < 0) || (ty >= dst.Height))
+                return false;
+
             unsafe
             {
-                byte* ptr = (byte*)(src.Scan0);
-                ptr += ty * src.Stride;
+                byte* ptr = (byte*)(dst.Scan0);
+                ptr += ty * dst.Stride;
                 ptr += tx * 3;
-                color[0] = ptr[0];
-                color[1] = ptr[1];
-                color[2] = ptr[2];
+                ptr[0] = color[0];
+                ptr[1] = color[1];
+                ptr[2] = color[2];
             }
-            return color;
-
+            return true;
         }
-        
     }
+
+
+
 
     /// <summary>
     /// other class-->

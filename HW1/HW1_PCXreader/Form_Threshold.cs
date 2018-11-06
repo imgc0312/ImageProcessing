@@ -96,8 +96,10 @@ namespace HW1_PCXreader
                         groupBox7.Enabled = false;
                         int[] threshs = MyDeal.OTSU(imgView);
                         trackBar1.Value = threshs[2];//R
-                        trackBar2.Value = threshs[1];//G
-                        trackBar3.Value = threshs[0];//B
+                        if (chUse >= 2)
+                            trackBar2.Value = threshs[1];//G
+                        if (chUse >= 3)
+                            trackBar3.Value = threshs[0];//B
                         break;
                 }
             }

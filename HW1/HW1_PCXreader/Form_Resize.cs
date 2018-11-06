@@ -68,12 +68,16 @@ namespace HW1_PCXreader
             setInfo();
             progress.view = progressBar1;
             progress.view.Visible = false;
+            comboBox1.SelectedIndex = 0;
+            comboBox2.SelectedIndex = 0;
         }
         protected override void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             base.clearToolStripMenuItem_Click(sender, e);
             radioButton2.Checked = true;
             radioButton5.Checked = true;
+            comboBox1.SelectedIndex = 0;
+            comboBox2.SelectedIndex = 0;
         }
 
         private void setInfo()
@@ -115,12 +119,22 @@ namespace HW1_PCXreader
                 resize();
         }
 
-        public void resize()
+        private void resize()
         {
+            MyDeal.valueMethod resizeMethod = MyDeal.valueMethod.Nearly;
             progress.start();
+            switch (comboBox1.SelectedIndex)
+            {
+                case 0:
+                    resizeMethod = MyDeal.valueMethod.Nearly;
+                    break;
+                case 1:
+                    resizeMethod = MyDeal.valueMethod.Linear;
+                    break;
+            }
             double[] rate = { 0.5, 1.0, 2.0 };
             int choose = 1;
-            foreach (RadioButton select in groupBox5.Controls)
+            foreach (RadioButton select in panel1.Controls)
             {
                 if (select.Checked)
                     choose = select.TabIndex;
@@ -128,9 +142,19 @@ namespace HW1_PCXreader
             if ((choose < 0) || (choose > 2))
                 choose = 1;
             progress.fine();
-            tempView = MyDeal.resize(imgView, rate[choose], MyDeal.valueMethod.Near, progress);
+            tempView = MyDeal.resize(imgView, rate[choose], resizeMethod, progress);
+
             progress.start();
-            foreach (RadioButton select in groupBox6.Controls)
+            switch (comboBox2.SelectedIndex)
+            {
+                case 0:
+                    resizeMethod = MyDeal.valueMethod.Nearly;
+                    break;
+                case 1:
+                    resizeMethod = MyDeal.valueMethod.Linear;
+                    break;
+            }
+            foreach (RadioButton select in panel2.Controls)
             {
                 if (select.Checked)
                     choose = select.TabIndex;
@@ -138,10 +162,14 @@ namespace HW1_PCXreader
             if ((choose < 0) || (choose > 2))
                 choose = 1;
             progress.fine();
-            outView = MyDeal.resize(tempView, rate[choose], MyDeal.valueMethod.Near, progress);
+            outView = MyDeal.resize(tempView, rate[choose], resizeMethod, progress);
 
         }
 
-        
+        private void comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            resize();
+        }
+
     }
 }

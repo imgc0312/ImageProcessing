@@ -453,6 +453,12 @@ namespace HW1_PCXreader
             Form_Resize form2 = new Form_Resize(this);
             form2.ShowDialog();
         }
+
+        private void rotateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Rotate form2 = new Form_Rotate(this);
+            form2.ShowDialog();
+        }
     }
 
 }
