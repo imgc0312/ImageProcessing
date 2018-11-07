@@ -100,6 +100,11 @@ namespace HW1_PCXreader
             comboBox2.SelectedIndex = 0;
         }
 
+        protected override void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            count();
+        }
+
         private void textBox_TextChanged(object sender, EventArgs e)
         {
             int value = 0;

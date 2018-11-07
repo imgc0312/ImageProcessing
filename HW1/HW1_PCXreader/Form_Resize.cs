@@ -70,6 +70,7 @@ namespace HW1_PCXreader
             progress.view.Visible = false;
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
+            resize();
         }
         protected override void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -78,6 +79,11 @@ namespace HW1_PCXreader
             radioButton5.Checked = true;
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
+        }
+
+        protected override void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            resize();
         }
 
         private void setInfo()

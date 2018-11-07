@@ -521,5 +521,11 @@ namespace HW1_PCXreader
             Form_Rotate form2 = new Form_Rotate(this);
             form2.ShowDialog();
         }
+
+        private void penetrateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Penetrate form2 = new Form_Penetrate(this);
+            form2.ShowDialog();
+        }
     }
 }

@@ -33,8 +33,8 @@
             System.Windows.Forms.StatusStrip statusStrip1;
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox4;
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -58,6 +58,8 @@
             this.thresholdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.penetrateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -193,15 +195,15 @@
             // 
             // chart1
             // 
-            chartArea2.AxisX.Interval = 255D;
-            chartArea2.AxisX.LabelStyle.Interval = 0D;
-            chartArea2.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea2.AxisY.LabelStyle.IsEndLabelVisible = false;
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea1.AxisX.Interval = 255D;
+            chartArea1.AxisX.LabelStyle.Interval = 0D;
+            chartArea1.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
+            chartArea1.AxisY.LabelStyle.IsEndLabelVisible = false;
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(3, 25);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(484, 171);
@@ -244,7 +246,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.modeToolStripMenuItem,
-            this.operateToolStripMenuItem});
+            this.operateToolStripMenuItem,
+            this.toolToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(3, 3);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(992, 30);
@@ -342,14 +345,14 @@
             // thresholdToolStripMenuItem
             // 
             this.thresholdToolStripMenuItem.Name = "thresholdToolStripMenuItem";
-            this.thresholdToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.thresholdToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.thresholdToolStripMenuItem.Text = "Threshold";
             this.thresholdToolStripMenuItem.Click += new System.EventHandler(this.thresholdToolStripMenuItem_Click);
             // 
             // resizeToolStripMenuItem
             // 
             this.resizeToolStripMenuItem.Name = "resizeToolStripMenuItem";
-            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.resizeToolStripMenuItem.Text = "Resize";
             this.resizeToolStripMenuItem.Click += new System.EventHandler(this.resizeToolStripMenuItem_Click);
             // 
@@ -359,6 +362,21 @@
             this.rotateToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.rotateToolStripMenuItem.Text = "Rotate / Mirror";
             this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotateToolStripMenuItem_Click);
+            // 
+            // toolToolStripMenuItem
+            // 
+            this.toolToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.penetrateToolStripMenuItem});
+            this.toolToolStripMenuItem.Name = "toolToolStripMenuItem";
+            this.toolToolStripMenuItem.Size = new System.Drawing.Size(56, 26);
+            this.toolToolStripMenuItem.Text = "tool";
+            // 
+            // penetrateToolStripMenuItem
+            // 
+            this.penetrateToolStripMenuItem.Name = "penetrateToolStripMenuItem";
+            this.penetrateToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.penetrateToolStripMenuItem.Text = "Penetrate";
+            this.penetrateToolStripMenuItem.Click += new System.EventHandler(this.penetrateToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -412,6 +430,8 @@
         private System.Windows.Forms.ToolStripMenuItem thresholdToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rotateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem penetrateToolStripMenuItem;
     }
 }
 

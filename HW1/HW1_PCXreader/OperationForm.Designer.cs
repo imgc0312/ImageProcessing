@@ -42,6 +42,7 @@
             this.operateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.thresholdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -53,7 +54,6 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -177,16 +177,23 @@
             // thresholdToolStripMenuItem
             // 
             this.thresholdToolStripMenuItem.Name = "thresholdToolStripMenuItem";
-            this.thresholdToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.thresholdToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.thresholdToolStripMenuItem.Text = "Threshold";
             this.thresholdToolStripMenuItem.Click += new System.EventHandler(this.thresholdToolStripMenuItem_Click);
             // 
             // resizeToolStripMenuItem
             // 
             this.resizeToolStripMenuItem.Name = "resizeToolStripMenuItem";
-            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.resizeToolStripMenuItem.Text = "Resize";
             this.resizeToolStripMenuItem.Click += new System.EventHandler(this.resizeToolStripMenuItem_Click);
+            // 
+            // rotateToolStripMenuItem
+            // 
+            this.rotateToolStripMenuItem.Name = "rotateToolStripMenuItem";
+            this.rotateToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.rotateToolStripMenuItem.Text = "Rotate / Mirror";
+            this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotateToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -241,6 +248,7 @@
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+            this.pictureBox1.DoubleClick += new System.EventHandler(this.pictureBox_DoubleClick);
             this.pictureBox1.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
             this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             // 
@@ -272,6 +280,7 @@
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox2.TabIndex = 0;
             this.pictureBox2.TabStop = false;
+            this.pictureBox2.DoubleClick += new System.EventHandler(this.pictureBox_DoubleClick);
             this.pictureBox2.MouseLeave += new System.EventHandler(this.pictureBox_MouseLeave);
             this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             // 
@@ -287,13 +296,6 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // rotateToolStripMenuItem
-            // 
-            this.rotateToolStripMenuItem.Name = "rotateToolStripMenuItem";
-            this.rotateToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.rotateToolStripMenuItem.Text = "Rotate / Mirror";
-            this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotateToolStripMenuItem_Click);
             // 
             // OperationForm
             // 

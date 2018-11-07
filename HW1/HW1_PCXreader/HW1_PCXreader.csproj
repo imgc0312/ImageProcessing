@@ -48,11 +48,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmptyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmptyForm.Designer.cs">
+      <DependentUpon>EmptyForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_ImageView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_ImageView.Designer.cs">
+      <DependentUpon>Form_ImageView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_Penetrate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Penetrate.Designer.cs">
+      <DependentUpon>Form_Penetrate.cs</DependentUpon>
     </Compile>
     <Compile Include="Form_Resize.cs">
       <SubType>Form</SubType>
@@ -89,8 +107,17 @@
     <Compile Include="ToolForm.Designer.cs">
       <DependentUpon>ToolForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="EmptyForm.resx">
+      <DependentUpon>EmptyForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_ImageView.resx">
+      <DependentUpon>Form_ImageView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Penetrate.resx">
+      <DependentUpon>Form_Penetrate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Resize.resx">
       <DependentUpon>Form_Resize.cs</DependentUpon>
@@ -116,6 +143,7 @@
     <EmbeddedResource Include="ToolForm.resx">
       <DependentUpon>ToolForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

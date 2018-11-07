@@ -441,16 +441,16 @@ namespace HW1_PCXreader
             Bitmap dst = new Bitmap(newWidth, newHeight, src.PixelFormat);
 
             BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             
             unsafe
             {
                 int skipByte = dstData.Stride - dstData.Width * 3;
                 byte* dstPtr = (byte*)(dstData.Scan0);
                 byte[] use = null;
-                for (int i = 0; i < newWidth; i++)
+                for (int j = 0; j < newHeight; j++)
                 {
-                    for (int j = 0; j < newHeight; j++)
+                    for (int i = 0; i < newWidth; i++)
                     {
                         use = getPixel(srcData, i / rate, j / rate, method);
                         if(use != null)
@@ -458,12 +458,12 @@ namespace HW1_PCXreader
                             dstPtr[0] = use[0];
                             dstPtr[1] = use[1];
                             dstPtr[2] = use[2];
-                            dstPtr += 3;
                         }
                         else
                         {
                             Debug.Print("getPixel Empty");
                         }
+                        dstPtr += 3;
                         progressCurrent++;
                         monitor.OnValueChanged(new ValueEventArgs() { value = (double)progressCurrent / progressEnd });
                     }
@@ -646,9 +646,53 @@ namespace HW1_PCXreader
             return dst;
         }
 
+        public static Bitmap opacity(Bitmap fore, Bitmap back, int rate)
+        {
+            Bitmap dst = null;
+            int newWidth = 0;
+            int newHeight = 0;
+            if (fore == null)
+                return back;
+            if (back == null)
+                return fore;
+            newWidth = Math.Max(fore.Width, back.Width);
+            newHeight = Math.Max(fore.Height, back.Height);
+            dst = new Bitmap(newWidth, newHeight, fore.PixelFormat);
+            BitmapData foreData = fore.LockBits(MyF.bound(fore), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData backData = back.LockBits(MyF.bound(back), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                byte[] useFore = null;
+                byte[] useBack = null;
+                for (int j = 0; j < newHeight; j++)
+                {
+                    for (int i = 0; i < newWidth; i++)
+                    {
+
+                        useFore = getPixel(foreData, i, j, valueMethod.Nearly);
+                        useBack = getPixel(backData, i, j, valueMethod.Nearly);
+                        dstPtr[0] = Convert.ToByte(((int)useFore[0] * rate + (int)useBack[0] * (100 - rate)) / 100);
+                        dstPtr[1] = Convert.ToByte(((int)useFore[1] * rate + (int)useBack[1] * (100 - rate)) / 100);
+                        dstPtr[2] = Convert.ToByte(((int)useFore[2] * rate + (int)useBack[2] * (100 - rate)) / 100);
+
+                        dstPtr += 3;
+                    }
+                    dstPtr += skipByte;
+                }
+
+            }
+            fore.UnlockBits(foreData);
+            back.UnlockBits(backData);
+            dst.UnlockBits(dstData);
+            return dst;
+        }
+
         private static byte[] getPixel(BitmapData src, double x, double y, valueMethod method)
         {
-            byte[] color = new byte[3];
+            byte[] color = new byte[3] { 0,0,0};
             if ((x < -0.5) || (x > (src.Width -0.5)) || (y < -0.5) || (y > (src.Height -0.5)))//out of bound
                 return color;
             switch (method)

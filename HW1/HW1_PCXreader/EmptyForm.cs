@@ -12,7 +12,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace HW1_PCXreader
 {
-    public partial class OperationForm : Form
+    public partial class EmptyForm : Form
     {
         public string filePath = "unset";
         public string fileName
@@ -53,7 +53,7 @@ namespace HW1_PCXreader
             set
             {
                 selMode = value;
-                pictureBox1.Image = imgView;
+                //pictureBox1.Image = imgView;
                 switch (value)
                 {
                     case (int)imgMode.ORI:
@@ -89,7 +89,6 @@ namespace HW1_PCXreader
         }
 
         protected Bitmap[] Img = new Bitmap[(int)imgMode.Size];//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
-        protected Bitmap OutImg = null;//image view-> 0:original , 1:negative , 2:gray , 3:R , 4:G , 5:B
         public Bitmap imgView
         {
             get
@@ -137,22 +136,10 @@ namespace HW1_PCXreader
                 }
             }
         }
-        public Bitmap outView
-        {
-            get
-            {
-                return OutImg;
-            }
-            set
-            {
-                OutImg = value;
-                pictureBox2.Image = OutImg;
-            }
-        }
-        protected Series seriesT;
-        protected Series seriesR;
-        protected Series seriesG;
-        protected Series seriesB;
+        Series seriesT;
+        Series seriesR;
+        Series seriesG;
+        Series seriesB;
         public string colorLabel
         {
             get
@@ -171,33 +158,17 @@ namespace HW1_PCXreader
                 }
             }
         }
-        private bool dataClear = true;//data is clear
-        protected virtual bool openEnable
-        {
-            get
-            {
-                return dataClear;
-            }
-            set
-            {
-                dataClear = value;
-                openFileToolStripMenuItem.Enabled = value;
-                clearToolStripMenuItem.Enabled = !value;
-            }
-        }
 
         /// <summary>
         /// function-->
         /// </summary>
 
-        public OperationForm()
+        public EmptyForm()
         {
             InitializeComponent();
-            initialForm();
-            openEnable = true;
         }
 
-        public OperationForm(Form1 form1)
+        public EmptyForm(Form1 form1)
         {
             InitializeComponent();
             initialForm();
@@ -210,34 +181,16 @@ namespace HW1_PCXreader
                     Img[i] = (Bitmap)form1.Img[i].Clone();
             }
             mode = form1.mode;
-            if(imgView != null)
+            if (imgView != null)
             {
                 foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
                 {
                     item.Enabled = true;
                 }
-                openEnable = false;
             }
         }
 
-        public OperationForm(OperationForm form)// if this inherit old operated image
-        {
-            InitializeComponent();
-            initialForm();
-            mode = form.mode;
-            Img[mode] = form.outView;
-            pictureBox1.Image = imgView;
-            if (imgView != null)
-            {
-                foreach (ToolStripMenuItem item in modeToolStripMenuItem.DropDownItems)// unlock image mode 
-                {
-                    item.Enabled = false; // if this inherit old operated image
-                }
-                openEnable = false;
-            }
-        }
-
-        protected void initialForm()
+        protected virtual void initialForm()
         {
             //openFileDialog Setting
             openFileDialog1 = new OpenFileDialog();
@@ -259,7 +212,6 @@ namespace HW1_PCXreader
             {
                 item.Enabled = false;
             }
-            openEnable = true;
         }
 
         protected string textFromLines(string[] lines)
@@ -288,7 +240,6 @@ namespace HW1_PCXreader
             return colorLabel;
         }
 
-
         protected void openPCX(string filePath)
         {
             fileName = filePath;
@@ -297,11 +248,11 @@ namespace HW1_PCXreader
                 MessageBox.Show(filePath, "開啟失敗");
                 return;
             }
-            if (pictureBox1.Image != null)
-            {
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = null;
-            }
+            //if (pictureBox1.Image != null)
+            //{
+            //    pictureBox1.Image.Dispose();
+            //    pictureBox1.Image = null;
+            //}
             imgView = thePCX.getView();
             mode = (int)imgMode.ORI;
             MessageBox.Show(filePath, "開啟成功");
@@ -309,10 +260,46 @@ namespace HW1_PCXreader
             {
                 item.Enabled = true;
             }
-            openEnable = false;
         }
 
-        protected void buildChart(Chart chart1)
+        protected Bitmap openPCX(string filePath, MyPCX pcxInfo)
+        {
+            if (pcxInfo == null)
+                pcxInfo = new MyPCX();
+            if (!pcxInfo.from(filePath))
+            {
+                MessageBox.Show(filePath, "開啟失敗");
+                return null;
+            }
+            MessageBox.Show(filePath, "開啟成功");
+            return pcxInfo.getView();
+        }
+
+        protected Bitmap openPCX(string filePath, MyPCX pcxInfo, PictureBox view)
+        {
+            if (pcxInfo == null)
+                pcxInfo = new MyPCX();
+            Bitmap output;
+            if (!pcxInfo.from(filePath))
+            {
+                MessageBox.Show(filePath, "開啟失敗");
+                return null;
+            }
+            output = pcxInfo.getView();
+            view.Image = output;
+            MessageBox.Show(filePath, "開啟成功");
+            return output;
+        }
+
+        protected String findName(String path)
+        {
+            if (path == null)
+                return ""; 
+            string[] fileAr = path.Split('\\');
+            return fileAr[fileAr.Length - 1];
+        }
+
+        protected void buildChart(Chart chart1, Bitmap outView)
         {
             try
             {
@@ -434,42 +421,6 @@ namespace HW1_PCXreader
             {
                 item.Enabled = false;
             }
-            openEnable = true;
-        }
-
-        protected virtual void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            if(outView == null)
-                outView = imgView;
-        }
-
-        private void thresholdToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Form_Threshold form2 = new Form_Threshold(this);
-            form2.ShowDialog();
-        }
-
-        private void resizeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Form_Resize form2 = new Form_Resize(this);
-            form2.ShowDialog();
-        }
-
-        private void rotateToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Form_Rotate form2 = new Form_Rotate(this);
-            form2.ShowDialog();
-        }
-
-        private void pictureBox_DoubleClick(object sender, EventArgs e)
-        {
-            PictureBox here = (PictureBox)sender;
-            if(here.Image != null)
-            {
-                Form_ImageView form2 = new Form_ImageView(here.Image, mode);
-                form2.ShowDialog();
-            }
         }
     }
-
 }

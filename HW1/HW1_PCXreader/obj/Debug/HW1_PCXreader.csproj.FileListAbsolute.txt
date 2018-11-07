@@ -11,3 +11,7 @@ C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\De
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Threshold.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Resize.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Rotate.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.EmptyForm.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.ToolForm.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_ImageView.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Penetrate.resources
