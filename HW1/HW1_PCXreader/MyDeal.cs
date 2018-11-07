@@ -511,13 +511,17 @@ namespace HW1_PCXreader
             monitor.start(); // start view progress
 
             int width = src.Width;
-            int hight = src.Height;
-            double[] Centroid = { width / 2, hight / 2};
+            int height = src.Height;
+            int newWidth = width;
+            int newHeight = height;
+            double[] oriCentroid = { width / 2, height / 2 };
+            linearTransfor(ref newWidth, ref newHeight, angle, TransforMethod.Rotate);//count new width & height
+            double[] Centroid = { newWidth / 2, newHeight / 2 };
 
             int progressCurrent = 0;
-            int progressEnd = width * hight;
+            int progressEnd = width * height;
 
-            Bitmap dst = new Bitmap(width, hight, src.PixelFormat);
+            Bitmap dst = new Bitmap(newWidth, newHeight, src.PixelFormat);
 
             BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
@@ -525,18 +529,18 @@ namespace HW1_PCXreader
             unsafe
             {
                 
-                int skipByte = dstData.Stride - dstData.Width * 3;
+                int skipByte = srcData.Stride - srcData.Width * 3;
                 byte* srcPtr = (byte*)(srcData.Scan0);
                 byte[] use = new byte[3];
                 MyMat rotateMat = MyMat.ROTATE(angle);
                 MyMat baseMat = new MyMat(2, 1);
                 MyMat dirMat;
-                for (int j = 0; j < hight; j++)
+                for (int j = 0; j < height; j++)
                 {
-                    baseMat[1, 0] = (double)j - Centroid[1];
+                    baseMat[1, 0] = (double)j - oriCentroid[1];
                     for (int i = 0; i < width; i++)
                     {
-                        baseMat[0, 0] = (double)i - Centroid[0];
+                        baseMat[0, 0] = (double)i - oriCentroid[0];
 
                         use[0] = srcPtr[0];
                         use[1] = srcPtr[1];
@@ -589,13 +593,15 @@ namespace HW1_PCXreader
             monitor.start(); // start view progress
 
             int width = src.Width;
-            int hight = src.Height;
-            double[] Centroid = { width / 2, hight / 2 };
+            int height = src.Height;
+            double[] oriCentroid = { width / 2, height / 2 };
+            linearTransfor(ref width, ref height, angle, method);//count new width & height
+            double[] Centroid = { width / 2, height / 2 };
 
             int progressCurrent = 0;
-            int progressEnd = width * hight;
+            int progressEnd = width * height;
 
-            Bitmap dst = new Bitmap(width, hight, src.PixelFormat);
+            Bitmap dst = new Bitmap(width, height, src.PixelFormat);
 
             BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
@@ -619,7 +625,7 @@ namespace HW1_PCXreader
                 }
                 MyMat baseMat = new MyMat(2, 1);
                 MyMat dirMat;
-                for (int j = 0; j < hight; j++)
+                for (int j = 0; j < height; j++)
                 {
                     baseMat[1, 0] = (double)j - Centroid[1];
                     for (int i = 0; i < width; i++)
@@ -627,7 +633,7 @@ namespace HW1_PCXreader
                         baseMat[0, 0] = (double)i - Centroid[0];
                         dirMat = MyMat.mul(tranforMat, baseMat);
 
-                        use = getPixel(srcData, dirMat[0, 0] + Centroid[0], dirMat[1, 0] + Centroid[1], valueMethod.Nearly);
+                        use = getPixel(srcData, dirMat[0, 0] + oriCentroid[0], dirMat[1, 0] + oriCentroid[1], valueMethod.Nearly);
                         dstPtr[0] = use[0];
                         dstPtr[1] = use[1];
                         dstPtr[2] = use[2];
@@ -644,6 +650,34 @@ namespace HW1_PCXreader
             dst.UnlockBits(dstData);
             monitor.fine();
             return dst;
+        }
+
+        public static void linearTransfor(ref int width, ref int height, int angle, TransforMethod method)
+        {
+            MyMat tranforMat = null;
+            MyMat baseMat = new MyMat(2, 1);
+            MyMat dirMat1 = null;
+            MyMat dirMat2 = null;
+            double tempWidth = 0.0, tempHeight = 0.0;
+            switch (method)
+            {
+                case TransforMethod.Mirror:
+                    tranforMat = MyMat.MIRROR(angle);
+                    break;
+                case TransforMethod.Rotate:
+                default:
+                    tranforMat = MyMat.ROTATE(angle);
+                    break;
+            }
+            baseMat[0, 0] = (double)width / 2;
+            baseMat[1, 0] = (double)height / 2;
+            dirMat1 = MyMat.mul(tranforMat, baseMat);
+            baseMat[1, 0] = -baseMat[1, 0];
+            dirMat2 = MyMat.mul(tranforMat, baseMat);
+            tempWidth = 2 * Math.Max(Math.Abs(dirMat1[0, 0]), Math.Abs(dirMat2[0, 0]));
+            tempHeight = 2 * Math.Max(Math.Abs(dirMat1[1, 0]), Math.Abs(dirMat2[1, 0]));
+            width = Convert.ToInt32(tempWidth);
+            height = Convert.ToInt32(tempHeight);
         }
 
         public static Bitmap opacity(Bitmap fore, Bitmap back, int rate)
