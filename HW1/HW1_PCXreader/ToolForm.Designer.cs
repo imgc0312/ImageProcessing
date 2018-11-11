@@ -46,7 +46,7 @@
             this.groupBox2.Size = new System.Drawing.Size(222, 280);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Useful Infomation";
+            this.groupBox2.Text = "Argument";
             // 
             // groupBox1
             // 

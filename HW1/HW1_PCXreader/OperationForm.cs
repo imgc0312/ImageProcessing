@@ -470,6 +470,12 @@ namespace HW1_PCXreader
                 form2.ShowDialog();
             }
         }
+
+        private void OperationForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                this.Close();
+        }
     }
 
 }

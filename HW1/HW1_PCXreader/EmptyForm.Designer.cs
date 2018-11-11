@@ -187,8 +187,10 @@
             this.ClientSize = new System.Drawing.Size(278, 239);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(statusStrip1);
+            this.KeyPreview = true;
             this.Name = "EmptyForm";
             this.Text = "EmptyForm";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EmptyForm_KeyDown);
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);

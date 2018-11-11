@@ -275,7 +275,18 @@ namespace HW1_PCXreader
             return pcxInfo.getView();
         }
 
+        public delegate Bitmap Dealing(Bitmap src);
+        protected Bitmap nondealing(Bitmap src)
+        {
+            return src;
+        }
+
         protected Bitmap openPCX(string filePath, MyPCX pcxInfo, PictureBox view)
+        {
+            return openPCX(filePath, pcxInfo, view, nondealing);
+        }
+
+        protected Bitmap openPCX(string filePath, MyPCX pcxInfo, PictureBox view, Dealing dealing)
         {
             if (pcxInfo == null)
                 pcxInfo = new MyPCX();
@@ -285,7 +296,7 @@ namespace HW1_PCXreader
                 MessageBox.Show(filePath, "開啟失敗");
                 return null;
             }
-            output = pcxInfo.getView();
+            output = dealing(pcxInfo.getView());
             view.Image = output;
             MessageBox.Show(filePath, "開啟成功");
             return output;
@@ -405,6 +416,13 @@ namespace HW1_PCXreader
             toolStripStatusLabel2.Text = colorLabel;
         }
 
+        protected void pictureBox_DoubleClick(object sender, EventArgs e)
+        {
+            PictureBox here = (PictureBox)sender;
+            Form_ImageView form2 = new Form_ImageView(here.Image, mode);
+            form2.ShowDialog();
+        }
+
         protected void ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem here = (ToolStripMenuItem)sender;
@@ -421,6 +439,12 @@ namespace HW1_PCXreader
             {
                 item.Enabled = false;
             }
+        }
+
+        private void EmptyForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                this.Close();
         }
     }
 }

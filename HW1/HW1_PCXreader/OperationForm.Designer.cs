@@ -311,6 +311,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "OperationForm";
             this.Text = "Operation";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OperationForm_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);

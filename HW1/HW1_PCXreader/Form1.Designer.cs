@@ -60,6 +60,7 @@
             this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.penetrateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bitPlaneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -366,7 +367,8 @@
             // toolToolStripMenuItem
             // 
             this.toolToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.penetrateToolStripMenuItem});
+            this.penetrateToolStripMenuItem,
+            this.bitPlaneToolStripMenuItem});
             this.toolToolStripMenuItem.Name = "toolToolStripMenuItem";
             this.toolToolStripMenuItem.Size = new System.Drawing.Size(56, 26);
             this.toolToolStripMenuItem.Text = "tool";
@@ -377,6 +379,13 @@
             this.penetrateToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
             this.penetrateToolStripMenuItem.Text = "Penetrate";
             this.penetrateToolStripMenuItem.Click += new System.EventHandler(this.penetrateToolStripMenuItem_Click);
+            // 
+            // bitPlaneToolStripMenuItem
+            // 
+            this.bitPlaneToolStripMenuItem.Name = "bitPlaneToolStripMenuItem";
+            this.bitPlaneToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
+            this.bitPlaneToolStripMenuItem.Text = "BitPlane";
+            this.bitPlaneToolStripMenuItem.Click += new System.EventHandler(this.bitPlaneToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -432,6 +441,7 @@
         private System.Windows.Forms.ToolStripMenuItem rotateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem penetrateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bitPlaneToolStripMenuItem;
     }
 }
 

@@ -38,5 +38,10 @@ namespace HW1_PCXreader
             base.pictureBox_MouseLeave(sender, e);
         }
 
+        protected new void pictureBox_DoubleClick(object sender, EventArgs e)
+        {
+            base.pictureBox_DoubleClick(sender, e);
+        }
+
     }
 }

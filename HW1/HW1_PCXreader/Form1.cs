@@ -527,5 +527,11 @@ namespace HW1_PCXreader
             Form_Penetrate form2 = new Form_Penetrate(this);
             form2.ShowDialog();
         }
+
+        private void bitPlaneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_BitPlane form2 = new Form_BitPlane(this);
+            form2.ShowDialog();
+        }
     }
 }
