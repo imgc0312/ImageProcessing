@@ -12,7 +12,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace HW1_PCXreader
 {
-    class MyDeal
+    public class MyDeal
     {
         public static ProgressMonitor progress = new ProgressMonitor();
         public enum colorMode : int { R, G, B, GRAY};
@@ -724,6 +724,53 @@ namespace HW1_PCXreader
             return dst;
         }
 
+        public static Bitmap stretch(Bitmap src, StretchOption[] opts)
+        {
+            Bitmap dst;
+            if (src == null)
+                return null;
+            dst = (Bitmap)src.Clone();
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            
+            unsafe
+            {
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                for (int i = 0; i < dstData.Width; i++)
+                {
+                    for (int j = 0; j < dstData.Height; j++)
+                    {
+                        foreach(StretchOption opt in opts)
+                        {
+                            if((opt.CH == colorMode.B) || (opt.CH == colorMode.GRAY))
+                            {
+                                if (opt.inRange(dstPtr[0]))
+                                    dstPtr[0] = Convert.ToByte(opt.map(dstPtr[0]));
+                            }
+                            if ((opt.CH == colorMode.G) || (opt.CH == colorMode.GRAY))
+                            {
+                                if (opt.inRange(dstPtr[1]))
+                                    dstPtr[1] = Convert.ToByte(opt.map(dstPtr[1]));
+                            }
+                            if ((opt.CH == colorMode.R) || (opt.CH == colorMode.GRAY))
+                            {
+                                if (opt.inRange(dstPtr[2]))
+                                    dstPtr[2] = Convert.ToByte(opt.map(dstPtr[2]));
+                            }
+                        }
+                        dstPtr += 3;
+                    }
+                    dstPtr += skipByte;
+                }
+
+            }
+            dst.UnlockBits(dstData);
+            return dst;
+        }
+
+        ///
+        /// -->pixel method
+        ///
         private static byte[] getPixel(BitmapData src, double x, double y, valueMethod method)
         {
             byte[] color = new byte[3] { 0,0,0};
@@ -853,6 +900,7 @@ namespace HW1_PCXreader
     /// other class-->
     /// </summary>
 
+    // for progress
     public class ValueEventArgs : EventArgs //for progressbar
     {
         public double value { set; get; }
@@ -921,4 +969,106 @@ namespace HW1_PCXreader
             //Debug.Print("progress : change");
         }
     }
+
+    // for stretch
+    public class StretchOption
+    {
+        private int start;
+        private int end;
+        private double rate;
+        private double bias;
+        public MyDeal.colorMode CH;
+
+        public StretchOption()
+        {
+            start = 0;
+            end = 255;
+            rate = 1.0;
+            bias = 0.0;
+            CH = MyDeal.colorMode.GRAY;
+        }
+
+        public StretchOption(int start, int end, double rate, double bias)
+        {
+            set(start, end, rate, bias);
+        }
+
+        public StretchOption(int start, int end, double rate, double bias, MyDeal.colorMode CH)
+        {
+            set(start, end, rate, bias, CH);
+        }
+
+        public StretchOption(int x1, int y1, int x2, int y2)
+        {
+            set(x1, y1, x2, y2);
+        }
+
+        public StretchOption(int x1, int y1, int x2, int y2, MyDeal.colorMode CH)
+        {
+            set(x1, y1, x2, y2, CH);
+        }
+
+        public void set(int start, int end, double rate, double bias)
+        {
+            set(start, end, rate, bias, MyDeal.colorMode.GRAY);
+        }
+
+        public void set(int start, int end, double rate, double bias, MyDeal.colorMode CH)
+        {
+            this.CH = CH;
+            this.rate = rate;
+            if (end > 255)
+                this.end = 255;
+            else
+                this.end = end;
+            if (start < 0)
+            {
+                this.start = 0;
+                this.bias = bias + rate * (this.start - start);
+            }
+            else
+            {
+                this.start = start;
+                this.bias = bias;
+            }
+            Debug.Print("start " + this.start + "," + this.end + " , rate " + this.rate + " , " + this.bias);
+        }
+
+        public void set(int x1, int y1, int x2, int y2)
+        {
+            set(x1, y1, x2, y2, MyDeal.colorMode.GRAY);
+        }
+
+        public void set(int x1, int y1, int x2, int y2, MyDeal.colorMode CH)
+        {
+            int theBase = x2 - x1;
+            if (theBase == 0)
+            {
+                if(x1 == 255)
+                    set(x1, x2, 0.0, (double)y1, CH);
+                else
+                    set(x1, x2, 0.0, (double)y2, CH);
+            }
+            else
+            {
+                set(x1, x2, ((double)y2 - y1) / theBase, (double)y1, CH);
+            }
+        }
+
+        public bool inRange(int index)
+        {
+            return ((index >= start) && (index <= end));
+        }
+
+        public int map(int index)
+        {
+            int output = Convert.ToInt32(rate * (index - start) + bias);
+            //Debug.Print(" " + index + " => " + output + " func : "  + start + ","+ rate + "," + bias);
+            if (output < 0)
+                output = 0;
+            else if (output > 255)
+                output = 255;
+            return output;
+        }
+    } 
 }

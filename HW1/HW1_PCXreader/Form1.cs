@@ -533,5 +533,11 @@ namespace HW1_PCXreader
             Form_BitPlane form2 = new Form_BitPlane(this);
             form2.ShowDialog();
         }
+
+        private void stretchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Stretch form2 = new Form_Stretch(this);
+            form2.ShowDialog();
+        }
     }
 }

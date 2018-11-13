@@ -439,8 +439,11 @@ namespace HW1_PCXreader
 
         protected virtual void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            if(outView == null)
+            if (imgView == null)
+                outView = null;
+            else if(outView == null)
                 outView = imgView;
+
         }
 
         private void thresholdToolStripMenuItem_Click(object sender, EventArgs e)
@@ -461,6 +464,12 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
 
+        private void stretchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Stretch form2 = new Form_Stretch(this);
+            form2.ShowDialog();
+        }
+
         private void pictureBox_DoubleClick(object sender, EventArgs e)
         {
             PictureBox here = (PictureBox)sender;
@@ -476,6 +485,7 @@ namespace HW1_PCXreader
             if (e.KeyCode == Keys.Escape)
                 this.Close();
         }
+        
     }
 
 }
