@@ -19,6 +19,7 @@ namespace HW1_PCXreader
         public enum valueMethod : int { Nearly, Linear}//取值法: 鄰近取直, 線性插值 
         public enum RotateMethod : int { posi, nega };
         public enum TransforMethod : int { Rotate, Mirror };
+        public enum seriesMode : int { PDF, CDF};
 
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
@@ -61,6 +62,12 @@ namespace HW1_PCXreader
         public static void setTByBytes(ref ushort target, byte[] srcBytes, int StartIndex)
         {
             target = BitConverter.ToUInt16(srcBytes, StartIndex);
+        }
+
+        public static double countSNR(Bitmap afterImg, Bitmap originImg)
+        {
+            double snr = 0.0;
+            return snr;
         }
 
         public static double[] countFreqs(Bitmap view)//default to use all ch
@@ -166,6 +173,11 @@ namespace HW1_PCXreader
 
         public static Series buildSeries(Bitmap view, colorMode mode)// mode please use the MyDeal.colorMode.*
         {
+            return buildSeries(view, mode, seriesMode.PDF);
+        }
+
+        public static Series buildSeries(Bitmap view, colorMode mode, seriesMode graphMode)// mode please use the MyDeal.colorMode.*
+        {
             if (view == null)
                 return null;
             Series series = new Series();
@@ -194,9 +206,36 @@ namespace HW1_PCXreader
             string[] xValue = Enumerable.Range(0, 256).ToArray().Select(x => x.ToString()).ToArray();
             double[] yValue;
             yValue = MyDeal.countFreqsT(view, mode);
-            series.ChartType = SeriesChartType.Column;
+            switch (graphMode)
+            {
+                case seriesMode.PDF:
+                    series.ChartType = SeriesChartType.Column;
+                    break;
+                case seriesMode.CDF:
+                    PDF2CDF(ref yValue);
+                    series.ChartType = SeriesChartType.Line;
+                    break;
+            }
             series.Points.DataBindXY(xValue, yValue);
             return series;
+        }
+
+        public static void CDF2PDF(ref double[] cdf)
+        {
+            for (int i = 1; i < cdf.Length; i++)
+            {
+                cdf[i] -= cdf[i-1];
+            }
+        }
+
+        public static void PDF2CDF(ref double[] pdf)
+        {
+            double n = 0;
+            for(int i = 0; i < pdf.Length; i++)
+            {
+                pdf[i] += n;
+                n = pdf[i];
+            }
         }
 
         public static Bitmap negative(Bitmap src)
@@ -220,16 +259,49 @@ namespace HW1_PCXreader
             if (src == null)
                 return null;
             Bitmap output = (Bitmap)src.Clone();
-            for (int i = 0; i < output.Width; i++)
+            //for (int i = 0; i < output.Width; i++)
+            //{
+            //    for (int j = 0; j < output.Height; j++)
+            //    {
+            //        Color ori = output.GetPixel(i, j);
+            //        int gray = (299 * ori.R + 587 * ori.G + 114 * ori.B + 500) / 1000;
+            //        output.SetPixel(i, j, Color.FromArgb(gray, gray, gray));
+            //    }
+            //}
+            BitmapData outputData = output.LockBits(MyF.bound(output), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            gray(outputData);
+            output.UnlockBits(outputData);
+            return output;
+        }
+
+        private static void gray(BitmapData src)
+        {// transfer src to gray , src is 24bppRGB & ReadWrite
+            if (src == null)
+                return ;
+            int skipByte = src.Stride - 3 * src.Width;
+            try
             {
-                for (int j = 0; j < output.Height; j++)
-                {
-                    Color ori = output.GetPixel(i, j);
-                    int gray = (299 * ori.R + 587 * ori.G + 114 * ori.B + 500) / 1000;
-                    output.SetPixel(i, j, Color.FromArgb(gray, gray, gray));
+                unsafe {
+                    byte* srcPtr = (byte*) src.Scan0;
+                    for (int i = 0; i < src.Width; i++)
+                    {
+                        for (int j = 0; j < src.Height; j++)
+                        {
+                            int gray = (299 * srcPtr[2] + 587 * srcPtr[1] + 114 * srcPtr[0] + 500) / 1000;
+                            srcPtr[2] = (byte)gray;
+                            srcPtr[1] = (byte)gray;
+                            srcPtr[0] = (byte)gray;
+                            srcPtr += 3;
+                        }
+                        srcPtr += skipByte;
+                    }
                 }
             }
-            return output;
+            catch (Exception e)
+            {
+                Debug.Print(e.ToString() + e.StackTrace);
+            }
+            
         }
 
         public static Bitmap selectCh(Bitmap src, int selectColor)//select channel
@@ -758,6 +830,98 @@ namespace HW1_PCXreader
                                     dstPtr[2] = Convert.ToByte(opt.map(dstPtr[2]));
                             }
                         }
+                        dstPtr += 3;
+                    }
+                    dstPtr += skipByte;
+                }
+
+            }
+            dst.UnlockBits(dstData);
+            return dst;
+        }
+
+        public static Bitmap equalize(Bitmap src)
+        {
+            if (src == null)
+                return null;
+            Bitmap dst = (Bitmap)src.Clone();
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            byte[] Rmaps = new byte[256];
+            byte[] Gmaps = new byte[256];
+            byte[] Bmaps = new byte[256];
+
+            double[] Rfreq = countFreqsT(src, colorMode.R);
+            double[] Gfreq = countFreqsT(src, colorMode.G);
+            double[] Bfreq = countFreqsT(src, colorMode.B);
+            double t = 0;
+            double Rp = 0.0, Gp = 0.0, Bp = 0.0;
+
+            for (int i = 0; i < 256; i++)
+            {
+                //Rmaps[i] = new byte();
+                //Gmaps[i] = new byte();
+                //Bmaps[i] = new byte();
+                //R
+                try
+                {
+                    t = Math.Floor(Rp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    Rmaps[i] = Convert.ToByte(t);
+                }
+                catch (OverflowException e)
+                {
+                    Rmaps[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                Rp += 256 * Rfreq[i];
+                //G
+                try
+                {
+                    t = Math.Floor(Gp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    Gmaps[i] = Convert.ToByte(t);
+                }
+                catch (OverflowException e)
+                {
+                    Gmaps[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                Gp += 256 * Gfreq[i];
+                //B
+                try
+                {
+                    t = Math.Floor(Bp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    Bmaps[i] = Convert.ToByte(t);
+                }
+                catch (OverflowException e)
+                {
+                    Bmaps[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                Bp += 256 * Bfreq[i];
+            }
+
+            unsafe
+            {
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                for (int i = 0; i < dstData.Width; i++)
+                {
+                    for (int j = 0; j < dstData.Height; j++)
+                    {
+                        dstPtr[0] = Bmaps[dstPtr[0]];
+                        dstPtr[1] = Gmaps[dstPtr[1]];
+                        dstPtr[2] = Rmaps[dstPtr[2]];
                         dstPtr += 3;
                     }
                     dstPtr += skipByte;

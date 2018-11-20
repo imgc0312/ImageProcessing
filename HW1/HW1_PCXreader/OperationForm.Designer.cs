@@ -43,6 +43,7 @@
             this.thresholdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stretchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -54,7 +55,7 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.stretchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.equalizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -171,7 +172,8 @@
             this.thresholdToolStripMenuItem,
             this.resizeToolStripMenuItem,
             this.rotateToolStripMenuItem,
-            this.stretchToolStripMenuItem});
+            this.stretchToolStripMenuItem,
+            this.equalizeToolStripMenuItem});
             this.operateToolStripMenuItem.Name = "operateToolStripMenuItem";
             this.operateToolStripMenuItem.Size = new System.Drawing.Size(88, 26);
             this.operateToolStripMenuItem.Text = "operate";
@@ -196,6 +198,13 @@
             this.rotateToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.rotateToolStripMenuItem.Text = "Rotate / Mirror";
             this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotateToolStripMenuItem_Click);
+            // 
+            // stretchToolStripMenuItem
+            // 
+            this.stretchToolStripMenuItem.Name = "stretchToolStripMenuItem";
+            this.stretchToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.stretchToolStripMenuItem.Text = "Stretch";
+            this.stretchToolStripMenuItem.Click += new System.EventHandler(this.stretchToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -299,12 +308,12 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // stretchToolStripMenuItem
+            // equalizeToolStripMenuItem
             // 
-            this.stretchToolStripMenuItem.Name = "stretchToolStripMenuItem";
-            this.stretchToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.stretchToolStripMenuItem.Text = "Stretch";
-            this.stretchToolStripMenuItem.Click += new System.EventHandler(this.stretchToolStripMenuItem_Click);
+            this.equalizeToolStripMenuItem.Name = "equalizeToolStripMenuItem";
+            this.equalizeToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.equalizeToolStripMenuItem.Text = "Equalize";
+            this.equalizeToolStripMenuItem.Click += new System.EventHandler(this.equalizeToolStripMenuItem_Click);
             // 
             // OperationForm
             // 
@@ -362,5 +371,6 @@
         protected System.Windows.Forms.ToolStripMenuItem resizeToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem rotateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stretchToolStripMenuItem;
+        protected System.Windows.Forms.ToolStripMenuItem equalizeToolStripMenuItem;
     }
 }

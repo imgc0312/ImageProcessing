@@ -66,7 +66,7 @@ namespace HW1_PCXreader
         {
             openEnable = openEnable;
             thresholdToolStripMenuItem.Enabled = false;
-            radioButton1.Checked = true;
+            radioButton2.Checked = true;
             mode = mode;
             //chart1
             ChartArea chartArea = chart1.ChartAreas[0];

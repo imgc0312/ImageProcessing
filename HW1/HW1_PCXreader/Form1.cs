@@ -539,5 +539,11 @@ namespace HW1_PCXreader
             Form_Stretch form2 = new Form_Stretch(this);
             form2.ShowDialog();
         }
+
+        private void equalizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Equalization form2 = new Form_Equalization(this);
+            form2.ShowDialog();
+        }
     }
 }

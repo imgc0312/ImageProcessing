@@ -312,41 +312,46 @@ namespace HW1_PCXreader
             openEnable = false;
         }
 
-        protected void buildChart(Chart chart1)
+        protected void buildChart(Chart chart)
+        {
+            buildChart(outView, chart);
+        }
+
+        protected void buildChart(Bitmap view, Chart chart1)
         {
             try
             {
                 chart1.Series.Clear();
-                if (outView == null)
+                if (view == null)
                     return;
                 switch (mode)
                 {
                     case (int)imgMode.GRAY:
-                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.GRAY);
+                        seriesT = MyDeal.buildSeries(view, MyDeal.colorMode.GRAY);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.R:
-                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.R);
+                        seriesT = MyDeal.buildSeries(view, MyDeal.colorMode.R);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.G:
-                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.G);
+                        seriesT = MyDeal.buildSeries(view, MyDeal.colorMode.G);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.B:
-                        seriesT = MyDeal.buildSeries(outView, MyDeal.colorMode.B);
+                        seriesT = MyDeal.buildSeries(view, MyDeal.colorMode.B);
                         chart1.Series.Add(seriesT);
                         return;
                     case (int)imgMode.ORI:
                     case (int)imgMode.NEG:
                     default:
-                        seriesR = MyDeal.buildSeries(outView, MyDeal.colorMode.R);
+                        seriesR = MyDeal.buildSeries(view, MyDeal.colorMode.R);
                         chart1.Series.Add(seriesR);
 
-                        seriesG = MyDeal.buildSeries(outView, MyDeal.colorMode.G);
+                        seriesG = MyDeal.buildSeries(view, MyDeal.colorMode.G);
                         chart1.Series.Add(seriesG);
 
-                        seriesB = MyDeal.buildSeries(outView, MyDeal.colorMode.B);
+                        seriesB = MyDeal.buildSeries(view, MyDeal.colorMode.B);
                         chart1.Series.Add(seriesB);
                         return;
                 }
@@ -470,6 +475,12 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
 
+        private void equalizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Equalization form2 = new Form_Equalization(this);
+            form2.ShowDialog();
+        }
+
         private void pictureBox_DoubleClick(object sender, EventArgs e)
         {
             PictureBox here = (PictureBox)sender;
@@ -485,7 +496,7 @@ namespace HW1_PCXreader
             if (e.KeyCode == Keys.Escape)
                 this.Close();
         }
-        
+
     }
 
 }
