@@ -18,3 +18,4 @@ C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\De
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_BitPlane.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Stretch.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Equalization.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Blur.resources

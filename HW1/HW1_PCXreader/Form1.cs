@@ -545,5 +545,11 @@ namespace HW1_PCXreader
             Form_Equalization form2 = new Form_Equalization(this);
             form2.ShowDialog();
         }
+
+        private void lowPassToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Blur form2 = new Form_Blur(this);
+            form2.ShowDialog();
+        }
     }
 }

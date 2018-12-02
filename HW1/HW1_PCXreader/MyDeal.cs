@@ -932,6 +932,50 @@ namespace HW1_PCXreader
             return dst;
         }
 
+        public static Bitmap filter2D(Bitmap src, MyFilter.BorderMethod borderMethod, MyFilter.FilterCount count, MyFilter filter)
+        {
+            return filter2D(src, borderMethod, count, filter, null);
+        }
+
+        public static Bitmap filter2D(Bitmap src, MyFilter.BorderMethod borderMethod, MyFilter.FilterCount count, MyFilter filter, ProgressMonitor monitor)
+        {
+            if (src == null)
+                return null;
+
+            if (monitor == null)
+                monitor = progress;
+            monitor.start(); // start view progress
+            int progressCurrent = 0;
+            int progressEnd = src.Width * src.Height;
+            Bitmap dst = new Bitmap(src.Width, src.Height);
+            BitmapData srcData = src.LockBits(MyF.bound(src), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                int skipByte = dstData.Stride - 3 * dstData.Width;
+                byte* dstPtr = (byte*)dstData.Scan0;
+                byte[] output = { 0, 0, 0 };
+                for (int y = 0; y < src.Height; y++)
+                {
+                    for (int x = 0; x < src.Width; x++)
+                    {
+                        output = count(srcData, x, y, borderMethod, filter);
+                        dstPtr[0] = output[0];
+                        dstPtr[1] = output[1];
+                        dstPtr[2] = output[2];
+                        dstPtr += 3;
+                        progressCurrent++;
+                        monitor.OnValueChanged(new ValueEventArgs() { value = (double)progressCurrent / progressEnd });
+                    }
+                    dstPtr += skipByte;
+                }
+            }
+            src.UnlockBits(srcData);
+            dst.UnlockBits(dstData);
+            monitor.fine();
+            return dst;
+        }
+
         ///
         /// -->pixel method
         ///
