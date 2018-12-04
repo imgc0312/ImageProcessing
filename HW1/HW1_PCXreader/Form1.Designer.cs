@@ -60,10 +60,11 @@
             this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stretchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.equalizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lowPassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.penetrateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bitPlaneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lowPassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.highBoostToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -344,7 +345,8 @@
             this.rotateToolStripMenuItem,
             this.stretchToolStripMenuItem,
             this.equalizeToolStripMenuItem,
-            this.lowPassToolStripMenuItem});
+            this.lowPassToolStripMenuItem,
+            this.highBoostToolStripMenuItem});
             this.operateToolStripMenuItem.Name = "operateToolStripMenuItem";
             this.operateToolStripMenuItem.Size = new System.Drawing.Size(88, 26);
             this.operateToolStripMenuItem.Text = "operate";
@@ -384,6 +386,13 @@
             this.equalizeToolStripMenuItem.Text = "Equalize";
             this.equalizeToolStripMenuItem.Click += new System.EventHandler(this.equalizeToolStripMenuItem_Click);
             // 
+            // lowPassToolStripMenuItem
+            // 
+            this.lowPassToolStripMenuItem.Name = "lowPassToolStripMenuItem";
+            this.lowPassToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.lowPassToolStripMenuItem.Text = "LowPass";
+            this.lowPassToolStripMenuItem.Click += new System.EventHandler(this.lowPassToolStripMenuItem_Click);
+            // 
             // toolToolStripMenuItem
             // 
             this.toolToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -407,12 +416,12 @@
             this.bitPlaneToolStripMenuItem.Text = "BitPlane";
             this.bitPlaneToolStripMenuItem.Click += new System.EventHandler(this.bitPlaneToolStripMenuItem_Click);
             // 
-            // lowPassToolStripMenuItem
+            // highBoostToolStripMenuItem
             // 
-            this.lowPassToolStripMenuItem.Name = "lowPassToolStripMenuItem";
-            this.lowPassToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.lowPassToolStripMenuItem.Text = "LowPass";
-            this.lowPassToolStripMenuItem.Click += new System.EventHandler(this.lowPassToolStripMenuItem_Click);
+            this.highBoostToolStripMenuItem.Name = "highBoostToolStripMenuItem";
+            this.highBoostToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.highBoostToolStripMenuItem.Text = "HighBoost";
+            this.highBoostToolStripMenuItem.Click += new System.EventHandler(this.highBoostToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -472,6 +481,7 @@
         private System.Windows.Forms.ToolStripMenuItem stretchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem equalizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem lowPassToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem highBoostToolStripMenuItem;
     }
 }
 

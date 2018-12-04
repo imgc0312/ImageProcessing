@@ -12,6 +12,13 @@ namespace HW1_PCXreader
     {
 
         protected ProgressMonitor progress = new ProgressMonitor();
+        public string[] info = new string[]{
+            "Method \t\t:\t",
+            "Kernel Size \t:\t",
+            "SNR(dB) \t\t:\t",
+            "Cost Time (ms) \t:\t"
+        };
+
         /// <summary>
         /// function-->
         /// </summary>
@@ -40,6 +47,7 @@ namespace HW1_PCXreader
             mode = mode;
             progress.view = progressBar1;
             progress.view.Visible = false;
+            textBox2.Lines = info;
         }
 
         private void trackBar1_ValueChanged(object sender, EventArgs e)
@@ -68,11 +76,29 @@ namespace HW1_PCXreader
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if(radioButton1.Checked)
-                outView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, MyFilter.blur, new MyFilter(trackBar1.Value), progress);
-            else if(radioButton2.Checked)
-                outView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, MyFilter.blur, new MyFilter(trackBar1.Value), progress);
+            MyFilter.FilterCount countMethod = null;
+            double SNR = 0.0;
+            double costTime = 0;
+            if (radioButton1.Checked)
+                countMethod = MyFilter.meanBlur;
+            else if (radioButton2.Checked)
+                countMethod = MyFilter.medianBlur;
+            DateTime curTime = DateTime.Now;
+            outView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, countMethod, new MyFilter(trackBar1.Value), progress);
+            costTime = DateTime.Now.Subtract(curTime).TotalMilliseconds;
+            SNR = MyDeal.SNR(imgView, outView);
+            textBox2.Lines = countInfo(countMethod, trackBar1.Value, SNR, costTime);
+        }
 
+        private string[] countInfo(MyFilter.FilterCount countMethod, int kernelSize, double SNR, double time)
+        {
+            string[] newLines = new string[info.Length];
+            info.CopyTo(newLines, 0);
+            newLines[0] += "" + countMethod.Method.Name;
+            newLines[1] += "" + kernelSize;
+            newLines[2] += "" + SNR.ToString("0.000000");
+            newLines[3] += "" + time;
+            return newLines;
         }
     }
 }

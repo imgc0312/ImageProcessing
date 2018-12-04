@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -69,27 +70,101 @@ namespace HW1_PCXreader
                 temp[1] *= rate;
                 temp[2] *= rate;
 
+                output = MyFilterData.boundPixel(temp);
+                return output;
+            }
+
+            public byte[] countAbs(double rate)
+            {// sigma each pixel in _data (rate*pixel) && abs output
+                byte[] output = new byte[3];
+                double[] temp = new double[3];
+                foreach (double[] pixel in _data)
+                {
+                    if (pixel != null)
+                    {
+                        temp[0] += pixel[0];
+                        temp[1] += pixel[1];
+                        temp[2] += pixel[2];
+                    }
+                }
+
+                temp[0] = Math.Abs(temp[0] * rate);
+                temp[1] = Math.Abs(temp[1] * rate);
+                temp[2] = Math.Abs(temp[2] * rate);
+                output = MyFilterData.boundPixel(temp);
+                return output;
+            }
+
+            public List<double>[] sort()
+            {// return sort list
+                List<double>[] sortData = new List<double>[3];
+
+                int pixels = 0;
+                foreach (double[] pixel in _data)
+                {
+                    if (pixel != null)
+                        pixels++;
+                }
+
+                sortData[0] = new List<double>(pixels);
+                sortData[1] = new List<double>(pixels);
+                sortData[2] = new List<double>(pixels);
+
+                foreach (double[] pixel in _data)
+                {
+                    if (pixel != null)
+                    {
+                        sortData[0].Add(pixel[0]);
+                        sortData[1].Add(pixel[1]);
+                        sortData[2].Add(pixel[2]);
+                    }
+                }
+
+                sortData[0].Sort();
+                sortData[1].Sort();
+                sortData[2].Sort();
+                return sortData;
+            }
+
+            public static byte[] boundPixel(double[] src)
+            {// convert double to byte
+                byte[] output = new byte[3];
                 try
                 {
-                    output[0] = Convert.ToByte(temp[0]);
+                    if (src[0] < 0)
+                        output[0] = 0;
+                    else if (src[0] > 255)
+                        output[0] = 255;
+                    else
+                        output[0] = Convert.ToByte(src[0]);
                 }
-                catch
+                catch (OverflowException e)
                 {
                     output[0] = 255;
                 }
                 try
                 {
-                    output[1] = Convert.ToByte(temp[1]);
+                    if (src[1] < 0)
+                        output[1] = 0;
+                    else if (src[1] > 255)
+                        output[1] = 255;
+                    else
+                        output[1] = Convert.ToByte(src[1]);
                 }
-                catch
+                catch (OverflowException e)
                 {
                     output[1] = 255;
                 }
                 try
                 {
-                    output[2] = Convert.ToByte(temp[2]);
+                    if (src[2] < 0)
+                        output[2] = 0;
+                    else if (src[2] > 255)
+                        output[2] = 255;
+                    else
+                        output[2] = Convert.ToByte(src[2]);
                 }
-                catch
+                catch (OverflowException e)
                 {
                     output[2] = 255;
                 }
@@ -98,7 +173,7 @@ namespace HW1_PCXreader
         }
 
         /// <summary>
-        /// Var->
+        /// member->
         /// </summary>
 
         int _size;
@@ -166,9 +241,9 @@ namespace HW1_PCXreader
 
         public void setData(int startX, int startY, int endX, int endY, double value)
         {//set range
-            for(int j = startY; j < endY; j++)
+            for(int j = startY; j <= endY; j++)
             {
-                for(int i = startX; i < endX; i++)
+                for(int i = startX; i <= endX; i++)
                 {
                     try
                     {
@@ -304,7 +379,7 @@ namespace HW1_PCXreader
             return output;
         }
 
-        public static byte[] blur(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        public static byte[] meanBlur(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
         {//this is a FilterCount, Mean Blur
             byte[] output = new byte[3];
             int size = filter.size;
@@ -314,27 +389,6 @@ namespace HW1_PCXreader
             }
             else
             {
-                //int[] mean = new int[3];
-                //byte[] temp = null;
-                //int startX = x - size / 2;
-                //int startY = y - size / 2;
-                //int endX = startX + size;
-                //int endY = startY + size;
-                //int pixels = 0;
-                //for (int j = startY; j < endY; j++)
-                //{
-                //    for (int i = startX; i < endX; i++)
-                //    {
-                //        temp = getPixel(data, i, j, borderMethod);
-                //        if(temp != null)
-                //        {
-                //            mean[0] += temp[0];
-                //            mean[1] += temp[1];
-                //            mean[2] += temp[2];
-                //            pixels++;
-                //        }
-                //    }
-                //}
                 MyFilterData kernel = new MyFilterData();
                 int pixels = 0;
                 filter.setData(1.0);
@@ -343,6 +397,107 @@ namespace HW1_PCXreader
                     throw new DivideByZeroException("blur pixel size 0");
                 return kernel.count(1.0 / pixels);
             }
+        }
+
+        public static byte[] medianBlur(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//this is a FilterCount, Mean Blur
+            byte[] output = new byte[3];
+            int size = filter.size;
+            if (size <= 1)
+            {
+                return getPixel(data, x, y, borderMethod);
+            }
+            else
+            {
+                MyFilterData kernel = new MyFilterData();
+                int pixels = 0;
+                filter.setData(1.0);
+                pixels = kernel.fill(data, x, y, borderMethod, filter);
+                List<double>[] sortList = kernel.sort();
+                double[] pixel = new double[3];
+                pixel[0] = sortList[0].ElementAt<double>(sortList[0].Count/2);
+                pixel[1] = sortList[1].ElementAt<double>(sortList[1].Count / 2);
+                pixel[2] = sortList[2].ElementAt<double>(sortList[2].Count / 2);
+                return MyFilterData.boundPixel(pixel);
+            }
+        }
+
+        public static byte[] highBoost(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//this is a FilterCount, Mean Blur
+            byte[] output = new byte[3];
+            int size = filter.size;
+            if (size <= 1)
+            {
+                return getPixel(data, x, y, borderMethod);
+            }
+            else
+            {
+                MyFilterData kernel = new MyFilterData();
+                
+                kernel.fill(data, x, y, borderMethod, filter);
+
+                double weightSize = 0;
+                int targetPoint = filter.size / 2;
+                for (int j = 0; j < filter.size; j++)
+                {
+                    for (int i = 0; i < filter.size; i++)
+                    {
+                        if((i != targetPoint) || (j != targetPoint))//ignore kernel target
+                            weightSize += filter[i, j];
+                    }
+                }
+                weightSize = 1 - weightSize;
+                if (weightSize <= 0)
+                    throw new DivideByZeroException("high boost weightSize 0");
+                return kernel.countAbs(1.0 / weightSize);
+            }
+        }
+
+        /// <summary>
+        /// val-->
+        /// </summary>
+        public static MyFilter HighPassKernel(int option)
+        {
+            MyFilter highPass = new MyFilter(3);
+            switch (option)
+            {
+                case 2:
+                    highPass.setData(1);
+                    highPass[1, 0] = -2;
+                    highPass[0, 1] = -2;
+                    highPass[1, 1] = 5;
+                    highPass[2, 1] = -2;
+                    highPass[1, 2] = -2;
+                    return highPass;
+                case 1:
+                    highPass.setData(-1);
+                    highPass[1, 1] = 9;
+                    return highPass;
+                case 0:
+                default:
+                    highPass[1, 0] = -1;
+                    highPass[0, 1] = -1;
+                    highPass[1, 1] = 5;
+                    highPass[2, 1] = -1;
+                    highPass[1, 2] = -1;
+                    return highPass;
+            }
+        }
+
+        /// <summary>
+        /// operate-->
+        /// </summary>
+        public static MyFilter add(MyFilter left, MyFilter right)
+        {
+            MyFilter newFilter = new MyFilter(left.size);
+            for(int j = 0; j < newFilter.size; j++)
+            {
+                for(int i = 0; i < newFilter.size; i++)
+                {
+                    newFilter[i, j] = left[i, j] + right[i, j];
+                }
+            }
+            return newFilter;
         }
     }
 

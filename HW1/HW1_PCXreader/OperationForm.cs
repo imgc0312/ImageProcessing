@@ -487,6 +487,12 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
 
+        private void highBoostToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_HighBoost form2 = new Form_HighBoost(this);
+            form2.ShowDialog();
+        }
+
         private void pictureBox_DoubleClick(object sender, EventArgs e)
         {
             PictureBox here = (PictureBox)sender;

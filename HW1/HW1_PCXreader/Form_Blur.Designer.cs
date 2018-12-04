@@ -37,11 +37,13 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -51,6 +53,10 @@
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.tableLayoutPanel1);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.textBox2);
             // 
             // tableLayoutPanel1
             // 
@@ -162,17 +168,32 @@
             this.progressBar1.Size = new System.Drawing.Size(318, 57);
             this.progressBar1.TabIndex = 3;
             // 
+            // textBox2
+            // 
+            this.textBox2.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox2.CausesValidation = false;
+            this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox2.Location = new System.Drawing.Point(3, 25);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.ReadOnly = true;
+            this.textBox2.Size = new System.Drawing.Size(324, 252);
+            this.textBox2.TabIndex = 0;
+            this.textBox2.TabStop = false;
+            // 
             // Form_Blur
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.ClientSize = new System.Drawing.Size(678, 639);
             this.Name = "Form_Blur";
-            this.Text = "Low Pass";
+            this.Text = "Blur";
             this.groupBox4.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
@@ -195,5 +216,6 @@
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }

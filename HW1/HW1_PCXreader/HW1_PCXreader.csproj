@@ -78,6 +78,18 @@
     <Compile Include="Form_Equalization.Designer.cs">
       <DependentUpon>Form_Equalization.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_Gradient.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Gradient.Designer.cs">
+      <DependentUpon>Form_Gradient.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_HighBoost.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_HighBoost.Designer.cs">
+      <DependentUpon>Form_HighBoost.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_ImageView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -146,6 +158,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Equalization.resx">
       <DependentUpon>Form_Equalization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Gradient.resx">
+      <DependentUpon>Form_Gradient.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HighBoost.resx">
+      <DependentUpon>Form_HighBoost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_ImageView.resx">
       <DependentUpon>Form_ImageView.cs</DependentUpon>

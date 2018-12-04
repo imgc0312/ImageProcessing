@@ -976,6 +976,45 @@ namespace HW1_PCXreader
             return dst;
         }
 
+        public static double SNR(Bitmap before, Bitmap after)
+        {//dB
+            double output = 0.0;
+            if (before == null)
+                return output;
+            if (after == null)
+                return output;
+            BitmapData beforeData = before.LockBits(MyF.bound(before), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData afterData = after.LockBits(MyF.bound(after), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                int skipByte = beforeData.Stride - 3 * beforeData.Width;
+                byte* beforePtr = (byte*)beforeData.Scan0;
+                byte* afterPtr = (byte*)afterData.Scan0;
+                double temp1 = 0.0;
+                double temp2 = 0.0;
+                for (int j = 0; j < beforeData.Height; j++)
+                {
+                    for(int i = 0; i < beforeData.Width; i++)
+                    {
+                        temp1 += Math.Pow(beforePtr[0], 2) + Math.Pow(beforePtr[1], 2) + Math.Pow(beforePtr[2], 2);
+                        temp2 += Math.Pow(beforePtr[0] - afterPtr[0], 2) + Math.Pow(beforePtr[1] - afterPtr[1], 2) + Math.Pow(beforePtr[2] - afterPtr[2], 2);
+                        beforePtr += 3;
+                        afterPtr += 3;
+                    }
+                    beforePtr += skipByte;
+                    afterPtr += skipByte;
+                }
+                if (temp2 == 0)
+                    output = Double.PositiveInfinity;
+                else
+                    output = 10*Math.Log10(temp1 / temp2);
+            }
+
+            before.UnlockBits(beforeData);
+            after.UnlockBits(afterData);
+            return output;
+        }
+
         ///
         /// -->pixel method
         ///

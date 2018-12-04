@@ -551,5 +551,11 @@ namespace HW1_PCXreader
             Form_Blur form2 = new Form_Blur(this);
             form2.ShowDialog();
         }
+
+        private void highBoostToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_HighBoost form2 = new Form_HighBoost(this);
+            form2.ShowDialog();
+        }
     }
 }
