@@ -12,14 +12,26 @@ namespace HW1_PCXreader
     public class MyFilter
     {
         public enum BorderMethod { NULL, ZERO, NEAR };
+        public enum GradientOperator { SOBEL, PREWITT };
+        public enum GradientDirect { X, Y, BOTH };
         public delegate byte[] FilterCount(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter);
         public class MyFilterData
         {
+            private int size{
+                get {
+                    return _data.getLength(0);
+                }
+            }
             private double[,][] _data;
 
             public MyFilterData()
             {
                 _data = new double[0, 0][];
+            }
+            
+            public MyFilterData(int size)
+            {
+                _data = new double[size, size][];
             }
 
             public double[] this[int x, int y]
@@ -170,6 +182,12 @@ namespace HW1_PCXreader
                 }
                 return output;
             }
+            
+            public static MyFilterData add(MyFilterData left, MyFilterData right){
+                MyFilterData newFilterData = new MyFilterData(left.size)
+                    //deal.....
+            }
+
         }
 
         /// <summary>
@@ -185,7 +203,13 @@ namespace HW1_PCXreader
             }
         }
         double[,] data;
-
+        
+        //gradient operator MyFilter
+        private static MyFilter _SOBEL_X = null;
+        private static MyFilter _SOBEL_Y = null;
+        private static MyFilter _PREWITT_X = null;
+        private static MyFilter _PREWITT_Y = null;
+        
         /// <summary>
         /// function-->
         /// </summary>
@@ -452,6 +476,60 @@ namespace HW1_PCXreader
                 return kernel.countAbs(1.0 / weightSize);
             }
         }
+        
+        public static MyFilter.FilterCount gradient(MyFilter.GradientOperator operator, MyFiltr.GradientDirect direct){
+            switch (operator)
+            {
+                case MyFilter.GradientOperator.SOBEL:
+                    switch (direct)
+                    {
+                        case MyFilter.GradientDirect.X:
+                            return kernel;
+                        case MyFilter.GradientDirect.Y:
+                            return kernel;
+                        case MyFilter.GradientDirect.BOTH:
+                            return ;
+                    }
+                case MyFilter.GradientOperator.PREWITT:
+                default:
+                    switch (direct)
+                    {
+                        case MyFilter.GradientDirect.X:
+                            return kernel;
+                        case MyFilter.GradientDirect.Y:
+                            return kernel;
+                        case MyFilter.GradientDirect.BOTH:
+                            return ;
+                    }
+            }
+        }
+        
+        private static byte[] SOBEL_X(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//SOBEL X , not use filter
+            byte[] output = new byte[3];
+            MyFilterData kernel = new MyFilterData();
+            kernel.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.X));
+            return kernel.count(1.0);
+        }
+        
+        private static byte[] SOBEL_Y(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//SOBEL Y , not use filter
+            byte[] output = new byte[3];
+            MyFilterData kernel = new MyFilterData();
+            kernel.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.Y));
+            return kernel.count(1.0);
+        }
+        
+        private static byte[] SOBEL_BOTH(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//SOBEL Y , not use filter
+            byte[] output = new byte[3];
+            MyFilterData kernel1 = new MyFilterData();
+            MyFilterData kernel2 = new MyFilterData();
+            kernel1.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.X));
+            kernel2.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.Y));
+            kernel1.
+            return kernel.count(1.0);
+        }
 
         /// <summary>
         /// val-->
@@ -481,6 +559,76 @@ namespace HW1_PCXreader
                     highPass[2, 1] = -1;
                     highPass[1, 2] = -1;
                     return highPass;
+            }
+        }
+        
+        public static MyFilter GradientKernel(GradientOperator operator, GradientDirect direct)
+        {// please not use MyFilter.GradientDirect.BOTH
+            MyFilter kernel = new MyFilter(3);
+            switch (operator)
+            {
+                case MyFilter.GradientOperator.SOBEL:
+                    switch (direct)
+                    {
+                        case MyFilter.GradientDirect.X:
+                            if (_SOBEL_X == null){
+                                kernel[0, 0] = 1;
+                                kernel[2, 0] = -1;
+                                kernel[0, 1] = 2;
+                                kernel[2, 1] = -2;
+                                kernel[0, 2] = 1;
+                                kernel[2, 2] = -1;
+                                _SOBEL_X = kernel;
+                                return kernel;
+                            }
+                            else
+                                return _SOBEL_X;
+                        case MyFilter.GradientDirect.Y:
+                            if (_SOBEL_Y == null){
+                                kernel[0, 0] = 1;
+                                kernel[1, 0] = 2;
+                                kernel[2, 0] = 1;
+                                kernel[0, 2] = -1;
+                                kernel[1, 2] = -2;
+                                kernel[2, 2] = -1;
+                                _SOBEL_Y = kernel;
+                                return kernel;
+                            }
+                            else
+                                return _SOBEL_Y;
+                    }
+                case MyFilter.GradientOperator.PREWITT:
+                    switch (direct)
+                    {
+                        case MyFilter.GradientDirect.X:
+                            if (_PREWITT_X == null){
+                                kernel[0, 0] = 1;
+                                kernel[2, 0] = -1;
+                                kernel[0, 1] = 1;
+                                kernel[2, 1] = -1;
+                                kernel[0, 2] = 1;
+                                kernel[2, 2] = -1;
+                                _PREWITT_X = kernel;
+                                return kernel;
+                            }
+                            else
+                                return _PREWITT_X;
+                        case MyFilter.GradientDirect.Y:
+                            if (_PREWITT_Y == null){
+                                kernel[0, 0] = 1;
+                                kernel[1, 0] = 1;
+                                kernel[2, 0] = 1;
+                                kernel[0, 2] = -1;
+                                kernel[1, 2] = -1;
+                                kernel[2, 2] = -1;
+                                _PREWITT_Y = kernel;
+                                return kernel;
+                            }
+                            else
+                                return _PREWITT_Y;
+                    }
+                default:
+                    return kernel;
             }
         }
 
