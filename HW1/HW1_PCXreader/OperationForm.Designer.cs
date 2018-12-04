@@ -46,6 +46,7 @@
             this.stretchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.equalizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lowPassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.highBoostToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -57,7 +58,7 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.highBoostToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gradientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -177,7 +178,8 @@
             this.stretchToolStripMenuItem,
             this.equalizeToolStripMenuItem,
             this.lowPassToolStripMenuItem,
-            this.highBoostToolStripMenuItem});
+            this.highBoostToolStripMenuItem,
+            this.gradientToolStripMenuItem});
             this.operateToolStripMenuItem.Name = "operateToolStripMenuItem";
             this.operateToolStripMenuItem.Size = new System.Drawing.Size(88, 26);
             this.operateToolStripMenuItem.Text = "operate";
@@ -223,6 +225,13 @@
             this.lowPassToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.lowPassToolStripMenuItem.Text = "LowPass";
             this.lowPassToolStripMenuItem.Click += new System.EventHandler(this.lowPassToolStripMenuItem_Click);
+            // 
+            // highBoostToolStripMenuItem
+            // 
+            this.highBoostToolStripMenuItem.Name = "highBoostToolStripMenuItem";
+            this.highBoostToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.highBoostToolStripMenuItem.Text = "HighBoost";
+            this.highBoostToolStripMenuItem.Click += new System.EventHandler(this.highBoostToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -326,12 +335,12 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // highBoostToolStripMenuItem
+            // gradientToolStripMenuItem
             // 
-            this.highBoostToolStripMenuItem.Name = "highBoostToolStripMenuItem";
-            this.highBoostToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.highBoostToolStripMenuItem.Text = "HighBoost";
-            this.highBoostToolStripMenuItem.Click += new System.EventHandler(this.highBoostToolStripMenuItem_Click);
+            this.gradientToolStripMenuItem.Name = "gradientToolStripMenuItem";
+            this.gradientToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.gradientToolStripMenuItem.Text = "Gradient";
+            this.gradientToolStripMenuItem.Click += new System.EventHandler(this.gradientToolStripMenuItem_Click);
             // 
             // OperationForm
             // 
@@ -392,5 +401,6 @@
         protected System.Windows.Forms.ToolStripMenuItem equalizeToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem lowPassToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem highBoostToolStripMenuItem;
+        protected System.Windows.Forms.ToolStripMenuItem gradientToolStripMenuItem;
     }
 }

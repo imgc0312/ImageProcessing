@@ -493,6 +493,13 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
 
+
+        private void gradientToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Gradient form2 = new Form_Gradient(this);
+            form2.ShowDialog();
+        }
+
         private void pictureBox_DoubleClick(object sender, EventArgs e)
         {
             PictureBox here = (PictureBox)sender;
@@ -508,7 +515,6 @@ namespace HW1_PCXreader
             if (e.KeyCode == Keys.Escape)
                 this.Close();
         }
-
     }
 
 }

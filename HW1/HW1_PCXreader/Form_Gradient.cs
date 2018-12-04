@@ -44,7 +44,7 @@ namespace HW1_PCXreader
         protected new void initialForm()
         {
             openEnable = openEnable;
-            //highBoostToolStripMenuItem.Enabled = false;
+            gradientToolStripMenuItem.Enabled = false;
             mode = mode;
             progress.view = progressBar1;
             progress.view.Visible = false;
@@ -57,6 +57,37 @@ namespace HW1_PCXreader
         private void button1_Click(object sender, EventArgs e)
         {
             MyFilter.FilterCount countMethod = null;
+            switch (comboBox1.SelectedIndex)
+            {//operate
+                case 0://SOBEL
+                    switch (comboBox2.SelectedIndex)
+                    {//direct
+                        case 0://BOTH
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.BOTH);
+                            break;
+                        case 1://X
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.X);
+                            break;
+                        case 2://Y
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.Y);
+                            break;
+                    }
+                    break;
+                case 1://PREWITT
+                    switch (comboBox2.SelectedIndex)
+                    {//direct
+                        case 0://BOTH
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.PREWITT, MyFilter.GradientDirect.BOTH);
+                            break;
+                        case 1://X
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.PREWITT, MyFilter.GradientDirect.X);
+                            break;
+                        case 2://Y
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.PREWITT, MyFilter.GradientDirect.Y);
+                            break;
+                    }
+                    break;
+            }
             double SNR = 0.0;
             double costTime = 0;
             DateTime curTime = DateTime.Now;
@@ -78,5 +109,55 @@ namespace HW1_PCXreader
             return newLines;
         }
 
+        private void comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBox1.SelectedIndex)
+            {//operate
+                case 0://SOBEL
+                    switch (comboBox2.SelectedIndex)
+                    {//direct
+                        case 0://BOTH
+                            countFilter = new MyFilter(3);
+                            setMaskView();
+                            break;
+                        case 1://X
+                            countFilter = MyFilter.GradientKernel(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.X);
+                            setMaskView();
+                            break;
+                        case 2://Y
+                            countFilter = MyFilter.GradientKernel(MyFilter.GradientOperator.SOBEL, MyFilter.GradientDirect.Y);
+                            setMaskView();
+                            break;
+                    }
+                    break;
+                case 1://PREWITT
+                    switch (comboBox2.SelectedIndex)
+                    {//direct
+                        case 0://BOTH
+                            countFilter = new MyFilter(3);
+                            setMaskView();
+                            break;
+                        case 1://X
+                            countFilter = MyFilter.GradientKernel(MyFilter.GradientOperator.PREWITT, MyFilter.GradientDirect.X);
+                            setMaskView();
+                            break;
+                        case 2://Y
+                            countFilter = MyFilter.GradientKernel(MyFilter.GradientOperator.PREWITT, MyFilter.GradientDirect.Y);
+                            setMaskView();
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        private void setMaskView()
+        {
+            string name = "textBox";
+            for (int i = 0; i < 9; i++)
+            {
+                TextBox target = (TextBox)tableLayoutPanel3.Controls.Find(name + (2 + i), true)[0];
+                target.Text = countFilter[i % 3, i / 3].ToString();
+            }
+        }
     }
 }

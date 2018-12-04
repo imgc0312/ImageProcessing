@@ -557,5 +557,11 @@ namespace HW1_PCXreader
             Form_HighBoost form2 = new Form_HighBoost(this);
             form2.ShowDialog();
         }
+
+        private void gradientToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Gradient form2 = new Form_Gradient(this);
+            form2.ShowDialog();
+        }
     }
 }
