@@ -26,6 +26,7 @@ namespace HW1_PCXreader
         public Form_HighBoost() : base()
         {
             InitializeComponent();
+            initialForm();
         }
 
         public Form_HighBoost(Form1 form1) : base(form1)
