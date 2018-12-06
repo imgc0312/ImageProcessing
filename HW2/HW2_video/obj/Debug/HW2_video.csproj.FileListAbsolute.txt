@@ -1,0 +1,10 @@
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\bin\Debug\HW2_video.exe.config
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\bin\Debug\HW2_video.exe
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\bin\Debug\HW2_video.pdb
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.Properties.Resources.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.csproj.GenerateResource.Cache
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.exe
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.pdb
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.BasicForm.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Debug\HW2_video.Form1.resources
