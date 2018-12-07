@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -40,12 +41,23 @@ namespace HW2_video
         /// </summary>
         public event playHandler playEventHandler;
         MyTiff tiff = new MyTiff();
+        public MyTiff Tiff { get { return tiff; } }
+        public Image LastView { get
+            {
+                if (viewer != null)
+                    return viewer.Image;
+                return null;
+            } }
+        public Image PredictView
+        {
+            get
+            {
+                if (Tiff != null)
+                    return Tiff.View;
+                return null;
+            }
+        }
         PlayState curState = PlayState.STOP;
-        int speed = 400;//ms
-
-        /// <summary>
-        /// function~
-        /// </summary>
         public PlayState State
         {
             get
@@ -65,6 +77,13 @@ namespace HW2_video
                 }
             }
         }
+        int _speed = 400;//ms
+        public int Speed { get { return _speed; } }
+        public Delegate SideWorkDo { get; set; }
+        public object[] SideWorkArgs { get; set; }
+        /// <summary>
+        /// function~
+        /// </summary>
 
         public MyPlayer(PictureBox viewer)
         {
@@ -107,6 +126,14 @@ namespace HW2_video
             if (this.playEventHandler != null)
             {
                 this.playEventHandler(tiff, e);
+            }
+        }
+
+        public void OnPlay(Image view, PlayEventArgs e)
+        {
+            if (this.playEventHandler != null)
+            {
+                this.playEventHandler(new MyTiff(view), e);
             }
         }
 
@@ -158,6 +185,7 @@ namespace HW2_video
             }
             if (viewer != null)
             {
+                this.tiff = tiff;
                 tiff.Current = e.value;
                 PlayState oldState = curState;
                 switch (e.state)
@@ -179,6 +207,7 @@ namespace HW2_video
                         //    Back();
                         break;
                     case PlayState.KEEP:
+                        sideWorking(SideWorkDo, SideWorkArgs);
                         viewer.Image = tiff.View;
                         switch (curState)
                         {
@@ -187,7 +216,7 @@ namespace HW2_video
                                 {
                                     if (tiff.CurrState == 2)
                                         curState = PlayState.STOP;
-                                    Thread.Sleep(speed);
+                                    Thread.Sleep(Speed);
                                     if (curState == oldState)
                                         Next();
                                 }))).Start();
@@ -197,7 +226,7 @@ namespace HW2_video
                                 {
                                     if (tiff.CurrState == 0)
                                         curState = PlayState.STOP;
-                                    Thread.Sleep(speed);
+                                    Thread.Sleep(Speed);
                                     if (curState == oldState)
                                         Back();
                                 }))).Start();
@@ -211,6 +240,12 @@ namespace HW2_video
         private void progressTrack()
         {
             trackBar.Value = tiff.Current;
+        }
+
+        private void sideWorking(Delegate work, params object[] args)
+        {//do things beside playing 
+            if(work != null)
+                work.DynamicInvoke(args);
         }
     }
 }

@@ -22,13 +22,16 @@ namespace HW2_video
             }
         }
         int _curr = 0;
-        public int Next { get {
+        public int Next
+        {
+            get {
                 _curr++;
                 if (_curr >= views.Count)
                     return (_curr = (views.Count - 1));
                 else
                     return _curr;
-            } }
+            }
+        }
         public int Back
         {
             get
@@ -40,7 +43,8 @@ namespace HW2_video
                     return _curr;
             }
         }
-        public int Current {
+        public int Current
+        {
             get { return _curr; }
             set {
                 _curr = value;
@@ -133,6 +137,12 @@ namespace HW2_video
         public MyTiff()
         {
             ;
+        }
+
+        public MyTiff(Image view)
+        {
+            fileName = "<no name>";
+            views.Add(view);
         }
 
         public void from(string filePath)

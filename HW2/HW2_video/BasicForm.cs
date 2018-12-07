@@ -15,9 +15,10 @@ namespace HW2_video
     public partial class BasicForm : Form
     {
 
-        MyTiff myTiff = new MyTiff();
-        MyPlayer player = null;
-
+        protected MyTiff myTiff = new MyTiff();
+        protected MyPlayer player = null;
+        protected MyPlayer player2 = null;
+        private delegate void playCombine(MyPlayer src, MyPlayer dst);
         /// <summary>
         /// function-->
         /// </summary>
@@ -38,6 +39,14 @@ namespace HW2_video
             openFileDialog1.CheckPathExists = true;
 
             player = new MyPlayer(pictureBox1);
+            player2 = new MyPlayer(pictureBox2);
+            player.SideWorkDo = new playCombine(lastView);
+            player.SideWorkArgs = new object[] { player, player2 };
+        }
+
+        private void lastView(MyPlayer src, MyPlayer dst)
+        {
+            dst.OnPlay(src.LastView, new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.STOP));
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
