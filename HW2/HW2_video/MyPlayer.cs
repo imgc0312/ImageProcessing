@@ -16,6 +16,12 @@ namespace HW2_video
         /// </summary>
         public class PlayEventArgs : EventArgs //for progressbar
         {
+            public PlayEventArgs(int value) : base()
+            {
+                this.value = value;
+                this.state = PlayState.KEEP;
+            }
+
             public PlayEventArgs(int value, PlayState state) : base()
             {
                 this.value = value;
@@ -45,7 +51,7 @@ namespace HW2_video
         public Image LastView { get
             {
                 if (viewer != null)
-                    return viewer.Image;
+                    return viewer.BackgroundImage;
                 return null;
             } }
         public Image PredictView
@@ -77,10 +83,10 @@ namespace HW2_video
                 }
             }
         }
-        int _speed = 400;//ms
+        int _speed = 300;//ms
         public int Speed { get { return _speed; } }
-        public Delegate SideWorkDo { get; set; }
-        public object[] SideWorkArgs { get; set; }
+        public List<Delegate> SideWorkDo = new List<Delegate>(0);
+        public List<object[]> SideWorkArgs = new List<object[]>(0);
         /// <summary>
         /// function~
         /// </summary>
@@ -96,7 +102,7 @@ namespace HW2_video
         public void open(MyTiff tiff)
         {
             this.tiff = tiff;
-            OnPlay(new PlayEventArgs(0, PlayState.STOP));
+            OnPlay(new PlayEventArgs(0, PlayState.KEEP));
         }
 
         public void connect(TrackBar trackBar)
@@ -179,15 +185,15 @@ namespace HW2_video
 
         private void playChangeMethod(MyTiff tiff, PlayEventArgs e)
         {
-            if(trackBar != null)
+            this.tiff = tiff;
+            tiff.Current = e.value;
+            PlayState oldState = curState;
+            if (trackBar != null)
             {
                 trackBar.Invoke(trackHandle);
             }
             if (viewer != null)
             {
-                this.tiff = tiff;
-                tiff.Current = e.value;
-                PlayState oldState = curState;
                 switch (e.state)
                 {
                     case PlayState.PLAY:
@@ -198,7 +204,7 @@ namespace HW2_video
                         break;
                     case PlayState.STOP:
                         curState = PlayState.STOP;
-                        Stop();
+                        //Stop();
                         break;
                     case PlayState.BACK:
                         curState = PlayState.BACK;
@@ -207,8 +213,8 @@ namespace HW2_video
                         //    Back();
                         break;
                     case PlayState.KEEP:
-                        sideWorking(SideWorkDo, SideWorkArgs);
-                        viewer.Image = tiff.View;
+                        sideWorking();
+                        viewer.BackgroundImage = tiff.View;
                         switch (curState)
                         {
                             case PlayState.PLAY:
@@ -240,6 +246,17 @@ namespace HW2_video
         private void progressTrack()
         {
             trackBar.Value = tiff.Current;
+        }
+
+        private void sideWorking()
+        {//do things beside playing in all
+            if (SideWorkDo != null)
+            {
+                for(int i = 0; i < SideWorkDo.Count; i++)
+                {
+                    sideWorking(SideWorkDo.ElementAt(i), SideWorkArgs.ElementAt(i));
+                }
+            }
         }
 
         private void sideWorking(Delegate work, params object[] args)

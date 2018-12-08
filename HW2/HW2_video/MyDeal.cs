@@ -22,7 +22,7 @@ namespace HW2_video
                 return x;
             Bitmap beforeBitmap = new Bitmap(before);
             Bitmap afterBitmap = new Bitmap(after);
-            if (boundB(beforeBitmap).Equals(boundB(afterBitmap)))
+            if (!boundB(beforeBitmap).Equals(boundB(afterBitmap)))
                 return Double.NegativeInfinity;
             BitmapData beforeData = beforeBitmap.LockBits(boundB(beforeBitmap), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             BitmapData afterData = afterBitmap.LockBits(boundB(afterBitmap), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);

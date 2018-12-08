@@ -19,7 +19,7 @@ namespace HW2_video
 
         private void button1_Click(object sender, EventArgs e)
         {
-            BasicForm form2 = new BasicForm();
+            Form_NormalPlayer form2 = new Form_NormalPlayer();
             this.Visible = false;
             form2.ShowDialog();
             this.Visible = true;
