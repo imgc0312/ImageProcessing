@@ -109,7 +109,8 @@ namespace HW2_video
                 if (chart1.Series.FindByName(seriesIdA) != null)
                 {
                     chart1.Series.FindByName(seriesIdA).Points.Clear();
-                    chart1.Series.FindByName(seriesIdA).Points.DataBindY(new double[myTiff.Size]);
+                    int[] xValue = Enumerable.Range(0, myTiff.Size).ToArray();
+                    chart1.Series.FindByName(seriesIdA).Points.DataBindXY(xValue, new double[myTiff.Size]);
 
                 }
             }
@@ -149,8 +150,9 @@ namespace HW2_video
                 if (chart1.Series.FindByName(seriesIdB) != null)
                 {
                     chart1.Series.FindByName(seriesIdB).Points.Clear();
-                    string[] xValue = Enumerable.Range(0, myTiffB.Size).ToArray().Select(x => x.ToString()).ToArray();
-                    chart1.Series.FindByName(seriesIdB).Points.DataBindXY(xValue, new double[myTiffB.Size]);
+                    int[] xValue = Enumerable.Range(0, myTiffB.Size).ToArray();
+                    double[] yValue = new double[myTiffB.Size];
+                    chart1.Series.FindByName(seriesIdB).Points.DataBindXY(xValue, yValue);
                 }
             }
         }

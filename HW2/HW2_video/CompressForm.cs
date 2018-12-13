@@ -60,7 +60,7 @@ namespace HW2_video
                 compresser.connect(this, saveFileDialog1);
                 if (checkBox1.Checked)
                 {
-                    MyCompresser.sleepTime = 30;
+                    MyCompresser.sleepTime = 50;
                     if (compresser != null)
                     {
                         compresser.ReferencePlayer.flashIgnore = false;
@@ -73,8 +73,11 @@ namespace HW2_video
 
         private void button1_Click(object sender, EventArgs e)
         {
-            button1.Enabled = false;
-            compresser.Compressing();
+            if(compresser != null)
+            {
+                button1.Enabled = false;
+                compresser.Compressing();
+            }
         }
 
         private void trackBar_Scroll(object sender, EventArgs e)
@@ -98,7 +101,7 @@ namespace HW2_video
         {
             if (checkBox1.Checked)
             {
-                MyCompresser.sleepTime = 30;
+                MyCompresser.sleepTime = 50;
                 if(compresser != null)
                 {
                     compresser.ReferencePlayer.flashIgnore = false;

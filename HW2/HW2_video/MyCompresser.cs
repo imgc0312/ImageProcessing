@@ -121,7 +121,7 @@ namespace HW2_video
                             CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0));
                             if (i == 0)
                             {//uncompress frame number
-                                compressFile.baseImg.Add((Image)RefPlayer.NextView.Clone());// add ref imge
+                                compressFile.baseImg.Add((Image)RefPlayer.Tiff.views[i].Clone());// add ref imge
                                 compressFile.motionTiff.Add(null);
                                 continue;
                             }
@@ -197,6 +197,9 @@ namespace HW2_video
         {
             matchRatePair dataRecord = new matchRatePair(Double.PositiveInfinity, 0, 0);
             MyFilterData refKernelGet = new MyFilterData();// the data copy from ref frame of kernel size
+            int farDistance2 = 128;//define half of this is mean the distance value from target is far
+            int nearDistance2 = 32;//define half of this is mean the distance value from target is near
+            int farJumpStap = compressKernelSize;// define search pixel jump step lenth when seach in far area
                         
             if ((targetX < 0) || (targetY < 0))
             {// search all pixels
@@ -223,17 +226,30 @@ namespace HW2_video
                 return dataRecord.rate;
             }
             else
-            {// just search near pixels
-                int tx = targetX - 16;
-                int ty = targetY - 16;
-                if (tx < (0 + compressKernelSize / 2))
-                    tx = 0 + compressKernelSize / 2;
-                if (ty < (0 + compressKernelSize / 2))
-                    ty = 0 + compressKernelSize / 2;
-                for (int y = ty; (y < refData.Height) && (y < ty + 32); y += 1)
+            {//local primary
+                // the far area  left & top posion
+                int fx = targetX - farDistance2 / 2;
+                int fy = targetY - farDistance2 / 2;
+                // the near area posion
+                int nl = targetX - nearDistance2 / 2;
+                int nt = targetY - nearDistance2 / 2;
+                int nr = targetX + nearDistance2 / 2;
+                int nb = targetY + nearDistance2 / 2;
+
+                int jumpStap = farJumpStap;
+                for (int y = (fy < (0 + compressKernelSize / 2) ? (0 + compressKernelSize / 2) : fy); (y < refData.Height) && (y < fy + farDistance2); y += jumpStap)
                 {
-                    for (int x = tx; (x < refData.Width) && (x < tx + 32); x += 1)
+                    for (int x = (fx < (0 + compressKernelSize / 2) ? (0 + compressKernelSize / 2) : fx); (x < refData.Width) && (x < fx + farDistance2); x += jumpStap)
                     {
+                        if ((x >= nl) && (x < nr) && (y >= nt) && (y < nb))
+                        {// in near
+                            jumpStap = 1;
+                        }
+                        else
+                        {//in far
+                            jumpStap = farJumpStap;
+                        }
+                        //Debug.Print("match Test " + x + " , " + y);
                         RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
                         refKernelGet.fill(refData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
                         double distance = MyFilterData.compare(search, refKernelGet);
