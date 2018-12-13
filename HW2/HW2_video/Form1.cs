@@ -24,5 +24,13 @@ namespace HW2_video
             form2.ShowDialog();
             this.Visible = true;
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            CompressForm form2 = new CompressForm();
+            this.Visible = false;
+            form2.ShowDialog();
+            this.Visible = true;
+        }
     }
 }

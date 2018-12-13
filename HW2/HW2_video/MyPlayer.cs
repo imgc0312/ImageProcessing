@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,6 +13,7 @@ namespace HW2_video
 {
     public class MyPlayer
     {
+        public bool flashIgnore = true;//ignore the play event args flash?
         /// <summary>
         /// define type
         /// </summary>
@@ -20,40 +23,53 @@ namespace HW2_video
             {
                 this.value = value;
                 this.state = PlayState.KEEP;
+                this.args = null;
             }
 
             public PlayEventArgs(int value, PlayState state) : base()
             {
                 this.value = value;
                 this.state = state;
+                this.args = null;
             }
-            public int value { set; get; }
-            public PlayState state { set; get; }
+
+            public PlayEventArgs(int value, PlayState state, params object[] args) : base()
+            {
+                this.value = value;
+                this.state = state;
+                this.args = args;
+            }
+            public int value { set; get; } // play frame number
+            public PlayState state { set; get; } // chage play state
+            public object[] args { set; get; } //other args ex: for filter Target (startX, startY, width, height)
         }
 
-        public enum PlayState { PLAY, STOP, BACK , KEEP };
+        public enum PlayState { PLAY, STOP, BACK, KEEP };
         public delegate void playHandler(MyTiff tiff, PlayEventArgs e);
         public delegate void threadHandler();
 
         /// <summary>
         /// control~
         /// </summary>
-        PictureBox viewer = null;//view control
-        TrackBar trackBar = null;//progress control
-        threadHandler trackHandle;//handle progress control
+        protected PictureBox viewer = null;//view control
+        protected TrackBar trackBar = null;//progress control
+        protected threadHandler trackHandle;//handle progress control
 
         /// <summary>
         /// member
         /// </summary>
         public event playHandler playEventHandler;
-        MyTiff tiff = new MyTiff();
-        public MyTiff Tiff { get { return tiff; } }
-        public Image LastView { get
+        protected MyTiff tiff = new MyTiff();
+        public MyTiff Tiff { get { return tiff; } set { tiff = value;  } }
+        public Image LastView
+        {
+            get
             {
                 if (viewer != null)
                     return viewer.BackgroundImage;
                 return null;
-            } }
+            }
+        }
         public Image PredictView
         {
             get
@@ -63,7 +79,16 @@ namespace HW2_video
                 return null;
             }
         }
-        PlayState curState = PlayState.STOP;
+        public Image NextView
+        {
+            get
+            {
+                if (Tiff != null)
+                    return Tiff.NextView;
+                return null;
+            }
+        }
+        protected PlayState curState = PlayState.STOP;
         public PlayState State
         {
             get
@@ -83,10 +108,11 @@ namespace HW2_video
                 }
             }
         }
-        int _speed = 300;//ms
+        protected int _speed = 300;//ms
         public int Speed { get { return _speed; } }
         public List<Delegate> SideWorkDo = new List<Delegate>(0);
         public List<object[]> SideWorkArgs = new List<object[]>(0);
+        Random random = new Random();// use for sleep
         /// <summary>
         /// function~
         /// </summary>
@@ -127,7 +153,7 @@ namespace HW2_video
             }
         }
 
-        public void OnPlay(MyTiff tiff,PlayEventArgs e)
+        public void OnPlay(MyTiff tiff, PlayEventArgs e)
         {
             if (this.playEventHandler != null)
             {
@@ -167,7 +193,7 @@ namespace HW2_video
             }
         }
 
-        public void Stop()//view current event
+        public void Keep()//view current event
         {
             if (this.playEventHandler != null)
             {
@@ -183,10 +209,21 @@ namespace HW2_video
             }
         }
 
-        private void playChangeMethod(MyTiff tiff, PlayEventArgs e)
+        public void Bound()//view current event && drawBound
+        {
+            if (this.playEventHandler != null)
+            {
+                this.playEventHandler(this.tiff, new PlayEventArgs(tiff.Current, PlayState.KEEP));
+            }
+        }
+
+        protected virtual void playChangeMethod(MyTiff tiff, PlayEventArgs e)
         {
             this.tiff = tiff;
-            tiff.Current = e.value;
+            if (tiff == null)
+                return;
+            if(e.value >= 0)
+                tiff.Current = e.value;
             PlayState oldState = curState;
             if (trackBar != null)
             {
@@ -198,7 +235,7 @@ namespace HW2_video
                 {
                     case PlayState.PLAY:
                         curState = PlayState.PLAY;
-                        Next();
+                        Keep();
                         //if (oldState == PlayState.STOP)
                         //    Next();
                         break;
@@ -208,13 +245,16 @@ namespace HW2_video
                         break;
                     case PlayState.BACK:
                         curState = PlayState.BACK;
-                        Back();
+                        Keep();
                         //if (oldState == PlayState.STOP)
                         //    Back();
                         break;
                     case PlayState.KEEP:
                         sideWorking();
-                        viewer.BackgroundImage = tiff.View;
+                        if (e.args == null)
+                            draw();
+                        else
+                            draw((int)e.args[0], (int)e.args[1], (int)e.args[2], (int)e.args[3]);
                         switch (curState)
                         {
                             case PlayState.PLAY:
@@ -243,26 +283,170 @@ namespace HW2_video
             }
         }
 
-        private void progressTrack()
+        protected void progressTrack()
         {
             trackBar.Value = tiff.Current;
         }
 
-        private void sideWorking()
+        protected void sideWorking()
         {//do things beside playing in all
             if (SideWorkDo != null)
             {
-                for(int i = 0; i < SideWorkDo.Count; i++)
+                for (int i = 0; i < SideWorkDo.Count; i++)
                 {
+                    //Debug.Print("i" + i);
                     sideWorking(SideWorkDo.ElementAt(i), SideWorkArgs.ElementAt(i));
                 }
             }
         }
 
-        private void sideWorking(Delegate work, params object[] args)
+        protected void sideWorking(Delegate work, params object[] args)
         {//do things beside playing 
-            if(work != null)
+            if (work != null)
+            {
+                //foreach (object arg in args)
+                //{
+                //    if (arg != null)
+                //        Debug.Print(arg.ToString());
+                //    else
+                //        Debug.Print("<null>");
+                //}
                 work.DynamicInvoke(args);
+            }
+                
+        }
+
+        protected void draw()
+        {
+            if (viewer != null)
+            {
+                new Thread(new ThreadStart(new Action(() =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+
+                            if (!Object.Equals(viewer.BackgroundImage, tiff.View))
+                                viewer.BackgroundImage = tiff.View;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(11);
+                            continue;
+                        }
+                        break;
+                    }
+                    //if (viewer.Image != null)
+                    //{
+                    //    viewer.Image.Dispose();
+                    //}
+                    viewer.Image = null;
+                
+                }))).Start();
+            }
+        }
+
+        protected void draw(int X, int Y, int width, int height)
+        {
+            if ((viewer != null) && (!flashIgnore))
+            {
+                new Thread(new ThreadStart(new Action(() =>
+                {
+                    int startX = X - width / 2;
+                    int startY = Y - height / 2;
+                    Bitmap targetDraw;
+                    int viewWidth;
+                    int viewHeight;
+                    while (true)
+                    {
+                        try
+                        {
+                            if (!Object.Equals(viewer.BackgroundImage, tiff.View))
+                                viewer.BackgroundImage = tiff.View;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(21);
+                            continue;
+                        }
+                        break;
+                    }
+                    while (true)
+                    {
+                        try
+                        {
+                            viewWidth = tiff.View.Width;
+                            viewHeight = tiff.View.Height;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(23);
+                            continue;
+                        }
+                        break;
+                    }
+                    targetDraw = new Bitmap(viewWidth, viewHeight);
+                    int tx, ty;
+                    for (int i = 0; i < width; i++)
+                    {//draw top line
+                        tx = startX + i;
+                        ty = startY;
+                        if (tx < 0)
+                            continue;
+                        if (tx >= targetDraw.Width)
+                            continue;
+                        if (ty < 0)
+                            continue;
+                        if (ty >= targetDraw.Height)
+                            continue;
+                        targetDraw.SetPixel(tx, ty, Color.Red);
+                    }
+                    for (int i = 0; i < width; i++)
+                    {//draw bottom line
+                        tx = startX + i;
+                        ty = startY + height;
+                        if (tx < 0)
+                            continue;
+                        if (tx >= targetDraw.Width)
+                            continue;
+                        if (ty < 0)
+                            continue;
+                        if (ty >= targetDraw.Height)
+                            continue;
+                        targetDraw.SetPixel(tx, ty, Color.Red);
+                    }
+                    for (int i = 0; i < height; i++)
+                    {//draw left line
+                        tx = startX;
+                        ty = startY + i;
+                        if (tx < 0)
+                            continue;
+                        if (tx >= targetDraw.Width)
+                            continue;
+                        if (ty < 0)
+                            continue;
+                        if (ty >= targetDraw.Height)
+                            continue;
+                        targetDraw.SetPixel(tx, ty, Color.Red);
+                    }
+                    for (int i = 0; i < height; i++)
+                    {//draw right line
+                        tx = startX + width;
+                        ty = startY + i;
+                        if (tx < 0)
+                            continue;
+                        if (tx >= targetDraw.Width)
+                            continue;
+                        if (ty < 0)
+                            continue;
+                        if (ty >= targetDraw.Height)
+                            continue;
+                        targetDraw.SetPixel(tx, ty, Color.Red);
+                    }
+                    viewer.Image = targetDraw;
+                }))).Start();
+            }
         }
     }
 }

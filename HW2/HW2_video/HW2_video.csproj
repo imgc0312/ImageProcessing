@@ -54,11 +54,23 @@
     <Compile Include="BasicForm.Designer.cs">
       <DependentUpon>BasicForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CompressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CompressForm.Designer.cs">
+      <DependentUpon>CompressForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_ComparePlayer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_ComparePlayer.Designer.cs">
+      <DependentUpon>Form_ComparePlayer.cs</DependentUpon>
     </Compile>
     <Compile Include="Form_NormalPlayer.cs">
       <SubType>Form</SubType>
@@ -66,7 +78,12 @@
     <Compile Include="Form_NormalPlayer.Designer.cs">
       <DependentUpon>Form_NormalPlayer.cs</DependentUpon>
     </Compile>
+    <Compile Include="MyCompresser.cs" />
+    <Compile Include="MyCompressTiff.cs" />
     <Compile Include="MyDeal.cs" />
+    <Compile Include="MyFilter.cs" />
+    <Compile Include="MyFilterData.cs" />
+    <Compile Include="MyMotionTiff.cs" />
     <Compile Include="MyPlayer.cs" />
     <Compile Include="MyTiff.cs" />
     <Compile Include="Program.cs" />
@@ -74,8 +91,17 @@
     <EmbeddedResource Include="BasicForm.resx">
       <DependentUpon>BasicForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CompressForm.resx">
+      <DependentUpon>CompressForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_ComparePlayer.resx">
+      <DependentUpon>Form_ComparePlayer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_NormalPlayer.resx">
+      <DependentUpon>Form_NormalPlayer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

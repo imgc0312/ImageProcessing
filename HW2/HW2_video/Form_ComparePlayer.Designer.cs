@@ -1,6 +1,6 @@
 ﻿namespace HW2_video
 {
-    partial class Form_NormalPlayer
+    partial class Form_ComparePlayer
     {
         /// <summary>
         /// 設計工具所需的變數。
@@ -30,16 +30,18 @@
         {
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
-            // Form_NormalPlayer
+            // Form_ComparePlayer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.ClientSize = new System.Drawing.Size(1211, 871);
-            this.Name = "Form_NormalPlayer";
-            this.Text = "TiffPlayer _ B043040044";
+            this.Name = "Form_ComparePlayer";
+            this.Text = "ComparePlayer";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

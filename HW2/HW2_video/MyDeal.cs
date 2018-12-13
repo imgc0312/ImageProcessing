@@ -4,12 +4,15 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace HW2_video
 {
-    class MyDeal
+    public class MyDeal
     {
+        private static double maxPSNR = 100.0;
         public static double PSNR(Image before, Image after)
         {// PSNR = 10 log( 255^2 / sigma(pixel difference) )
             //if one of arg is null, then return null
@@ -17,7 +20,7 @@ namespace HW2_video
             //else return PSNR 
             double x = 0.0;
             if (before == null)
-                return x;
+                return maxPSNR;
             if (after == null)
                 return x;
             Bitmap beforeBitmap = new Bitmap(before);
@@ -53,12 +56,91 @@ namespace HW2_video
                 x = Double.PositiveInfinity;
             else
                 x = 10 * Math.Log10(255.0 * 255.0 * 3.0 * width * height / x);
+
+            if (x > maxPSNR)
+                x = maxPSNR;
             return x;
         }
 
-        private static Rectangle boundB(Bitmap src)
+        public static Rectangle boundB(Bitmap src)
         {//get Bitmap rectangle
             return new Rectangle(0, 0, src.Width, src.Height);
         }
+
+
+        /// <summary>
+        /// other class-->
+        /// </summary>
+
+        // for progress
+        public class ValueEventArgs : EventArgs //for progressbar
+        {
+            public double value { set; get; }
+            public int percent { get { return Convert.ToInt32(value * 100); } }
+        }
+
+        public delegate void ValueChangedEventHandler(object sender, ValueEventArgs e);
+
+        public class ProgressMonitor
+        {
+            private event ValueChangedEventHandler ValueChanged; //change event
+            public double current = 0;
+            public ProgressBar view { get; set; }
+            //int tryTime = 0;
+            public ProgressMonitor()
+            {
+                ValueChanged = new ValueChangedEventHandler(ValueChangeMethod);
+                view = null;
+            }
+
+            public ProgressMonitor(ProgressBar view)
+            {
+                ValueChanged = new ValueChangedEventHandler(ValueChangeMethod);
+                this.view = view;
+            }
+
+            public void start()
+            {
+                current = 0;
+                if (view != null)
+                {
+                    view.Value = 0;
+                    view.Visible = true;
+                    //Debug.Print("progress : start" + tryTime);
+                }
+            }
+
+            public void fine()
+            {
+                current = 1.0;
+                if (view != null)
+                {
+                    view.Value = 100;
+                    view.Visible = false;
+                    //Debug.Print("progress : fine" + tryTime);
+                    //tryTime++;
+                }
+            }
+
+            public void OnValueChanged(ValueEventArgs e)
+            {
+                if (this.ValueChanged != null)
+                {
+                    this.ValueChanged(this, e);
+                }
+            }
+
+            public void ValueChangeMethod(object sender, ValueEventArgs e)
+            {
+                current = e.value;
+                if (view != null)
+                {
+                    view.Value = e.percent;
+                    //Debug.Print("progress : " + view.Value);
+                }
+                //Debug.Print("progress : change");
+            }
+        }
+
     }
 }

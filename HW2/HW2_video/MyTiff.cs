@@ -69,6 +69,12 @@ namespace HW2_video
         {
             get
             {
+                if (views.Count == 0)
+                    return null;
+                if (_curr >= views.Count)
+                    return null;
+                else if (_curr < 0)
+                    return null;
                 return views.ElementAt(_curr);
             }
         }
@@ -77,6 +83,8 @@ namespace HW2_video
         {
             get
             {
+                if (views.Count == 0)
+                    return null;
                 if ((_curr + 1) >= views.Count)
                     return views.ElementAt(views.Count - 1);
                 else
@@ -88,6 +96,8 @@ namespace HW2_video
         {
             get
             {
+                if (views.Count == 0)
+                    return null;
                 if ((_curr - 1) < 0)
                     return views.ElementAt(0);
                 else
@@ -99,6 +109,8 @@ namespace HW2_video
         {
             get
             {
+                if (views.Count == 0)
+                    return null;
                 _curr = cur;
                 if (Size != 0)
                 {
