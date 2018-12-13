@@ -121,7 +121,7 @@ namespace HW2_video
                             CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0));
                             if (i == 0)
                             {//uncompress frame number
-                                compressFile.baseImg.Add((Image)RefPlayer.Tiff.views[i].Clone());// add ref imge
+                                compressFile.baseImg.Add((Image)RefPlayer.Tiff[i].Clone());// add ref imge
                                 compressFile.motionTiff.Add(null);
                                 continue;
                             }
