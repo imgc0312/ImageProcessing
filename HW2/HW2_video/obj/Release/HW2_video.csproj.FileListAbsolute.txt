@@ -1,0 +1,13 @@
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\bin\Release\HW2_video.exe.config
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.BasicForm.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.CompressForm.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.Form1.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.Form_ComparePlayer.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.Form_NormalPlayer.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.Properties.Resources.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.csproj.GenerateResource.Cache
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\bin\Release\HW2_video.exe
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\bin\Release\HW2_video.pdb
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.exe
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.pdb
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW2\HW2_video\obj\Release\HW2_video.csprojResolveAssemblyReference.cache

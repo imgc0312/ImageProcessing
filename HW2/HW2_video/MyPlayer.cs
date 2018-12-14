@@ -444,7 +444,19 @@ namespace HW2_video
                             continue;
                         targetDraw.SetPixel(tx, ty, Color.Red);
                     }
-                    viewer.Image = targetDraw;
+                    while (true)
+                    {
+                        try
+                        {
+                            viewer.Image = targetDraw;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(3);
+                            continue;
+                        }
+                        break;
+                    }
                 }))).Start();
             }
         }

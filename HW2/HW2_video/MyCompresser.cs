@@ -53,7 +53,10 @@ namespace HW2_video
         public MyPlayer CurrentPlayer { get { return CurPlayer; } }
         MyCompressTiff compressFile = null;//encode file
         public static int compressKernelSize = 8; // compress Kernel Size
-        public static int sleepTime = 0; // if too low the ref viewer would be error
+        
+        public static int sleepShort = 0; // sleepTime short ver
+        public static int sleepLong = 50; // sleepTime long ver
+        public static int sleepTime = sleepShort; // if too low the ref viewer would be error
 
         findMatchDelegate findMatch = null;
         PictureBox featureViewer = null;
@@ -104,7 +107,7 @@ namespace HW2_video
 
         public void Compressing()
         {
-            new Thread(new ThreadStart(new Action(() =>
+            Thread compressThread = new Thread(new ThreadStart(new Action(() =>
             {
                 try
                 {
@@ -163,6 +166,11 @@ namespace HW2_video
                             {
                                 for (int x = 0 + compressKernelSize / 2; x < curBitmapCp.Width; x += compressKernelSize)
                                 {
+                                    if(activeFrom != null)
+                                    {
+                                        if (activeFrom.IsDisposed)//form be dispose
+                                            return;
+                                    }
                                     CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
                                     CurKernelGet.fill(curData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
                                     if (featureViewer != null)
@@ -189,7 +197,9 @@ namespace HW2_video
                     return;
                 }
                 
-            }))).Start();
+            })));
+            compressThread.IsBackground = true;
+            compressThread.Start();
 
         }
 

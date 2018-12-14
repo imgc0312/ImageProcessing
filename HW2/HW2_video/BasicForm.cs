@@ -73,6 +73,7 @@ namespace HW2_video
             PSNRSeries.LegendText = test;
             PSNRSeries.ChartType = SeriesChartType.Line;
             PSNRSeries.Color = color;
+            PSNRSeries.BorderWidth = 3;
             return PSNRSeries;
         }
 

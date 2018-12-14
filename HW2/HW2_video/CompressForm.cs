@@ -28,7 +28,7 @@ namespace HW2_video
 
         protected virtual void initialForm()
         {
-            MyCompresser.sleepTime = 0;
+            MyCompresser.sleepTime = MyCompresser.sleepShort;
 
             //openFileDialog Setting
             openFileDialog1 = new OpenFileDialog();
@@ -60,7 +60,7 @@ namespace HW2_video
                 compresser.connect(this, saveFileDialog1);
                 if (checkBox1.Checked)
                 {
-                    MyCompresser.sleepTime = 50;
+                    MyCompresser.sleepTime = MyCompresser.sleepTime = MyCompresser.sleepLong; ;
                     if (compresser != null)
                     {
                         compresser.ReferencePlayer.flashIgnore = false;
@@ -101,7 +101,7 @@ namespace HW2_video
         {
             if (checkBox1.Checked)
             {
-                MyCompresser.sleepTime = 50;
+                MyCompresser.sleepTime = MyCompresser.sleepLong;
                 if(compresser != null)
                 {
                     compresser.ReferencePlayer.flashIgnore = false;
@@ -109,7 +109,7 @@ namespace HW2_video
             }
             else
             {
-                MyCompresser.sleepTime = 0;
+                MyCompresser.sleepTime = MyCompresser.sleepShort;
                 if (compresser != null)
                 {
                     compresser.ReferencePlayer.flashIgnore = true;
