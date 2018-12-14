@@ -36,12 +36,18 @@ namespace HW2_video
 
         public static MyTiff decode(MyCompressTiff myct)
         {
+            return decode(myct, null);
+        }
+
+        public static MyTiff decode(MyCompressTiff myct, MyDeal.ProgressMonitor monitor)
+        {
             MyTiff decodeTiff = new MyTiff();
             Bitmap baseImg = null;
             MyMotionTiff targetMotion;
-            for(int i = 0; i < myct.baseImg.Count; i++)
+
+            for (int i = 0; i < myct.baseImg.Count; i++)
             {
-                if(myct.baseImg.ElementAt(i) != null)
+                if (myct.baseImg.ElementAt(i) != null)
                 {
                     decodeTiff.views.Add(baseImg = new Bitmap(myct.baseImg.ElementAt(i)));
                 }
@@ -51,6 +57,8 @@ namespace HW2_video
                     baseImg = MyMotionTiff.decode(baseImg, targetMotion);
                     decodeTiff.views.Add(baseImg);
                 }
+                if (monitor != null)
+                    monitor.OnValueChanged(new MyDeal.ValueEventArgs() { value = (double)i / myct.baseImg.Count });
             }
             return decodeTiff;
         }

@@ -17,6 +17,10 @@ namespace HW2_video
     public partial class BasicForm : Form
     {
 
+        protected delegate void playCombine(MyPlayer src, Control dst, params object[] args);
+        protected delegate void chartDelegate(Chart use,object[] args);//Delegate for chart invoke
+
+
         protected MyTiff myTiff = new MyTiff();
         protected MyPlayer player = null;
         protected MyCompressTiff myCompressTiff;
@@ -25,8 +29,7 @@ namespace HW2_video
         protected MyCompressTiff myCompressTiffB;
         protected string seriesIdA = "Series1";
         protected string seriesIdB = "Series2";
-        protected delegate void playCombine(MyPlayer src, Control dst, params object[] args);
-        protected delegate void chartDelegate(Chart use,object[] args);//Delegate for chart invoke
+        protected internal MyDeal.ProgressMonitor basicProgress = null; 
         /// <summary>
         /// function-->
         /// </summary>
@@ -39,6 +42,7 @@ namespace HW2_video
 
         protected virtual void initialForm()
         {
+            basicProgress = new MyDeal.ProgressMonitor(progressBar1);
             //openFileDialog Setting
             openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "tif file(*.tiff)|*.01.tiff;*01.*.tiff|my compress file(*.MYCT)|*.MYCT";
@@ -51,7 +55,7 @@ namespace HW2_video
             chart1.ChartAreas.ElementAt(0).AxisX.Maximum = 0;
             chart1.ChartAreas.ElementAt(0).AxisX.Interval = 5;//橫坐標 標籤距
             chart1.ChartAreas.ElementAt(0).AxisY.Minimum = 0;
-            chart1.ChartAreas.ElementAt(0).AxisY.Maximum = 100;
+            chart1.ChartAreas.ElementAt(0).AxisY.Maximum = MyDeal.maxPSNR;
 
             //add psnr
             chart1.Series.Clear();
@@ -93,10 +97,14 @@ namespace HW2_video
                             MessageBox.Show(openFileDialog1.FileName, "open fail < not a MYCT file >");
                             return;
                         }
+                        if (basicProgress != null)
+                            basicProgress.start();
                         FileStream fs = (FileStream)openFileDialog1.OpenFile();
                         myCompressTiff = MyCompressTiff.readFromFile(fs);
-                        myTiff = MyCompressTiff.decode(myCompressTiff);
+                        myTiff = MyCompressTiff.decode(myCompressTiff, basicProgress);
                         fs.Close();
+                        if (basicProgress != null)
+                            basicProgress.fine();
                         break;
                 }
                 
@@ -137,10 +145,14 @@ namespace HW2_video
                             MessageBox.Show(openFileDialog1.FileName, "open fail < not a MYCT file >");
                             return;
                         }
+                        if (basicProgress != null)
+                            basicProgress.start();
                         FileStream fs = (FileStream)openFileDialog1.OpenFile();
                         myCompressTiffB = MyCompressTiff.readFromFile(fs);
-                        myTiffB = MyCompressTiff.decode(myCompressTiffB);
+                        myTiffB = MyCompressTiff.decode(myCompressTiffB, basicProgress);
                         fs.Close();
+                        if (basicProgress != null)
+                            basicProgress.fine();
                         break;
                 }
 

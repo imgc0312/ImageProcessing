@@ -323,7 +323,6 @@
         protected System.Windows.Forms.TextBox textBox_progress;
         protected System.Windows.Forms.GroupBox groupBox1;
         protected System.Windows.Forms.PictureBox pictureBox1;
-        protected System.Windows.Forms.Button button1;
         protected System.Windows.Forms.GroupBox groupBox2;
         protected System.Windows.Forms.PictureBox pictureBox2;
         protected System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
@@ -337,5 +336,6 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.CheckBox checkBox1;
+        protected internal System.Windows.Forms.Button button1;
     }
 }

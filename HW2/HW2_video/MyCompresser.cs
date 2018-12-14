@@ -59,7 +59,7 @@ namespace HW2_video
         PictureBox featureViewer = null;
         TrackBar trackBar = null;
         SaveFileDialog saver = null;
-        Form activeFrom = null;
+        CompressForm activeFrom = null;
 
         static MyFilter CompressKernel;
 
@@ -96,7 +96,7 @@ namespace HW2_video
             
         }
 
-        public void connect(Form activeFrom, SaveFileDialog saver)
+        public void connect(CompressForm activeFrom, SaveFileDialog saver)
         {
             this.activeFrom = activeFrom;
             this.saver = saver;
@@ -288,6 +288,7 @@ namespace HW2_video
                     }
                 }
             }
+            activeFrom.button1.Enabled = true;
         }
 
     }

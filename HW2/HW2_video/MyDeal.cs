@@ -12,7 +12,7 @@ namespace HW2_video
 {
     public class MyDeal
     {
-        private static double maxPSNR = 100.0;
+        public static double maxPSNR = 60.0;//upper bound of the PSNR() return value
         public static double PSNR(Image before, Image after)
         {// PSNR = 10 log( 255^2 / sigma(pixel difference) )
             //if one of arg is null, then return null
