@@ -44,6 +44,7 @@
             this.redToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.greenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.blueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -55,7 +56,8 @@
             statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel0,
             this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2});
+            this.toolStripStatusLabel2,
+            this.toolStripStatusLabel3});
             statusStrip1.Location = new System.Drawing.Point(0, 211);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new System.Drawing.Size(278, 28);
@@ -180,6 +182,13 @@
             this.blueToolStripMenuItem.Size = new System.Drawing.Size(233, 30);
             this.blueToolStripMenuItem.Text = "Blue";
             // 
+            // toolStripStatusLabel3
+            // 
+            this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            this.toolStripStatusLabel3.Size = new System.Drawing.Size(71, 23);
+            this.toolStripStatusLabel3.Text = "reserve";
+            this.toolStripStatusLabel3.Visible = false;
+            // 
             // EmptyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -217,5 +226,6 @@
         private System.Windows.Forms.ToolStripMenuItem blueToolStripMenuItem;
         protected System.Windows.Forms.MenuStrip menuStrip1;
         protected System.Windows.Forms.OpenFileDialog openFileDialog1;
+        protected System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
     }
 }

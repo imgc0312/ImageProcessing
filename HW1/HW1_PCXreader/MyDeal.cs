@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -983,8 +984,11 @@ namespace HW1_PCXreader
                 return output;
             if (after == null)
                 return output;
+            if (before.Equals(after))
+                return Double.PositiveInfinity;
             BitmapData beforeData = before.LockBits(MyF.bound(before), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
             BitmapData afterData = after.LockBits(MyF.bound(after), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+
             unsafe
             {
                 int skipByte = beforeData.Stride - 3 * beforeData.Width;

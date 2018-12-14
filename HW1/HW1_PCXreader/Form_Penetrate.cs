@@ -10,6 +10,7 @@ namespace HW1_PCXreader
 {
     public partial class Form_Penetrate : HW1_PCXreader.ToolForm
     {
+        string SNRText = "SNR (dB) : ";
         Bitmap input1 = null;
         Bitmap Input1
         {
@@ -58,6 +59,8 @@ namespace HW1_PCXreader
         {
             InitializeComponent();
             mode = (int)imgMode.ORI;
+            toolStripStatusLabel3.Visible = true;
+            toolStripStatusLabel3.Text = SNRText;
         }
 
         public Form_Penetrate(Form1 form1) : base(form1)
@@ -65,6 +68,8 @@ namespace HW1_PCXreader
             InitializeComponent();
             Input1 = form1.Img[0];
             mode = (int)imgMode.ORI;
+            toolStripStatusLabel3.Visible = true;
+            toolStripStatusLabel3.Text = SNRText;
         }
 
         private void textBox_TextChanged(object sender, EventArgs e)
@@ -144,6 +149,7 @@ namespace HW1_PCXreader
         private void count()
         {
             Output = MyDeal.opacity(Input1, Input2, trackBar1.Value);
+            toolStripStatusLabel3.Text = SNRText + MyDeal.SNR(Input1, Output).ToString("0.00");
         }
     }
 }

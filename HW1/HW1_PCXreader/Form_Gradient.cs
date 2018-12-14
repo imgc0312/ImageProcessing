@@ -13,7 +13,7 @@ namespace HW1_PCXreader
         protected ProgressMonitor progress = new ProgressMonitor();
         public string[] info = new string[]{
             "Mask \t\t:\t",
-            "Weight \t\t:\t",
+            "Direct \t\t:\t",
             "SNR(dB) \t\t:\t",
             "Cost Time (ms) \t:\t"
         };
@@ -104,8 +104,8 @@ namespace HW1_PCXreader
             info.CopyTo(newLines, 0);
             newLines[0] += "" + operatorName;
             newLines[1] += "" + direction;
-            newLines[2] += "" + SNR.ToString("0.000000");
-            newLines[3] += "" + time;
+            newLines[2] += "" + SNR.ToString("0.00");
+            newLines[3] += "" + time.ToString("0.00");
             return newLines;
         }
 

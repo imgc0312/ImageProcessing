@@ -10,6 +10,7 @@ namespace HW1_PCXreader
 {
     public partial class Form_BitPlane : HW1_PCXreader.ToolForm
     {
+        string SNRText = "SNR (dB) : ";
         BitPlanes.CodingMethod CodingMode = BitPlanes.CodingMethod.Binary;
         Bitmap input1 = null;
         BitPlanes input1P = new BitPlanes();
@@ -65,6 +66,8 @@ namespace HW1_PCXreader
         {
             InitializeComponent();
             mode = (int)imgMode.GRAY;
+            toolStripStatusLabel3.Visible = true;
+            toolStripStatusLabel3.Text = SNRText;
         }
 
         public Form_BitPlane(Form1 form1) : base(form1)
@@ -72,6 +75,8 @@ namespace HW1_PCXreader
             InitializeComponent();
             Input1 = MyDeal.gray(form1.Img[0]);
             mode = (int)imgMode.GRAY;
+            toolStripStatusLabel3.Visible = true;
+            toolStripStatusLabel3.Text = SNRText;
             count();
         }
 
@@ -137,6 +142,7 @@ namespace HW1_PCXreader
             pictureBox10.Image = planes[1];
             pictureBox11.Image = planes[0];
             Output = planes.merge(CodingMode);
+            toolStripStatusLabel3.Text = SNRText + MyDeal.SNR(Input1, Output).ToString("0.00");
         }
 
         private new void pictureBox_MouseMove(object sender, MouseEventArgs e)

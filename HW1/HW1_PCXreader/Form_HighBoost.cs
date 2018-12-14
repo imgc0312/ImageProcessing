@@ -70,8 +70,8 @@ namespace HW1_PCXreader
             info.CopyTo(newLines, 0);
             newLines[0] += "" + maskName;
             newLines[1] += "" + weight.ToString("0.00");
-            newLines[2] += "" + SNR.ToString("0.000000");
-            newLines[3] += "" + time;
+            newLines[2] += "" + SNR.ToString("0.00");
+            newLines[3] += "" + time.ToString("0.00");
             return newLines;
         }
 
