@@ -17,6 +17,7 @@ namespace HW2_video
         protected MyPlayer player = null;
         protected delegate void playCombine(MyPlayer src, Control dst, object[] args);
         MyCompresser compresser = null;
+        MyCompresser.MATCH_METHOD compressMatchMethod = MyCompresser.MATCH_METHOD.LOCAL;
         /// <summary>
         /// function-->
         /// </summary>
@@ -54,17 +55,25 @@ namespace HW2_video
                 player.OnPlay(new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.STOP));
 
                 compresser = new MyCompresser(player, pictureBox2);
-                compresser.setMatchMethod(compresser.findMatchNormal);
-                compresser.connect(pictureBoxFeature);
+                compresser.setMatchMethod(compressMatchMethod);
+                compresser.connect(pictureBoxFeature, MyCompresser.CONNECT.PICTURE_FEATURE);
+                compresser.connect(pictureBoxFeatureRef, MyCompresser.CONNECT.PICTURE_MATCH);
+                compresser.connect(pictureBoxMotion, MyCompresser.CONNECT.PICTURE_MOTION);
                 compresser.connect(trackBar1);
                 compresser.connect(this, saveFileDialog1);
                 if (checkBox1.Checked)
                 {
-                    MyCompresser.sleepTime = MyCompresser.sleepTime = MyCompresser.sleepLong; ;
+                    MyCompresser.sleepTime = MyCompresser.sleepLong; ;
                     if (compresser != null)
                     {
                         compresser.ReferencePlayer.flashIgnore = false;
                     }
+                    pictureBoxFeatureRef.Visible = true;
+                }
+                if (checkBox2.Checked)
+                {
+                    pictureBoxMotion.Visible = true;
+                    pictureBox2.Visible = false;
                 }
                 compresser.CurrentPlayer.flashIgnore = false;
                 textBox_progress.Text = "0 / " + (myTiff.Size - 1);
@@ -106,6 +115,7 @@ namespace HW2_video
                 {
                     compresser.ReferencePlayer.flashIgnore = false;
                 }
+                pictureBoxFeatureRef.Visible = true;
             }
             else
             {
@@ -114,6 +124,44 @@ namespace HW2_video
                 {
                     compresser.ReferencePlayer.flashIgnore = true;
                     compresser.ReferencePlayer.OnPlay(new MyPlayer.PlayEventArgs(-1));
+                }
+                pictureBoxFeatureRef.Visible = false;
+            }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                pictureBoxMotion.Visible = true;
+                pictureBox2.Visible = false;
+            }
+            else
+            {
+                pictureBoxMotion.Visible = false;
+                pictureBox2.Visible = true;
+            }
+        }
+
+        private void radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton here = (RadioButton)sender;
+            if (here.Checked)
+            {
+                int option = 0;
+                Int32.TryParse(here.Name.Replace("radioButton", null), out option);
+                switch (option)
+                {
+                    case 1:
+                        compressMatchMethod = MyCompresser.MATCH_METHOD.ALL;
+                        break;
+                    case 2:
+                        compressMatchMethod = MyCompresser.MATCH_METHOD.LOCAL;
+                        break;
+                }
+                if(compresser != null)
+                {
+                    compresser.setMatchMethod(compressMatchMethod);
                 }
             }
         }

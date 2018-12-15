@@ -13,6 +13,8 @@ namespace HW2_video
 {
     public class MyCompresser
     {
+        public enum CONNECT { PICTURE_MOTION, PICTURE_FEATURE, PICTURE_MATCH }// for connect form control
+        public enum MATCH_METHOD { ALL, LOCAL }// compress match search
         public delegate double findMatchDelegate(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int x, ref int y);
         private delegate void threadHandler();//for save
         private delegate void threadHandler2(int value);//for track
@@ -59,12 +61,15 @@ namespace HW2_video
         public static int sleepTime = sleepShort; // if too low the ref viewer would be error
 
         findMatchDelegate findMatch = null;
+        PictureBox MotionViewer = null;
         PictureBox featureViewer = null;
+        PictureBox MatchViewer = null;
         TrackBar trackBar = null;
         SaveFileDialog saver = null;
         CompressForm activeFrom = null;
 
         static MyFilter CompressKernel;
+        Random random = new Random();
 
         public MyCompresser(MyPlayer RefPlayer, PictureBox CurViewer)
         {
@@ -80,9 +85,39 @@ namespace HW2_video
             findMatch = findMatchWay;
         }
 
+        public void setMatchMethod(MATCH_METHOD method)
+        {
+            switch (method)
+            {
+                case MATCH_METHOD.ALL:
+                    this.findMatch = findMatchAll;
+                    return;
+                case MATCH_METHOD.LOCAL:
+                    this.findMatch = findMatchLocal;
+                    return;
+            }
+        }
+
         public void connect(PictureBox viewer)
         {
             featureViewer = viewer;
+        }
+
+        public void connect(PictureBox viewer, CONNECT forWhat)
+        {
+            switch (forWhat)
+            {
+                case CONNECT.PICTURE_MOTION:
+                    MotionViewer = viewer;
+                    return;
+                case CONNECT.PICTURE_FEATURE:
+                    featureViewer = viewer;
+                    return;
+                case CONNECT.PICTURE_MATCH:
+                    MatchViewer = viewer;
+                    return;
+
+            }
         }
 
         public void connect(TrackBar trackBar)
@@ -115,13 +150,25 @@ namespace HW2_video
                     {
                         MyFilterData CurKernelGet = new MyFilterData();// the data copy from cur frame of kernel size
                         for (int i = 0; i < RefPlayer.Tiff.Size; i++)
-                        //for (int i = 0; i < 3; i++)
-                        {
+                        {//run frames
                             //Debug.Print("in frame " + i);
-                            trackBar.Invoke(new threadHandler2(progressTrack), i);
 
-                            RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(i - 1, MyPlayer.PlayState.KEEP));
-                            CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0));
+                            trackBar.Invoke(new threadHandler2(progressTrack), i);// reflash progress view
+
+                            RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(i - 1, MyPlayer.PlayState.KEEP));//flash ref frame view
+                            CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0));//flash current frame view
+
+                            //clear motion view
+                            Bitmap motionBlock = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
+                            Bitmap motionVector = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
+                            MyDeal.tryDraw(MotionViewer, motionVector);
+                            MyDeal.tryDrawBack(MotionViewer, motionBlock);
+                            Graphics graphicMotionBlock = Graphics.FromImage(motionBlock);
+                            Graphics graphicMotionVector = Graphics.FromImage(motionVector);
+                            int colorLowBound = 64;// for random color value lower bound
+                            int colorHighBound = 256 - colorLowBound;
+                            Color penColor = Color.Black;
+
                             if (i == 0)
                             {//uncompress frame number
                                 compressFile.baseImg.Add((Image)RefPlayer.Tiff[i].Clone());// add ref imge
@@ -171,14 +218,22 @@ namespace HW2_video
                                         if (activeFrom.IsDisposed)//form be dispose
                                             return;
                                     }
+                                    //draw target
                                     CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
                                     CurKernelGet.fill(curData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
-                                    if (featureViewer != null)
-                                        featureViewer.Image = CurKernelGet.transToBitmap();
+                                    MyDeal.tryDraw(featureViewer, CurKernelGet.transToBitmap());
+                                    //draw motion
+                                    penColor = Color.FromArgb(colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound);
+                                    graphicMotionBlock.FillRectangle(new SolidBrush(penColor), x - MyCompresser.compressKernelSize / 4, y - MyCompresser.compressKernelSize / 4, MyCompresser.compressKernelSize / 2, MyCompresser.compressKernelSize / 2);
+                                    MotionViewer.Invalidate();
+                                    //find match
                                     int targetX = x;
                                     int targetY = y;
-                                    findMatchNormal(CurKernelGet, refData, RefPlayer, ref targetX, ref targetY);
+                                    findMatch(CurKernelGet, refData, RefPlayer, ref targetX, ref targetY);
                                     theMotion[x, y] = new int[] { targetX, targetY };
+                                    //draw match vector
+                                    graphicMotionVector.DrawLine(new Pen(Color.FromArgb(128, penColor), 2.0f), x, y, targetX, targetY);
+
                                     //Debug.Print("in frame " + i + " in " + x + " , "+ y + "find target " + targetX + " , " + targetY);
                                 }
                             }
@@ -203,22 +258,60 @@ namespace HW2_video
 
         }
 
-        public double findMatchNormal(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int targetX, ref int targetY)
+        protected void progressTrack(int value)
         {
+            trackBar.Value = value;
+        }
+
+        private void saveFile()
+        {
+            if (saver != null)
+            {//save compress file
+                if (saver.ShowDialog() == DialogResult.OK)
+                {
+                    // If the file name is not an empty string open it for saving.  
+                    if (saver.FileName != "")
+                    {
+                        FileStream fs = (FileStream)saver.OpenFile();
+                        MyCompressTiff.writeToFile(fs, compressFile);
+                        fs.Close();
+                    }
+                }
+            }
+            activeFrom.button1.Enabled = true;
+        }
+
+        ///
+        /// -> find Match 
+        ///
+        public double findMatchAll(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int targetX, ref int targetY)
+        {// all seach
+            int i = -1;
+            int j = -1;
+            return findMatchNormal(search, refData, RefPlayer,ref i, ref j);
+        }
+
+        public double findMatchLocal(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int targetX, ref int targetY)
+        {// local primary 
+            return findMatchNormal(search, refData, RefPlayer, ref targetX, ref targetY);
+        }
+
+        public double findMatchNormal(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int targetX, ref int targetY)
+        {// 2D loorer methd if x,y < 0 ? all seach : local primary 
             matchRatePair dataRecord = new matchRatePair(Double.PositiveInfinity, 0, 0);
             MyFilterData refKernelGet = new MyFilterData();// the data copy from ref frame of kernel size
             int farDistance2 = 128;//define half of this is mean the distance value from target is far
             int nearDistance2 = 32;//define half of this is mean the distance value from target is near
             int farJumpStap = compressKernelSize;// define search pixel jump step lenth when seach in far area
-                        
+
             if ((targetX < 0) || (targetY < 0))
             {// search all pixels
-                
+
                 for (int y = 0 + compressKernelSize / 2; y < refData.Height; y += 1)
                 {
                     for (int x = 0 + compressKernelSize / 2; x < refData.Width; x += 1)
                     {
-                        if(x%2 == 0)// reduce the reflash view frequence
+                        if (x % 3 == 0)// reduce the reflash view frequence
                             RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
                         refKernelGet.fill(refData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
                         double distance = MyFilterData.compare(search, refKernelGet);
@@ -227,6 +320,7 @@ namespace HW2_video
                             dataRecord.rate = distance;
                             dataRecord.x = x;
                             dataRecord.y = y;
+                            MyDeal.tryDraw(MatchViewer, refKernelGet.transToBitmap());
                         }
                         Thread.Sleep(sleepTime);
                     }
@@ -268,6 +362,7 @@ namespace HW2_video
                             dataRecord.rate = distance;
                             dataRecord.x = x;
                             dataRecord.y = y;
+                            MyDeal.tryDraw(MatchViewer, refKernelGet.transToBitmap());
                         }
                         Thread.Sleep(sleepTime);
                     }
@@ -277,29 +372,5 @@ namespace HW2_video
                 return dataRecord.rate;
             }
         }
-
-        protected void progressTrack(int value)
-        {
-            trackBar.Value = value;
-        }
-
-        private void saveFile()
-        {
-            if (saver != null)
-            {//save compress file
-                if (saver.ShowDialog() == DialogResult.OK)
-                {
-                    // If the file name is not an empty string open it for saving.  
-                    if (saver.FileName != "")
-                    {
-                        FileStream fs = (FileStream)saver.OpenFile();
-                        MyCompressTiff.writeToFile(fs, compressFile);
-                        fs.Close();
-                    }
-                }
-            }
-            activeFrom.button1.Enabled = true;
-        }
-
     }
 }

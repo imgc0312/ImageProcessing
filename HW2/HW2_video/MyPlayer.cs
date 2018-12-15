@@ -322,27 +322,8 @@ namespace HW2_video
             {
                 new Thread(new ThreadStart(new Action(() =>
                 {
-                    while (true)
-                    {
-                        try
-                        {
-
-                            if (!Object.Equals(viewer.BackgroundImage, tiff.View))
-                                viewer.BackgroundImage = tiff.View;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            Thread.Sleep(11);
-                            continue;
-                        }
-                        break;
-                    }
-                    //if (viewer.Image != null)
-                    //{
-                    //    viewer.Image.Dispose();
-                    //}
-                    viewer.Image = null;
-                
+                    MyDeal.tryDrawBack(viewer, tiff.View, -1);
+                    MyDeal.tryDraw(viewer, null);
                 }))).Start();
             }
         }
@@ -358,20 +339,7 @@ namespace HW2_video
                     Bitmap targetDraw;
                     int viewWidth;
                     int viewHeight;
-                    while (true)
-                    {
-                        try
-                        {
-                            if (!Object.Equals(viewer.BackgroundImage, tiff.View))
-                                viewer.BackgroundImage = tiff.View;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            Thread.Sleep(21);
-                            continue;
-                        }
-                        break;
-                    }
+                    MyDeal.tryDrawBack(viewer, tiff.View);
                     while (true)
                     {
                         try
@@ -444,19 +412,8 @@ namespace HW2_video
                             continue;
                         targetDraw.SetPixel(tx, ty, Color.Red);
                     }
-                    while (true)
-                    {
-                        try
-                        {
-                            viewer.Image = targetDraw;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            Thread.Sleep(3);
-                            continue;
-                        }
-                        break;
-                    }
+                    MyDeal.tryDraw(viewer, targetDraw);
+                    
                 }))).Start();
             }
         }

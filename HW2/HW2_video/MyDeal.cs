@@ -67,6 +67,54 @@ namespace HW2_video
             return new Rectangle(0, 0, src.Width, src.Height);
         }
 
+        public static int tryTimesBasic = 3;//basic try draw times
+        public static void tryDraw(PictureBox viewer, Image image)
+        {// try to set PictureBox . Image
+            tryDraw(viewer, image, tryTimesBasic);
+        }
+
+        public static void tryDraw(PictureBox viewer, Image image, int tryTimes)
+        {// try to set PictureBox . Image , if tryTimes < 0 , try until access
+            if (viewer == null)
+                return;
+            for (int i = 0; (i < tryTimes) || (tryTimes < 0); i++)
+            {
+                try
+                {
+                    viewer.Image = image;
+                }
+                catch (InvalidOperationException)
+                {
+                    Thread.Sleep(3);
+                    continue;
+                }
+                break;
+            }
+        }
+        public static void tryDrawBack(PictureBox viewer, Image image)
+        {
+            tryDrawBack(viewer, image, tryTimesBasic * 2);
+        }
+        public static void tryDrawBack(PictureBox viewer, Image image, int tryTimes)
+        {// try to set PictureBox . BackgroundImage , if tryTimes < 0 , try until access
+            if (viewer == null)
+                return;
+            for (int i = 0; (i < tryTimes) || (tryTimes < 0); i++)
+            {
+                try
+                {
+                    if (!Object.Equals(viewer.BackgroundImage, image))
+                        viewer.BackgroundImage = image;
+                }
+                catch (InvalidOperationException)
+                {
+                    Thread.Sleep(21);
+                    continue;
+                }
+                break;
+            }
+        }
+
 
         /// <summary>
         /// other class-->

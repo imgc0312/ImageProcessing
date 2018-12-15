@@ -86,12 +86,20 @@ namespace HW2_video
             Random random = new Random();
             int i = 0;//pen sequence
             //draw box
-            for (int y = 0; y < motion.Height; y += MyCompresser.compressKernelSize)
+            for (int y = MyCompresser.compressKernelSize / 2; y < motion.Height; y += MyCompresser.compressKernelSize)
             {
-                for (int x = 0; x < motion.Width; x += MyCompresser.compressKernelSize)
+                for (int x = MyCompresser.compressKernelSize / 2; x < motion.Width; x += MyCompresser.compressKernelSize)
                 {
-                    colors[i] = Color.FromArgb(colorLowBound + random.Next()% colorHighBound, colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound);
-                    grapic.FillRectangle(new SolidBrush(colors[i]), x, y, MyCompresser.compressKernelSize, MyCompresser.compressKernelSize);
+                    if ((motion[x, y][0] == x) && (motion[x, y][1] == y))
+                    {//no motiom
+                        colors[i] = Color.Black;
+                    }
+                    else
+                    {
+                        colors[i] = Color.FromArgb(colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound);
+                    }
+                    grapic.FillRectangle(new SolidBrush(colors[i]), x - MyCompresser.compressKernelSize / 4, y - MyCompresser.compressKernelSize / 4, MyCompresser.compressKernelSize / 2, MyCompresser.compressKernelSize / 2);
+                    //grapic.FillRectangle(new SolidBrush(colors[i]), x - MyCompresser.compressKernelSize / 2, y - MyCompresser.compressKernelSize / 2, MyCompresser.compressKernelSize / 2, MyCompresser.compressKernelSize / 2);
                     //grapic.DrawRectangle(new Pen(colors[i]), x , y, MyCompresser.compressKernelSize, MyCompresser.compressKernelSize);
                     i++;
                 }
@@ -102,7 +110,7 @@ namespace HW2_video
             {
                 for (int x = 0 + MyCompresser.compressKernelSize / 2; x < motion.Width; x += MyCompresser.compressKernelSize)
                 {
-                    grapic.DrawLine(new Pen(Color.FromArgb(128, colors[i])), x, y, motion[x, y][0], motion[x, y][1]);
+                    grapic.DrawLine(new Pen(Color.FromArgb(128, colors[i]), 2.0f), x, y, motion[x, y][0], motion[x, y][1]);
                     i++;
                 }
             }
