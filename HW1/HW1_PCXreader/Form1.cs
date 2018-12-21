@@ -563,5 +563,11 @@ namespace HW1_PCXreader
             Form_Gradient form2 = new Form_Gradient(this);
             form2.ShowDialog();
         }
+
+        private void specificationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Specification form2 = new Form_Specification(this);
+            form2.ShowDialog();
+        }
     }
 }

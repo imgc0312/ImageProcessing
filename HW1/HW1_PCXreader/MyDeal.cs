@@ -182,41 +182,63 @@ namespace HW1_PCXreader
             if (view == null)
                 return null;
             Series series = new Series();
-            String Name = " ??";
-            series.Color = Color.Pink;
-            switch (mode)
-            {
-                case colorMode.R:
-                    Name = "R";
-                    series.Color = Color.Red;
-                    break;
-                case colorMode.G:
-                    Name = "G";
-                    series.Color = Color.Green;
-                    break;
-                case colorMode.B:
-                    Name = "B";
-                    series.Color = Color.Blue;
-                    break;
-                case colorMode.GRAY:
-                    Name = "gray";
-                    series.Color = Color.DarkGray;
-                    break;
-            }
-            series.Name = Name;
+
             string[] xValue = Enumerable.Range(0, 256).ToArray().Select(x => x.ToString()).ToArray();
             double[] yValue;
             yValue = MyDeal.countFreqsT(view, mode);
+
+            String Name = " ??";
+            series.Color = Color.Pink;
             switch (graphMode)
             {
                 case seriesMode.PDF:
                     series.ChartType = SeriesChartType.Column;
+                    switch (mode)
+                    {
+                        case colorMode.R:
+                            Name = "R";
+                            series.Color = Color.Red;
+                            break;
+                        case colorMode.G:
+                            Name = "G";
+                            series.Color = Color.Green;
+                            break;
+                        case colorMode.B:
+                            Name = "B";
+                            series.Color = Color.Blue;
+                            break;
+                        case colorMode.GRAY:
+                            Name = "gray";
+                            series.Color = Color.DarkGray;
+                            break;
+                    }
                     break;
                 case seriesMode.CDF:
                     PDF2CDF(ref yValue);
                     series.ChartType = SeriesChartType.Line;
+                    switch (mode)
+                    {
+                        case colorMode.R:
+                            Name = "R(cdf)";
+                            series.Color = Color.DeepPink;
+                            break;
+                        case colorMode.G:
+                            Name = "G(cdf)";
+                            series.Color = Color.ForestGreen;
+                            break;
+                        case colorMode.B:
+                            Name = "B(cdf)";
+                            series.Color = Color.DeepSkyBlue;
+                            break;
+                        case colorMode.GRAY:
+                            Name = "gray(cdf)";
+                            series.Color = Color.DimGray;
+                            break;
+                    }
                     break;
             }
+            series.Name = Name;
+            
             series.Points.DataBindXY(xValue, yValue);
             return series;
         }
@@ -437,7 +459,7 @@ namespace HW1_PCXreader
                     if (input < thresh)
                         return maxVal;
                     else
-                        return input;
+                        return 255;
             }
         }
 
@@ -923,6 +945,170 @@ namespace HW1_PCXreader
                         dstPtr[0] = Bmaps[dstPtr[0]];
                         dstPtr[1] = Gmaps[dstPtr[1]];
                         dstPtr[2] = Rmaps[dstPtr[2]];
+                        dstPtr += 3;
+                    }
+                    dstPtr += skipByte;
+                }
+
+            }
+            dst.UnlockBits(dstData);
+            return dst;
+        }
+
+        public static Bitmap specification(Bitmap src, Bitmap refer)
+        {
+            if (src == null)
+                return null;
+            Bitmap dst = (Bitmap)src.Clone();
+            if (refer == null)
+                return dst;
+
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            byte[] srcRmaps = new byte[256];
+            byte[] srcGmaps = new byte[256];
+            byte[] srcBmaps = new byte[256];
+
+            double[] srcRfreq = countFreqsT(src, colorMode.R);
+            double[] srcGfreq = countFreqsT(src, colorMode.G);
+            double[] srcBfreq = countFreqsT(src, colorMode.B);
+            double t = 0;
+            double srcRp = 0.0, srcGp = 0.0, srcBp = 0.0;
+
+            byte[] refRmaps_R = new byte[256];
+            byte[] refGmaps_R = new byte[256];
+            byte[] refBmaps_R = new byte[256];
+
+            double[] refRfreq = countFreqsT(refer, colorMode.R);
+            double[] refGfreq = countFreqsT(refer, colorMode.G);
+            double[] refBfreq = countFreqsT(refer, colorMode.B);
+            double refRp = 0.0, refGp = 0.0, refBp = 0.0;
+
+            for (int i = 0; i <= 255; i++)
+            {//count src equalize map & refer reverse equalize map
+                //R
+                try
+                {// src R
+                    t = Math.Floor(srcRp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    srcRmaps[i] = Convert.ToByte(t);
+                }
+                catch (OverflowException e)
+                {
+                    srcRmaps[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                try
+                {// ref R
+                    t = Math.Floor(refRp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    refRmaps_R[Convert.ToByte(t)] = Convert.ToByte(i); ;
+                }
+                catch (OverflowException e)
+                {
+                    refRmaps_R[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                srcRp += 256 * srcRfreq[i];
+                refRp += 256 * refRfreq[i];
+                //G
+                try
+                {//src G
+                    t = Math.Floor(srcGp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    srcGmaps[i] = Convert.ToByte(t);
+                }
+                catch (OverflowException e)
+                {
+                    srcGmaps[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                try
+                {// ref G
+                    t = Math.Floor(refGp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    refGmaps_R[Convert.ToByte(t)] = Convert.ToByte(i); ;
+                }
+                catch (OverflowException e)
+                {
+                    refGmaps_R[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                srcGp += 256 * srcGfreq[i];
+                refGp += 256 * refGfreq[i];
+                //B
+                try
+                {//src B
+                    t = Math.Floor(srcBp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    srcBmaps[i] = Convert.ToByte(t);
+                }
+                catch (OverflowException e)
+                {
+                    srcBmaps[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                try
+                {//ref B
+                    t = Math.Floor(refBp);
+                    if (t < 0)
+                        t = 0;
+                    else if (t > 255)
+                        t = 255;
+                    refBmaps_R[Convert.ToByte(t)] = Convert.ToByte(i);
+                }
+                catch (OverflowException e)
+                {
+                    refBmaps_R[i] = 255;
+                    Debug.Print(e.ToString() + e.StackTrace);
+                }
+                srcBp += 256 * srcBfreq[i];
+                refBp += 256 * refBfreq[i];
+            }
+            byte tR = 0, tB = 0, tG = 0;
+            for(int i = 0; i <= 255; i++)
+            {// fill refer reverse equalize map
+                if (refRmaps_R[i] > tR)
+                    tR = refRmaps_R[i];
+                else
+                    refRmaps_R[i] = tR;
+
+                if (refBmaps_R[i] > tB)
+                    tB = refBmaps_R[i];
+                else
+                    refBmaps_R[i] = tB;
+
+                if (refGmaps_R[i] > tG)
+                    tG = refGmaps_R[i];
+                else
+                    refGmaps_R[i] = tG;
+            }
+
+            unsafe
+            {
+                int skipByte = dstData.Stride - dstData.Width * 3;
+                byte* dstPtr = (byte*)(dstData.Scan0);
+                for (int i = 0; i < dstData.Width; i++)
+                {
+                    for (int j = 0; j < dstData.Height; j++)
+                    {
+                        dstPtr[0] = refBmaps_R[srcBmaps[dstPtr[0]]];
+                        dstPtr[1] = refGmaps_R[srcGmaps[dstPtr[1]]];
+                        dstPtr[2] = refRmaps_R[srcRmaps[dstPtr[2]]];
                         dstPtr += 3;
                     }
                     dstPtr += skipByte;

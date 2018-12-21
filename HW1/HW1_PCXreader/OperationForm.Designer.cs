@@ -47,6 +47,7 @@
             this.equalizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lowPassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.highBoostToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gradientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -58,7 +59,7 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.gradientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.specificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -177,6 +178,7 @@
             this.rotateToolStripMenuItem,
             this.stretchToolStripMenuItem,
             this.equalizeToolStripMenuItem,
+            this.specificationToolStripMenuItem,
             this.lowPassToolStripMenuItem,
             this.highBoostToolStripMenuItem,
             this.gradientToolStripMenuItem});
@@ -232,6 +234,13 @@
             this.highBoostToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.highBoostToolStripMenuItem.Text = "HighBoost";
             this.highBoostToolStripMenuItem.Click += new System.EventHandler(this.highBoostToolStripMenuItem_Click);
+            // 
+            // gradientToolStripMenuItem
+            // 
+            this.gradientToolStripMenuItem.Name = "gradientToolStripMenuItem";
+            this.gradientToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.gradientToolStripMenuItem.Text = "Gradient";
+            this.gradientToolStripMenuItem.Click += new System.EventHandler(this.gradientToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -335,12 +344,12 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // gradientToolStripMenuItem
+            // specificationToolStripMenuItem
             // 
-            this.gradientToolStripMenuItem.Name = "gradientToolStripMenuItem";
-            this.gradientToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.gradientToolStripMenuItem.Text = "Gradient";
-            this.gradientToolStripMenuItem.Click += new System.EventHandler(this.gradientToolStripMenuItem_Click);
+            this.specificationToolStripMenuItem.Name = "specificationToolStripMenuItem";
+            this.specificationToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.specificationToolStripMenuItem.Text = "Specification";
+            this.specificationToolStripMenuItem.Click += new System.EventHandler(this.specificationToolStripMenuItem_Click);
             // 
             // OperationForm
             // 
@@ -402,5 +411,6 @@
         protected System.Windows.Forms.ToolStripMenuItem lowPassToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem highBoostToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem gradientToolStripMenuItem;
+        protected System.Windows.Forms.ToolStripMenuItem specificationToolStripMenuItem;
     }
 }

@@ -20,3 +20,5 @@ C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\bin\Re
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\bin\Release\HW1_PCXreader.pdb
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Release\HW1_PCXreader.exe
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Release\HW1_PCXreader.pdb
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Release\HW1_PCXreader.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Release\HW1_PCXreader.Form_Specification.resources

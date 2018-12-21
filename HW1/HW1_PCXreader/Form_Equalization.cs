@@ -75,7 +75,7 @@ namespace HW1_PCXreader
             {
                 chart.Series.Clear();
                 Series target;
-                if (outView == null)
+                if (view == null)
                     return;
                 switch (mode)
                 {

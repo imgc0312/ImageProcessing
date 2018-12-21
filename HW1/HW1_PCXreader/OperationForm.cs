@@ -481,6 +481,12 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
 
+        private void specificationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Specification form2 = new Form_Specification(this);
+            form2.ShowDialog();
+        }
+
         private void lowPassToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Form_Blur form2 = new Form_Blur(this);
@@ -515,6 +521,7 @@ namespace HW1_PCXreader
             if (e.KeyCode == Keys.Escape)
                 this.Close();
         }
+
     }
 
 }
