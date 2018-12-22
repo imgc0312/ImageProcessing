@@ -61,6 +61,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_EdgeCrispen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_EdgeCrispen.Designer.cs">
+      <DependentUpon>Form_EdgeCrispen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_Outlier.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -162,6 +168,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_EdgeCrispen.resx">
+      <DependentUpon>Form_EdgeCrispen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Outlier.resx">
       <DependentUpon>Form_Outlier.cs</DependentUpon>

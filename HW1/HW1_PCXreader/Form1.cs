@@ -575,5 +575,11 @@ namespace HW1_PCXreader
             Form_Outlier form2 = new Form_Outlier(this);
             form2.ShowDialog();
         }
+
+        private void edgeCrispenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_EdgeCrispen form2 = new Form_EdgeCrispen(this);
+            form2.ShowDialog();
+        }
     }
 }

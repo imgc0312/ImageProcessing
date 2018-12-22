@@ -33,8 +33,8 @@
             System.Windows.Forms.StatusStrip statusStrip1;
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox4;
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.toolStripStatusLabel0 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -68,6 +68,7 @@
             this.penetrateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bitPlaneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.outlierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.edgeCrispenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -203,15 +204,15 @@
             // 
             // chart1
             // 
-            chartArea1.AxisX.Interval = 255D;
-            chartArea1.AxisX.LabelStyle.Interval = 0D;
-            chartArea1.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea1.AxisY.LabelStyle.IsEndLabelVisible = false;
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
+            chartArea3.AxisX.Interval = 255D;
+            chartArea3.AxisX.LabelStyle.Interval = 0D;
+            chartArea3.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
+            chartArea3.AxisY.LabelStyle.IsEndLabelVisible = false;
+            chartArea3.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea3);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
+            legend3.Name = "Legend1";
+            this.chart1.Legends.Add(legend3);
             this.chart1.Location = new System.Drawing.Point(3, 25);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(484, 171);
@@ -351,6 +352,7 @@
             this.specificationToolStripMenuItem,
             this.outlierToolStripMenuItem,
             this.lowPassToolStripMenuItem,
+            this.edgeCrispenToolStripMenuItem,
             this.highBoostToolStripMenuItem,
             this.gradientToolStripMenuItem});
             this.operateToolStripMenuItem.Name = "operateToolStripMenuItem";
@@ -450,6 +452,13 @@
             this.outlierToolStripMenuItem.Text = "Outlier";
             this.outlierToolStripMenuItem.Click += new System.EventHandler(this.outlierToolStripMenuItem_Click);
             // 
+            // edgeCrispenToolStripMenuItem
+            // 
+            this.edgeCrispenToolStripMenuItem.Name = "edgeCrispenToolStripMenuItem";
+            this.edgeCrispenToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.edgeCrispenToolStripMenuItem.Text = "EdgeCrispen";
+            this.edgeCrispenToolStripMenuItem.Click += new System.EventHandler(this.edgeCrispenToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -512,6 +521,7 @@
         private System.Windows.Forms.ToolStripMenuItem gradientToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem specificationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem outlierToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem edgeCrispenToolStripMenuItem;
     }
 }
 

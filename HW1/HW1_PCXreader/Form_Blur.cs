@@ -12,6 +12,7 @@ namespace HW1_PCXreader
     {
 
         protected ProgressMonitor progress = new ProgressMonitor();
+        protected Bitmap countOutView = null;
         public string[] info = new string[]{
             "Method \t\t: ",
             "Kernel Size \t: ",
@@ -74,7 +75,7 @@ namespace HW1_PCXreader
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        protected virtual void button1_Click(object sender, EventArgs e)
         {
             MyFilter.FilterCount countMethod = null;
             double SNR = 0.0;
@@ -108,13 +109,14 @@ namespace HW1_PCXreader
                 }
 
             }
-            outView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, countMethod, filter, progress);
+            countOutView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, countMethod, filter, progress);
+            outView = countOutView;
             costTime = DateTime.Now.Subtract(curTime).TotalMilliseconds;
             SNR = MyDeal.SNR(imgView, outView);
             textBox2.Lines = countInfo(countMethod, trackBar1.Value, SNR, costTime);
         }
 
-        private string[] countInfo(MyFilter.FilterCount countMethod, int kernelSize, double SNR, double time)
+        protected string[] countInfo(MyFilter.FilterCount countMethod, int kernelSize, double SNR, double time)
         {
             string[] newLines = new string[info.Length];
             info.CopyTo(newLines, 0);

@@ -25,33 +25,8 @@ namespace HW1_PCXreader
         public static void setBytesByBytes(ref byte[] target, byte[] srcBytes, int StartIndex, int Size)
         {
             target = new byte[Size];
-            //IntPtr buffer = Marshal.AllocHGlobal(Size);
-            //try
-            //{
-            //    Marshal.Copy(srcBytes, StartIndex, buffer, Size);
-            //    Marshal.PtrToStructure(buffer, target);
-            //}
-            //finally
-            //{
-            //    Marshal.FreeHGlobal(buffer);
-            //}
             Buffer.BlockCopy(srcBytes, StartIndex, target, 0, Size);
         }
-
-        //public static void setTByBytes<T>(T target, byte[] srcBytes, int StartIndex)
-        //{
-        //    int Size = Marshal.SizeOf(target);
-        //    IntPtr buffer = Marshal.AllocHGlobal(Size);
-        //    try
-        //    {
-        //        Marshal.Copy(srcBytes, StartIndex, buffer, Size);
-        //        Marshal.PtrToStructure(buffer, target);
-        //    }
-        //    finally
-        //    {
-        //        Marshal.FreeHGlobal(buffer);
-        //    }
-        //}
 
         public static void setTByBytes(ref byte target, byte[] srcBytes, int StartIndex)
         {
@@ -63,6 +38,51 @@ namespace HW1_PCXreader
         public static void setTByBytes(ref ushort target, byte[] srcBytes, int StartIndex)
         {
             target = BitConverter.ToUInt16(srcBytes, StartIndex);
+        }
+
+        public static Bitmap subBitmap(Bitmap left, Bitmap right, int offset)
+        {
+            if (left == null)
+                return null;
+            if (right == null)
+                return left;
+            Bitmap dst = new Bitmap(left.Width, left.Height);
+            BitmapData dstData = dst.LockBits(MyF.bound(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            BitmapData leftData = left.LockBits(MyF.bound(left), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData rightData = right.LockBits(MyF.bound(right), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                byte* dstPtr = (byte*)dstData.Scan0;
+                byte* leftPtr = (byte*)leftData.Scan0;
+                byte* rightPtr = (byte*)rightData.Scan0;
+                int skipByte = dstData.Stride - 3 * dstData.Width;
+                int temp = 0;
+                for(int j = 0; j < dstData.Height; j++)
+                {
+                    for(int i = 0; i < dstData.Width; i++)
+                    {
+                        for(int c = 0; c < 3; c++)
+                        {
+                            temp = (*leftPtr) - (*rightPtr) + offset;
+                            if (temp < 0)
+                                temp = 0;
+                            else if (temp > 255)
+                                temp = 255;
+                            *dstPtr = Convert.ToByte(temp);
+                            dstPtr += 1;
+                            leftPtr += 1;
+                            rightPtr += 1;
+                        }
+                    }
+                    dstPtr += skipByte;
+                    leftPtr += skipByte;
+                    rightPtr += skipByte;
+                }
+            }
+            dst.UnlockBits(dstData);
+            left.UnlockBits(leftData);
+            right.UnlockBits(rightData);
+            return dst;
         }
 
         public static double countSNR(Bitmap afterImg, Bitmap originImg)

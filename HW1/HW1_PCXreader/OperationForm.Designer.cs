@@ -61,6 +61,7 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.outlierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.edgeCrispenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -182,6 +183,7 @@
             this.specificationToolStripMenuItem,
             this.outlierToolStripMenuItem,
             this.lowPassToolStripMenuItem,
+            this.edgeCrispenToolStripMenuItem,
             this.highBoostToolStripMenuItem,
             this.gradientToolStripMenuItem});
             this.operateToolStripMenuItem.Name = "operateToolStripMenuItem";
@@ -360,6 +362,13 @@
             this.outlierToolStripMenuItem.Text = "Outlier";
             this.outlierToolStripMenuItem.Click += new System.EventHandler(this.outlierToolStripMenuItem_Click);
             // 
+            // edgeCrispenToolStripMenuItem
+            // 
+            this.edgeCrispenToolStripMenuItem.Name = "edgeCrispenToolStripMenuItem";
+            this.edgeCrispenToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.edgeCrispenToolStripMenuItem.Text = "EdgeCrispen";
+            this.edgeCrispenToolStripMenuItem.Click += new System.EventHandler(this.edgeCrispenToolStripMenuItem_Click);
+            // 
             // OperationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -422,5 +431,6 @@
         protected System.Windows.Forms.ToolStripMenuItem gradientToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem specificationToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem outlierToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem edgeCrispenToolStripMenuItem;
     }
 }

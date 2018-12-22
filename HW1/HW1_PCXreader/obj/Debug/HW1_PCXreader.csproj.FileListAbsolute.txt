@@ -23,3 +23,4 @@ C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\De
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Gradient.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Specification.resources
 C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_Outlier.resources
+C:\Users\Administrator\Documents\GitHub\ImageProcessing\HW1\HW1_PCXreader\obj\Debug\HW1_PCXreader.Form_EdgeCrispen.resources
