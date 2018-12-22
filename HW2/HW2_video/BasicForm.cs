@@ -273,5 +273,19 @@ namespace HW2_video
             form2.ShowDialog();
             this.Close();
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {//change speed
+            if(player.Speed != MyPlayer.NormalSpeed)
+            {
+                player.Speed = MyPlayer.NormalSpeed;
+                button4.Text = "2X";
+            }
+            else
+            {
+                player.Speed = MyPlayer.HighSpeed;
+                button4.Text = "1X";
+            }
+        }
     }
 }

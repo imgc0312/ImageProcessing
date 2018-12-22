@@ -108,8 +108,10 @@ namespace HW2_video
                 }
             }
         }
-        protected int _speed = 300;//ms
-        public int Speed { get { return _speed; } }
+        protected int _speed = 400;//ms
+        public static int NormalSpeed = 400;
+        public static int HighSpeed = 200;
+        public int Speed { get { return _speed; } set { _speed = value; } }
         public List<Delegate> SideWorkDo = new List<Delegate>(0);
         public List<object[]> SideWorkArgs = new List<object[]>(0);
         Random random = new Random();// use for sleep
