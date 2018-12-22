@@ -13,10 +13,10 @@ namespace HW1_PCXreader
 
         protected ProgressMonitor progress = new ProgressMonitor();
         public string[] info = new string[]{
-            "Method \t\t:\t",
-            "Kernel Size \t:\t",
-            "SNR(dB) \t\t:\t",
-            "Cost Time (ms) \t:\t"
+            "Method \t\t: ",
+            "Kernel Size \t: ",
+            "SNR(dB) \t\t: ",
+            "Cost Time (ms) \t: "
         };
 
         /// <summary>
@@ -83,8 +83,32 @@ namespace HW1_PCXreader
                 countMethod = MyFilter.meanBlur;
             else if (radioButton2.Checked)
                 countMethod = MyFilter.medianBlur;
+            else if (radioButton3.Checked)
+                countMethod = MyFilter.pseudoMedianBlur;
             DateTime curTime = DateTime.Now;
-            outView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, countMethod, new MyFilter(trackBar1.Value), progress);
+            MyFilter filter = new MyFilter(trackBar1.Value);
+            if(radioButton4.Checked)//rect
+                filter.setData(1.0);
+            else if (radioButton5.Checked)
+            {//cross
+                filter.setData(Double.NegativeInfinity);
+                if(trackBar1.Value % 2 == 0)
+                {//even
+                    int st, ed;
+                    ed = trackBar1.Value / 2;
+                    st = ed - 1;
+                    filter.setData(st, 0, ed, trackBar1.Value - 1, 1.0);
+                    filter.setData(0, st, trackBar1.Value - 1, ed, 1.0);
+                }
+                else
+                {//odd
+                    int t = trackBar1.Value / 2;
+                    filter.setData(t, 0, t, trackBar1.Value - 1, 1.0);
+                    filter.setData(0, t, trackBar1.Value - 1, t, 1.0);
+                }
+
+            }
+            outView = MyDeal.filter2D(imgView, MyFilter.BorderMethod.NULL, countMethod, filter, progress);
             costTime = DateTime.Now.Subtract(curTime).TotalMilliseconds;
             SNR = MyDeal.SNR(imgView, outView);
             textBox2.Lines = countInfo(countMethod, trackBar1.Value, SNR, costTime);

@@ -17,7 +17,8 @@ namespace HW2_video
         protected MyPlayer player = null;
         protected delegate void playCombine(MyPlayer src, Control dst, object[] args);
         MyCompresser compresser = null;
-        MyCompresser.MATCH_METHOD compressMatchMethod = MyCompresser.MATCH_METHOD.LOCAL;
+        MyCompresser.COMPRESS_METHOD compressMethod = MyCompresser.COMPRESS_METHOD.LOCAL;
+        MyFilterData.CRITERIA_METHOD criteria = MyFilterData.CRITERIA_METHOD.SQUARE;
         /// <summary>
         /// function-->
         /// </summary>
@@ -53,9 +54,11 @@ namespace HW2_video
                 myTiff.from(openFileDialog1.FileName);
                 player.open(myTiff);
                 player.OnPlay(new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.STOP));
-
+                if (compresser != null)
+                    compresser.shutDown();
                 compresser = new MyCompresser(player, pictureBox2);
-                compresser.setMatchMethod(compressMatchMethod);
+                compresser.setCompressMethod(compressMethod);
+                compresser.setCriteriaMethod(criteria);
                 compresser.connect(pictureBoxFeature, MyCompresser.CONNECT.PICTURE_FEATURE);
                 compresser.connect(pictureBoxFeatureRef, MyCompresser.CONNECT.PICTURE_MATCH);
                 compresser.connect(pictureBoxMotion, MyCompresser.CONNECT.PICTURE_MOTION);
@@ -76,6 +79,8 @@ namespace HW2_video
                     pictureBox2.Visible = false;
                 }
                 compresser.CurrentPlayer.flashIgnore = false;
+                button1.Enabled = true;
+                groupBox3.Enabled = true;
                 textBox_progress.Text = "0 / " + (myTiff.Size - 1);
             }
         }
@@ -85,6 +90,7 @@ namespace HW2_video
             if(compresser != null)
             {
                 button1.Enabled = false;
+                groupBox3.Enabled = false;
                 compresser.Compressing();
             }
         }
@@ -104,6 +110,8 @@ namespace HW2_video
         private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
             button1.Enabled = true;
+            groupBox3.Enabled = true;
+            compresser = null;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -148,21 +156,44 @@ namespace HW2_video
             RadioButton here = (RadioButton)sender;
             if (here.Checked)
             {
-                int option = 0;
-                Int32.TryParse(here.Name.Replace("radioButton", null), out option);
-                switch (option)
+                switch (here.Name)
                 {
-                    case 1:
-                        compressMatchMethod = MyCompresser.MATCH_METHOD.ALL;
+                    case "radioButton1":
+                        compressMethod = MyCompresser.COMPRESS_METHOD.ALL;
                         break;
-                    case 2:
-                        compressMatchMethod = MyCompresser.MATCH_METHOD.LOCAL;
+                    case "radioButton2":
+                        compressMethod = MyCompresser.COMPRESS_METHOD.LOCAL;
+                        break;
+                    case "radioButton3":
+                        compressMethod = MyCompresser.COMPRESS_METHOD.TSS;
                         break;
                 }
-                if(compresser != null)
+                if (compresser != null)
                 {
-                    compresser.setMatchMethod(compressMatchMethod);
+                    compresser.setCompressMethod(compressMethod);
                 }
+            }
+        }
+
+        private void radioButtonCriteria_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton here = (RadioButton)sender;
+            if (here.Checked)
+            {
+                switch (here.Name)
+                {
+                    case "radioButtonSQ":
+                        criteria = MyFilterData.CRITERIA_METHOD.SQUARE;
+                        break;
+                    case "radioButtonAB":
+                        criteria = MyFilterData.CRITERIA_METHOD.ABSOLUTE;
+                        break;
+                }
+                if (compresser != null)
+                {
+                    compresser.setCriteriaMethod(criteria);
+                }
+
             }
         }
     }

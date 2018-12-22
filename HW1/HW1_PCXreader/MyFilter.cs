@@ -138,6 +138,82 @@ namespace HW1_PCXreader
                 return sortData;
             }
 
+            public double[] getPseudoMedian()
+            {// return sort list
+                double[] pseudoMedian = new double[3];
+                List<double>[] sortData = new List<double>[3];
+
+                int pixels = 0;
+                foreach (double[] pixel in _data)
+                {
+                    if (pixel != null)
+                        pixels++;
+                }
+                if (pixels == 0)
+                    return null;
+
+                sortData[0] = new List<double>(pixels);
+                sortData[1] = new List<double>(pixels);
+                sortData[2] = new List<double>(pixels);
+
+                foreach (double[] pixel in _data)
+                {
+                    if (pixel != null)
+                    {
+                        sortData[0].Add(pixel[0]);
+                        sortData[1].Add(pixel[1]);
+                        sortData[2].Add(pixel[2]);
+                    }
+                }
+
+                pseudoMedian[0] = getPseudoMedian(sortData[0]);
+                pseudoMedian[1] = getPseudoMedian(sortData[1]);
+                pseudoMedian[2] = getPseudoMedian(sortData[2]);
+                return pseudoMedian;
+            }
+
+            private static double getPseudoMedian(List<double> data)
+            {
+                if(data.Count == 0)
+                    return 0.0;
+                else
+                {
+                    int m = data.Count;
+                    int n = (data.Count + 1) / 2;
+                    int size = m; // C m 取 n size
+                    for (int i = m - 1; i > n ; i--)
+                        size *= i;
+                    for (int i = n - 1; i > 1; i--)
+                        size /= i;
+
+                    List<double> maxArr = new List<double>(size);
+                    int[] b = new int[n];
+                    double[] dataArr = data.ToArray();
+                    CMN(ref dataArr, m, n, ref b, n, ref maxArr);//取所有MN組合最大值
+                    return maxArr.Min();
+                }
+            }
+
+            private static void CMN(ref double[] data, int m, int n, ref int[] b, int N, ref List<double> maxArr)
+            {
+                for (int i = m; i >= n; i--)
+                {
+                    b[n - 1] = i - 1;
+                    if (n > 1)
+                        CMN(ref data, i - 1, n - 1,ref b, N, ref maxArr);
+                    else
+                    {
+                        double max = Double.NegativeInfinity;
+                        for (int j = N - 1; j >= 0; j--)
+                        {
+                            if (data[b[j]] > max)
+                                max = data[b[j]];
+                        }
+                        maxArr.Add(max);
+                    }
+                }
+            }
+
             public static byte[] boundPixel(double[] src)
             {// convert double to byte
                 byte[] output = new byte[3];
@@ -354,6 +430,10 @@ namespace HW1_PCXreader
 
         private static double[] getPixel(BitmapData data, int x, int y, BorderMethod method, double rate)
         {
+            if(rate == Double.NegativeInfinity)
+            {//不須對該欄位值取值
+                return null;
+            }
             double[] output = new double[3];
             switch (method)
             {
@@ -425,7 +505,6 @@ namespace HW1_PCXreader
             {
                 MyFilterData kernel = new MyFilterData();
                 int pixels = 0;
-                filter.setData(1.0);
                 pixels = kernel.fill(data, x, y, borderMethod, filter);
                 if (pixels <= 0)
                     throw new DivideByZeroException("blur pixel size 0");
@@ -445,11 +524,32 @@ namespace HW1_PCXreader
             {
                 MyFilterData kernel = new MyFilterData();
                 int pixels = 0;
-                filter.setData(1.0);
                 pixels = kernel.fill(data, x, y, borderMethod, filter);
                 List<double>[] sortList = kernel.sort();
                 double[] pixel = new double[3];
                 pixel[0] = sortList[0].ElementAt<double>(sortList[0].Count/2);
+                pixel[1] = sortList[1].ElementAt<double>(sortList[1].Count / 2);
+                pixel[2] = sortList[2].ElementAt<double>(sortList[2].Count / 2);
+                return MyFilterData.boundPixel(pixel);
+            }
+        }
+
+        public static byte[] pseudoMedianBlur(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//this is a FilterCount, Mean Blur
+            byte[] output = new byte[3];
+            int size = filter.size;
+            if (size <= 1)
+            {
+                return getPixel(data, x, y, borderMethod);
+            }
+            else
+            {
+                MyFilterData kernel = new MyFilterData();
+                int pixels = 0;
+                pixels = kernel.fill(data, x, y, borderMethod, filter);
+                List<double>[] sortList = kernel.sort();
+                double[] pixel = new double[3];
+                pixel[0] = sortList[0].ElementAt<double>(sortList[0].Count / 2);
                 pixel[1] = sortList[1].ElementAt<double>(sortList[1].Count / 2);
                 pixel[2] = sortList[2].ElementAt<double>(sortList[2].Count / 2);
                 return MyFilterData.boundPixel(pixel);

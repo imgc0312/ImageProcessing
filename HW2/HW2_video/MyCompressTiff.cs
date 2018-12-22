@@ -11,15 +11,21 @@ using System.Threading.Tasks;
 
 namespace HW2_video
 {
+    public class MyCompressTiffDefine
+    {
+        public enum TYPE { SUBSAMPLE, MOTION }
+    }
     [Serializable]
     public class MyCompressTiff
     {
+        public MyCompressTiffDefine.TYPE type;
         public List<Image> baseImg;//if no compress ref
         public List<MyMotionTiff> motionTiff;// compress
         public MyCompressTiff()
         {
             baseImg = new List<Image>(0);
             motionTiff = new List<MyMotionTiff>(0);
+            type = MyCompressTiffDefine.TYPE.MOTION;
         }
 
         public static void writeToFile(Stream fs, MyCompressTiff myct)
@@ -41,10 +47,19 @@ namespace HW2_video
 
         public static MyTiff decode(MyCompressTiff myct, MyDeal.ProgressMonitor monitor)
         {
+            switch (myct.type)
+            {
+                case MyCompressTiffDefine.TYPE.MOTION:
+                    return decodeMotion(myct, monitor);
+            }
+            return null;
+        }
+
+        private static MyTiff decodeMotion(MyCompressTiff myct, MyDeal.ProgressMonitor monitor)
+        {
             MyTiff decodeTiff = new MyTiff();
             Bitmap baseImg = null;
             MyMotionTiff targetMotion;
-
             for (int i = 0; i < myct.baseImg.Count; i++)
             {
                 if (myct.baseImg.ElementAt(i) != null)

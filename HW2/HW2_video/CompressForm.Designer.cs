@@ -47,13 +47,19 @@
             this.pictureBoxFeatureRef = new System.Windows.Forms.PictureBox();
             this.pictureBoxFeature = new System.Windows.Forms.PictureBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.radioButtonAB = new System.Windows.Forms.RadioButton();
+            this.radioButtonSQ = new System.Windows.Forms.RadioButton();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.radioButton3 = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.tableLayoutPanel3.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -68,6 +74,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFeatureRef)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFeature)).BeginInit();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -255,6 +262,7 @@
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.panel1, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.groupBox3, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox4, 3, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 31);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -295,6 +303,9 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.radioButton3);
+            this.groupBox3.Controls.Add(this.label2);
+            this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.radioButton2);
             this.groupBox3.Controls.Add(this.radioButton1);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -303,13 +314,31 @@
             this.groupBox3.Size = new System.Drawing.Size(141, 370);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Match Method";
+            this.groupBox3.Text = "Method";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 36);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(92, 18);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Intraframe :";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 151);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(92, 18);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Interframe :";
             // 
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
             this.radioButton2.Checked = true;
-            this.radioButton2.Location = new System.Drawing.Point(7, 85);
+            this.radioButton2.Location = new System.Drawing.Point(7, 226);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(122, 22);
             this.radioButton2.TabIndex = 1;
@@ -321,13 +350,48 @@
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(6, 46);
+            this.radioButton1.Location = new System.Drawing.Point(7, 187);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(105, 22);
             this.radioButton1.TabIndex = 0;
             this.radioButton1.Text = "All search";
             this.radioButton1.UseVisualStyleBackColor = true;
             this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton_CheckedChanged);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.radioButtonAB);
+            this.groupBox4.Controls.Add(this.radioButtonSQ);
+            this.groupBox4.Location = new System.Drawing.Point(948, 379);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(141, 78);
+            this.groupBox4.TabIndex = 7;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Match Criteria";
+            // 
+            // radioButtonAB
+            // 
+            this.radioButtonAB.AutoSize = true;
+            this.radioButtonAB.Location = new System.Drawing.Point(9, 55);
+            this.radioButtonAB.Name = "radioButtonAB";
+            this.radioButtonAB.Size = new System.Drawing.Size(90, 22);
+            this.radioButtonAB.TabIndex = 1;
+            this.radioButtonAB.Text = "absolute";
+            this.radioButtonAB.UseVisualStyleBackColor = true;
+            this.radioButtonAB.CheckedChanged += new System.EventHandler(this.radioButtonCriteria_CheckedChanged);
+            // 
+            // radioButtonSQ
+            // 
+            this.radioButtonSQ.AutoSize = true;
+            this.radioButtonSQ.Checked = true;
+            this.radioButtonSQ.Location = new System.Drawing.Point(9, 29);
+            this.radioButtonSQ.Name = "radioButtonSQ";
+            this.radioButtonSQ.Size = new System.Drawing.Size(78, 22);
+            this.radioButtonSQ.TabIndex = 0;
+            this.radioButtonSQ.TabStop = true;
+            this.radioButtonSQ.Text = "square";
+            this.radioButtonSQ.UseVisualStyleBackColor = true;
+            this.radioButtonSQ.CheckedChanged += new System.EventHandler(this.radioButtonCriteria_CheckedChanged);
             // 
             // openToolStripMenuItem
             // 
@@ -368,6 +432,18 @@
             // 
             this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
+            // radioButton3
+            // 
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.Location = new System.Drawing.Point(7, 264);
+            this.radioButton3.Name = "radioButton3";
+            this.radioButton3.Size = new System.Drawing.Size(61, 22);
+            this.radioButton3.TabIndex = 4;
+            this.radioButton3.TabStop = true;
+            this.radioButton3.Text = "TSS";
+            this.radioButton3.UseVisualStyleBackColor = true;
+            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton_CheckedChanged);
+            // 
             // CompressForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -395,6 +471,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFeature)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -430,5 +508,11 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.RadioButton radioButtonAB;
+        private System.Windows.Forms.RadioButton radioButtonSQ;
+        private System.Windows.Forms.RadioButton radioButton3;
     }
 }

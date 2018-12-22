@@ -10,6 +10,8 @@ namespace HW2_video
 {
     public class MyFilterData
     {
+        public enum CRITERIA_METHOD { SQUARE, ABSOLUTE }// compress match criteria
+
         private int size
         {
             get
@@ -232,6 +234,40 @@ namespace HW2_video
                         Math.Pow(left[i, j][2] - right[i, j][2], 2)) / 3;
                 }
             }
+            return rate;
+        }
+
+        public static double compare(MyFilterData left, MyFilterData right, CRITERIA_METHOD criteria)
+        {// return value high means the right is not like left
+            double rate = 0.0;
+            switch (criteria)
+            {
+                case CRITERIA_METHOD.ABSOLUTE:
+                    for (int j = 0; j < left.size; j++)
+                    {
+                        for (int i = 0; i < left.size; i++)
+                        {
+                            rate +=
+                                (Math.Abs(left[i, j][0] - right[i, j][0]) +
+                                Math.Abs(left[i, j][1] - right[i, j][1]) +
+                                Math.Abs(left[i, j][2] - right[i, j][2])) / 3;
+                        }
+                    }
+                    break;
+                case CRITERIA_METHOD.SQUARE:
+                    for (int j = 0; j < left.size; j++)
+                    {
+                        for (int i = 0; i < left.size; i++)
+                        {
+                            rate +=
+                                (Math.Pow(left[i, j][0] - right[i, j][0], 2) +
+                                Math.Pow(left[i, j][1] - right[i, j][1], 2) +
+                                Math.Pow(left[i, j][2] - right[i, j][2], 2)) / 3;
+                        }
+                    }
+                    break;
+            }
+            
             return rate;
         }
 
