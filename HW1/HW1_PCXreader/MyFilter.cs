@@ -556,6 +556,40 @@ namespace HW1_PCXreader
             }
         }
 
+        public static byte[] outlier(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//this is a FilterCount, Mean Blur
+            byte[] output = new byte[3];
+            
+            int size = filter.size;
+            
+            if (size <= 1)
+            {
+                return getPixel(data, x, y, borderMethod);
+            }
+            else
+            {
+                int targetPoint = filter.size / 2;
+                double cleanValue = filter[targetPoint, targetPoint];
+                filter[targetPoint, targetPoint] = 0;// remove clean value
+                MyFilterData kernel = new MyFilterData();
+                kernel.fill(data, x, y, borderMethod, filter);
+                filter[targetPoint, targetPoint] = cleanValue;// recover clean value
+
+                double weightSize = size * size - 1;
+                if (weightSize <= 0)
+                    throw new DivideByZeroException("outlier weightSize 0");
+                output = kernel.count(1.0 / weightSize);
+                byte[] originPixel = getPixel(data, x, y, borderMethod);
+                for (int i = 0; i < 3; i++)
+                {
+                    if (Math.Abs(output[i] - originPixel[i]) > Math.Abs(cleanValue))
+                        output[i] = originPixel[i];
+                }
+
+                return output;
+            }
+        }
+
         public static byte[] highBoost(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
         {//this is a FilterCount, Mean Blur
             byte[] output = new byte[3];

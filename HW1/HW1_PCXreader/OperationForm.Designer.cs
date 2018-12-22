@@ -45,6 +45,7 @@
             this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stretchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.equalizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.specificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lowPassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.highBoostToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gradientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,7 +60,7 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.specificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.outlierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -179,6 +180,7 @@
             this.stretchToolStripMenuItem,
             this.equalizeToolStripMenuItem,
             this.specificationToolStripMenuItem,
+            this.outlierToolStripMenuItem,
             this.lowPassToolStripMenuItem,
             this.highBoostToolStripMenuItem,
             this.gradientToolStripMenuItem});
@@ -220,6 +222,13 @@
             this.equalizeToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.equalizeToolStripMenuItem.Text = "Equalize";
             this.equalizeToolStripMenuItem.Click += new System.EventHandler(this.equalizeToolStripMenuItem_Click);
+            // 
+            // specificationToolStripMenuItem
+            // 
+            this.specificationToolStripMenuItem.Name = "specificationToolStripMenuItem";
+            this.specificationToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.specificationToolStripMenuItem.Text = "Specification";
+            this.specificationToolStripMenuItem.Click += new System.EventHandler(this.specificationToolStripMenuItem_Click);
             // 
             // lowPassToolStripMenuItem
             // 
@@ -344,12 +353,12 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // specificationToolStripMenuItem
+            // outlierToolStripMenuItem
             // 
-            this.specificationToolStripMenuItem.Name = "specificationToolStripMenuItem";
-            this.specificationToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.specificationToolStripMenuItem.Text = "Specification";
-            this.specificationToolStripMenuItem.Click += new System.EventHandler(this.specificationToolStripMenuItem_Click);
+            this.outlierToolStripMenuItem.Name = "outlierToolStripMenuItem";
+            this.outlierToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.outlierToolStripMenuItem.Text = "Outlier";
+            this.outlierToolStripMenuItem.Click += new System.EventHandler(this.outlierToolStripMenuItem_Click);
             // 
             // OperationForm
             // 
@@ -412,5 +421,6 @@
         protected System.Windows.Forms.ToolStripMenuItem highBoostToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem gradientToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem specificationToolStripMenuItem;
+        protected System.Windows.Forms.ToolStripMenuItem outlierToolStripMenuItem;
     }
 }

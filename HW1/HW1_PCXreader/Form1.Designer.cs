@@ -60,13 +60,14 @@
             this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stretchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.equalizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.specificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lowPassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.highBoostToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gradientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.penetrateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bitPlaneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.specificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.outlierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -348,6 +349,7 @@
             this.stretchToolStripMenuItem,
             this.equalizeToolStripMenuItem,
             this.specificationToolStripMenuItem,
+            this.outlierToolStripMenuItem,
             this.lowPassToolStripMenuItem,
             this.highBoostToolStripMenuItem,
             this.gradientToolStripMenuItem});
@@ -389,6 +391,13 @@
             this.equalizeToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.equalizeToolStripMenuItem.Text = "Equalize";
             this.equalizeToolStripMenuItem.Click += new System.EventHandler(this.equalizeToolStripMenuItem_Click);
+            // 
+            // specificationToolStripMenuItem
+            // 
+            this.specificationToolStripMenuItem.Name = "specificationToolStripMenuItem";
+            this.specificationToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.specificationToolStripMenuItem.Text = "Specification";
+            this.specificationToolStripMenuItem.Click += new System.EventHandler(this.specificationToolStripMenuItem_Click);
             // 
             // lowPassToolStripMenuItem
             // 
@@ -434,12 +443,12 @@
             this.bitPlaneToolStripMenuItem.Text = "BitPlane";
             this.bitPlaneToolStripMenuItem.Click += new System.EventHandler(this.bitPlaneToolStripMenuItem_Click);
             // 
-            // specificationToolStripMenuItem
+            // outlierToolStripMenuItem
             // 
-            this.specificationToolStripMenuItem.Name = "specificationToolStripMenuItem";
-            this.specificationToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
-            this.specificationToolStripMenuItem.Text = "Specification";
-            this.specificationToolStripMenuItem.Click += new System.EventHandler(this.specificationToolStripMenuItem_Click);
+            this.outlierToolStripMenuItem.Name = "outlierToolStripMenuItem";
+            this.outlierToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
+            this.outlierToolStripMenuItem.Text = "Outlier";
+            this.outlierToolStripMenuItem.Click += new System.EventHandler(this.outlierToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -502,6 +511,7 @@
         private System.Windows.Forms.ToolStripMenuItem highBoostToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gradientToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem specificationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem outlierToolStripMenuItem;
     }
 }
 

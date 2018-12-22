@@ -487,6 +487,13 @@ namespace HW1_PCXreader
             form2.ShowDialog();
         }
 
+
+        private void outlierToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Outlier form2 = new Form_Outlier(this);
+            form2.ShowDialog();
+        }
+
         private void lowPassToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Form_Blur form2 = new Form_Blur(this);

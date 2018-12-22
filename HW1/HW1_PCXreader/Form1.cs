@@ -569,5 +569,11 @@ namespace HW1_PCXreader
             Form_Specification form2 = new Form_Specification(this);
             form2.ShowDialog();
         }
+
+        private void outlierToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Outlier form2 = new Form_Outlier(this);
+            form2.ShowDialog();
+        }
     }
 }
