@@ -12,7 +12,7 @@ namespace HW1_PCXreader
     public class MyFilter
     {
         public enum BorderMethod { NULL, ZERO, NEAR };
-        public enum GradientOperator { SOBEL, PREWITT };
+        public enum GradientOperator { ROBERT, SOBEL, PREWITT };
         public enum GradientDirect { X, Y, BOTH };
         public delegate byte[] FilterCount(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter);
         public class MyFilterData
@@ -295,7 +295,9 @@ namespace HW1_PCXreader
         private static MyFilter _SOBEL_Y = null;
         private static MyFilter _PREWITT_X = null;
         private static MyFilter _PREWITT_Y = null;
-        
+        private static MyFilter _ROBERT_X = null;
+        private static MyFilter _ROBERT_Y = null;
+
         /// <summary>
         /// function-->
         /// </summary>
@@ -624,6 +626,17 @@ namespace HW1_PCXreader
         public static MyFilter.FilterCount gradient(MyFilter.GradientOperator operate, MyFilter.GradientDirect direct){
             switch (operate)
             {
+                case MyFilter.GradientOperator.ROBERT:
+                    switch (direct)
+                    {
+                        case MyFilter.GradientDirect.X:
+                            return MyFilter.ROBERT_X;
+                        case MyFilter.GradientDirect.Y:
+                            return MyFilter.ROBERT_Y;
+                        case MyFilter.GradientDirect.BOTH:
+                            return MyFilter.ROBERT_BOTH;
+                    }
+                    break;
                 case MyFilter.GradientOperator.SOBEL:
                     switch (direct)
                     {
@@ -703,6 +716,32 @@ namespace HW1_PCXreader
             return MyFilterData.add(kernel1, kernel2).countAbs(1.0);
         }
 
+        private static byte[] ROBERT_X(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//SOBEL X , not use filter
+            byte[] output = new byte[3];
+            MyFilterData kernel = new MyFilterData();
+            kernel.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.X));
+            return kernel.count(1.0);
+        }
+
+        private static byte[] ROBERT_Y(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//SOBEL Y , not use filter
+            byte[] output = new byte[3];
+            MyFilterData kernel = new MyFilterData();
+            kernel.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.Y));
+            return kernel.count(1.0);
+        }
+
+        private static byte[] ROBERT_BOTH(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)
+        {//SOBEL BOTH , not use filter
+            byte[] output = new byte[3];
+            MyFilterData kernel1 = new MyFilterData();
+            MyFilterData kernel2 = new MyFilterData();
+            kernel1.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.X));
+            kernel2.fill(data, x, y, borderMethod, MyFilter.GradientKernel(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.Y));
+            return MyFilterData.add(kernel1, kernel2).countAbs(1.0);
+        }
+
         /// <summary>
         /// val-->
         /// </summary>
@@ -736,10 +775,11 @@ namespace HW1_PCXreader
         
         public static MyFilter GradientKernel(GradientOperator operate, GradientDirect direct)
         {// please not use MyFilter.GradientDirect.BOTH
-            MyFilter kernel = new MyFilter(3);
+            MyFilter kernel = null;
             switch (operate)
             {
                 case MyFilter.GradientOperator.SOBEL:
+                    kernel = new MyFilter(3);
                     switch (direct)
                     {
                         case MyFilter.GradientDirect.X:
@@ -771,6 +811,7 @@ namespace HW1_PCXreader
                     }
                     break;
                 case MyFilter.GradientOperator.PREWITT:
+                    kernel = new MyFilter(3);
                     switch (direct)
                     {
                         case MyFilter.GradientDirect.X:
@@ -799,6 +840,36 @@ namespace HW1_PCXreader
                             }
                             else
                                 return _PREWITT_Y;
+                    }
+                    break;
+                case MyFilter.GradientOperator.ROBERT:
+                    kernel = new MyFilter(2);
+                    switch (direct)
+                    {
+                        case MyFilter.GradientDirect.X:
+                            if (_ROBERT_X == null)
+                            {
+                                kernel[0, 0] = -1;
+                                kernel[1, 0] = 0;
+                                kernel[0, 1] = 0;
+                                kernel[1, 1] = 1;
+                                _ROBERT_X = kernel;
+                                return kernel;
+                            }
+                            else
+                                return _ROBERT_X;
+                        case MyFilter.GradientDirect.Y:
+                            if (_ROBERT_Y == null)
+                            {
+                                kernel[0, 0] = 0;
+                                kernel[1, 0] = -1;
+                                kernel[0, 1] = 1;
+                                kernel[1, 1] = 0;
+                                _ROBERT_Y = kernel;
+                                return kernel;
+                            }
+                            else
+                                return _ROBERT_Y;
                     }
                     break;
             }

@@ -87,6 +87,20 @@ namespace HW1_PCXreader
                             break;
                     }
                     break;
+                case 2://ROBERT
+                    switch (comboBox2.SelectedIndex)
+                    {//direct
+                        case 0://BOTH
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.BOTH);
+                            break;
+                        case 1://X
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.X);
+                            break;
+                        case 2://Y
+                            countMethod = MyFilter.gradient(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.Y);
+                            break;
+                    }
+                    break;
             }
             double SNR = 0.0;
             double costTime = 0;
@@ -147,6 +161,23 @@ namespace HW1_PCXreader
                             break;
                     }
                     break;
+                case 2://ROBERT
+                    switch (comboBox2.SelectedIndex)
+                    {//direct
+                        case 0://BOTH
+                            countFilter = new MyFilter(2);
+                            setMaskView();
+                            break;
+                        case 1://X
+                            countFilter = MyFilter.GradientKernel(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.X);
+                            setMaskView();
+                            break;
+                        case 2://Y
+                            countFilter = MyFilter.GradientKernel(MyFilter.GradientOperator.ROBERT, MyFilter.GradientDirect.Y);
+                            setMaskView();
+                            break;
+                    }
+                    break;
             }
         }
 
@@ -156,7 +187,10 @@ namespace HW1_PCXreader
             for (int i = 0; i < 9; i++)
             {
                 TextBox target = (TextBox)tableLayoutPanel3.Controls.Find(name + (2 + i), true)[0];
-                target.Text = countFilter[i % 3, i / 3].ToString();
+                if (((i % 3) < countFilter.size) && ((i / 3) < countFilter.size))
+                    target.Text = countFilter[i % 3, i / 3].ToString();
+                else
+                    target.Text = "X";
             }
         }
     }
