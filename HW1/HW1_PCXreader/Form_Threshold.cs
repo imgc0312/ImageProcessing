@@ -142,7 +142,11 @@ namespace HW1_PCXreader
 
         protected override void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            outView = imgView;
+            int[] thresholds = new int[3];
+            thresholds[2] = trackBar1.Value;//R
+            thresholds[1] = trackBar2.Value;//G
+            thresholds[0] = trackBar3.Value;//B
+            outView = MyDeal.threshold(imgView, thresholds);
         }
 
         private void textBox_TextChanged(object sender, EventArgs e)
