@@ -14,7 +14,7 @@ namespace HW2_video
     public class MyCompresser
     {
         public enum CONNECT { PICTURE_MOTION, PICTURE_FEATURE, PICTURE_MATCH }// for connect form control
-        public enum COMPRESS_METHOD { ALL, LOCAL, TSS }// compress method
+        public enum COMPRESS_METHOD { ALL, LOCAL, TSS, INTER_SUB, INTRA_SUB }// compress method
         
         public delegate double findMatchDelegate(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int x, ref int y);
         private delegate void threadHandler();//for save
@@ -110,6 +110,12 @@ namespace HW2_video
                     this.findMatch = findMatchTSS;
                     Debug.Print("OOXX**in TSS");
                     break;
+                case COMPRESS_METHOD.INTER_SUB:
+                    Debug.Print("OOXX**in INTER_SUB");
+                    break;
+                case COMPRESS_METHOD.INTRA_SUB:
+                    Debug.Print("OOXX**in INTRA_SUB");
+                    break;
             }
             this.compressMethod = method;
         }
@@ -190,6 +196,12 @@ namespace HW2_video
                 {
                     switch (compressMethod)
                     {
+                        case COMPRESS_METHOD.INTRA_SUB:
+                            intraSubsample();
+                            break;
+                        case COMPRESS_METHOD.INTER_SUB:
+                            interSubsample();
+                            break;
                         case COMPRESS_METHOD.ALL:
                         case COMPRESS_METHOD.LOCAL:
                         case COMPRESS_METHOD.TSS:
@@ -210,9 +222,146 @@ namespace HW2_video
 
         }
 
+        protected void intraSubsample()
+        {
+            compressFile.type = MyCompressTiffDefine.TYPE.SUBSAMPLE;
+            if (RefPlayer != null)
+            {
+                RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP));
+                CurPlayer.Tiff = RefPlayer.Tiff.clone();
+                MyFilterData CurKernelGet = new MyFilterData();// the data copy from cur frame of kernel size
+                int intraSubSize = 2;
+                int subSizeHalf = intraSubSize / 2;
+                double subWeight = 1.0 / (intraSubSize * intraSubSize);
+                MyFilter intraSubFilter = new MyFilter(intraSubSize);
+                intraSubFilter.setData(1.0);
+
+                for (int i = 0; i < RefPlayer.Tiff.Size; i++)
+                {//run frames
+                 //Debug.Print("in frame " + i);
+                    trackBar.Invoke(new threadHandler2(progressTrack), i);// reflash progress view
+                    CurPlayer.OnPlay(new MyPlayer.PlayEventArgs(i));//flash current frame view
+
+                    Bitmap curBitmapCp;// the copy Bitmap for cur frame
+                    Bitmap dstBitmap;// viewer in counting out view
+                    while (true)
+                    {
+                        try
+                        {
+                            curBitmapCp = new Bitmap((Image)CurPlayer.PredictView.Clone());// the copy Bitmap for cur frame
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(33);
+                            continue;
+                        }
+                        break;
+                    }
+                    dstBitmap = new Bitmap(curBitmapCp.Width, curBitmapCp.Height);
+                    while (true)
+                    {
+                        try
+                        {
+                            MotionViewer.Image = dstBitmap;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(33);
+                            continue;
+                        }
+                        break;
+                    }
+
+                    BitmapData curData = curBitmapCp.LockBits(MyDeal.boundB(curBitmapCp), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    //Bitmap afterSubView = new Bitmap(intraSubSize, intraSubSize);// view in match blok
+                    //while (true)
+                    //{
+                    //    try
+                    //    {
+                    //        MatchViewer.Image = afterSubView;
+                    //    }
+                    //    catch (InvalidOperationException)
+                    //    {
+                    //        Thread.Sleep(33);
+                    //        continue;
+                    //    }
+                    //    break;
+                    //}
+                    //Graphics afterSubViewG = Graphics.FromImage(afterSubView);
+                    Graphics dstBitmapG = Graphics.FromImage(dstBitmap);
+                    int freq = 0;
+                    for (int y = 0 + subSizeHalf; y < curBitmapCp.Height; y += intraSubSize)
+                    {
+                        for (int x = 0 + subSizeHalf; x < curBitmapCp.Width; x += intraSubSize)
+                        {
+                            if (activeFrom != null)
+                            {
+                                if (activeFrom.IsDisposed)//form be dispose
+                                    return;
+                            }
+                            //draw target
+                            if (freq % 2 == 0)
+                            { // reduce flash freq
+                                freq = 0;
+                                CurPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, intraSubSize, intraSubSize));
+                            }
+                            else
+                                freq++;
+                            CurKernelGet.fill(curData, x, y, MyFilter.BorderMethod.ZERO, intraSubFilter);
+                            //MyDeal.tryDraw(featureViewer, CurKernelGet.transToBitmap());
+                            byte[] subSample = CurKernelGet.count(subWeight);
+                            //Debug.Print("in " + x + " , " + y + " : " + subSample[2] + " " + subSample[1] + " " + subSample[0]);
+                            Color sampleColor = Color.FromArgb(subSample[2], subSample[1], subSample[0]);
+                            Brush sample = new SolidBrush(sampleColor);
+                            //afterSubViewG.Clear(sampleColor);
+                            dstBitmapG.FillRectangle(sample, x - subSizeHalf, y - subSizeHalf, intraSubSize, intraSubSize);
+                            MotionViewer.Invalidate();
+                            //MatchViewer.Invalidate();
+                            Thread.Sleep(sleepTime);
+                            //Debug.Print("in frame " + i + " in " + x + " , "+ y + "find target " + targetX + " , " + targetY);
+                        }
+                    }
+                    curBitmapCp.UnlockBits(curData);
+                    compressFile.baseImg.Add(dstBitmap);// add dst imge
+                    compressFile.motionTiff.Add(null);
+                }
+
+                if (activeFrom != null)
+                    activeFrom.Invoke(new threadHandler(saveFile));// save the result
+            }
+        }
+
         protected void interSubsample()
         {
+            compressFile.type = MyCompressTiffDefine.TYPE.SUBSAMPLE;
+            if (RefPlayer != null)
+            {
+                RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP));
+                CurPlayer.Tiff = RefPlayer.Tiff;
+                MyFilterData CurKernelGet = new MyFilterData();// the data copy from cur frame of kernel size
+                for (int i = 0; i < RefPlayer.Tiff.Size; i++)
+                {//run frames
+                 //Debug.Print("in frame " + i);
+                    trackBar.Invoke(new threadHandler2(progressTrack), i);// reflash progress view
+                    CurPlayer.OnPlay(new MyPlayer.PlayEventArgs(i));//flash current frame view
 
+                    if ((i % 2 == 0) || (i == (RefPlayer.Tiff.Size - 1) ))
+                    {//uncompress frame number
+                        compressFile.baseImg.Add((Image)RefPlayer.Tiff[i].Clone());// add ref imge
+                        compressFile.motionTiff.Add(null);
+                        continue;
+                    }
+                    else
+                    {
+                        compressFile.baseImg.Add(null);// add ref imge
+                        compressFile.motionTiff.Add(null);
+                        continue;
+                    }
+                }
+
+                if (activeFrom != null)
+                    activeFrom.Invoke(new threadHandler(saveFile));// save the result
+            }
         }
 
         protected void motionMethod()

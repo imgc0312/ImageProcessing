@@ -219,6 +219,38 @@ namespace HW2_video
             return output;
         }
 
+        public static void setPixel(BitmapData data, int x, int y, double[] value)
+        {
+            setPixel(data, x, y, value, 1.0);
+        }
+
+        public static void setPixel(BitmapData data, int x, int y, double[] value, double rate)
+        {
+            if (x < 0 || x >= data.Width || y < 0 || y >= data.Height)
+            {
+                return ;
+            }
+            else
+            {
+                unsafe
+                {
+                    double t;
+                    byte* target = (byte*)data.Scan0;
+                    target += y * data.Stride + x * 3;
+                    for(int c = 0; c < 3; c++)
+                    {
+                        t = rate * value[c];
+                        if (t < 0)
+                            t = 0;
+                        else if (t > 255)
+                            t = 255; 
+                        target[c] = Convert.ToByte(t);
+                    }
+                }
+                return ;
+            }
+        }
+
         /// <summary>
         /// val-->
         /// </summary>

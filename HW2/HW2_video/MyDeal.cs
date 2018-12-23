@@ -62,6 +62,11 @@ namespace HW2_video
             return x;
         }
 
+        public static Rectangle boundB(Image src)
+        {//get Bitmap rectangle
+            return new Rectangle(0, 0, src.Width, src.Height);
+        }
+
         public static Rectangle boundB(Bitmap src)
         {//get Bitmap rectangle
             return new Rectangle(0, 0, src.Width, src.Height);
@@ -81,11 +86,24 @@ namespace HW2_video
             {
                 try
                 {
-                    viewer.Image = image;
+                    if ((viewer.Image == null) || (image == null))
+                    {
+                        viewer.Image = image;
+                    }
+                    else
+                    {
+                        if (!Object.Equals(viewer.BackgroundImage, image))
+                        {
+                            Graphics graphic = Graphics.FromImage(viewer.Image);
+                            graphic.Clear(Color.Transparent);
+                            graphic.DrawImage(image, MyDeal.boundB(image));
+                        }
+                        viewer.Invalidate();
+                    }
                 }
                 catch (InvalidOperationException)
                 {
-                    Thread.Sleep(3);
+                    Thread.Sleep(7);
                     continue;
                 }
                 break;
@@ -104,7 +122,9 @@ namespace HW2_video
                 try
                 {
                     if (!Object.Equals(viewer.BackgroundImage, image))
+                    {
                         viewer.BackgroundImage = image;
+                    }
                 }
                 catch (InvalidOperationException)
                 {

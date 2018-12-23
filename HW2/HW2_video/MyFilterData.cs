@@ -62,6 +62,22 @@ namespace HW2_video
             return pixels;
         }
 
+        public void set(BitmapData src, int x, int y, MyFilter filter)
+        {
+            int size = filter.size;
+            _data = new double[size, size][];
+            int startX = x - size / 2;
+            int startY = y - size / 2;
+            for (int j = 0; j < size; j++)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    MyFilter.setPixel(src, startX +i, startY + j, this[i, j], filter[i,j]);
+                }
+            }
+            return ;
+        }
+
         public byte[] count(double rate)
         {// sigma each pixel in _data (rate*pixel)
             byte[] output = new byte[3];

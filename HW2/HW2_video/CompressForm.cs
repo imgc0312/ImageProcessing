@@ -162,12 +162,23 @@ namespace HW2_video
                 {
                     case "radioButton1":
                         compressMethod = MyCompresser.COMPRESS_METHOD.ALL;
+                        groupBox4.Visible = true;
                         break;
                     case "radioButton2":
                         compressMethod = MyCompresser.COMPRESS_METHOD.LOCAL;
+                        groupBox4.Visible = true;
                         break;
                     case "radioButton3":
                         compressMethod = MyCompresser.COMPRESS_METHOD.TSS;
+                        groupBox4.Visible = true;
+                        break;
+                    case "radioButton4":
+                        compressMethod = MyCompresser.COMPRESS_METHOD.INTER_SUB;
+                        groupBox4.Visible = false;
+                        break;
+                    case "radioButton5":
+                        compressMethod = MyCompresser.COMPRESS_METHOD.INTRA_SUB;
+                        groupBox4.Visible = false;
                         break;
                 }
                 if (compresser != null)
@@ -196,6 +207,14 @@ namespace HW2_video
                     compresser.setCriteriaMethod(criteria);
                 }
 
+            }
+        }
+
+        private void CompressForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (compresser != null)
+            {
+                compresser.shutDown();
             }
         }
     }

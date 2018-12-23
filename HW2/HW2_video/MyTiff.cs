@@ -163,6 +163,17 @@ namespace HW2_video
             openALL(_filePath, _fileName);
         }
 
+        public MyTiff clone()
+        {
+            MyTiff newTiff = new MyTiff();
+            newTiff.views = new List<Image>(Size);
+            foreach (Image view in views)
+            {
+                newTiff.views.Add(view);
+            }
+            return newTiff;
+        }
+
         private void openALL(string root, string name)
         {
             views.Clear();

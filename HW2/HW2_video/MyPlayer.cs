@@ -13,6 +13,7 @@ namespace HW2_video
 {
     public class MyPlayer
     {
+        private static Pen redPen = new Pen(Color.Red);// use for draw roi block bound 
         public bool flashIgnore = true;//ignore the play event args flash?
         /// <summary>
         /// define type
@@ -338,6 +339,7 @@ namespace HW2_video
                 {
                     int startX = X - width / 2;
                     int startY = Y - height / 2;
+
                     Bitmap targetDraw;
                     int viewWidth;
                     int viewHeight;
@@ -357,62 +359,19 @@ namespace HW2_video
                         break;
                     }
                     targetDraw = new Bitmap(viewWidth, viewHeight);
-                    int tx, ty;
-                    for (int i = 0; i < width; i++)
-                    {//draw top line
-                        tx = startX + i;
-                        ty = startY;
-                        if (tx < 0)
+                    Graphics targetG = Graphics.FromImage(targetDraw);
+                    for(int time = 0; time < 5; time++)
+                    {
+                        try
+                        {
+                            targetG.DrawRectangle(redPen, startX, startY, width, height);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(17);
                             continue;
-                        if (tx >= targetDraw.Width)
-                            continue;
-                        if (ty < 0)
-                            continue;
-                        if (ty >= targetDraw.Height)
-                            continue;
-                        targetDraw.SetPixel(tx, ty, Color.Red);
-                    }
-                    for (int i = 0; i < width; i++)
-                    {//draw bottom line
-                        tx = startX + i;
-                        ty = startY + height;
-                        if (tx < 0)
-                            continue;
-                        if (tx >= targetDraw.Width)
-                            continue;
-                        if (ty < 0)
-                            continue;
-                        if (ty >= targetDraw.Height)
-                            continue;
-                        targetDraw.SetPixel(tx, ty, Color.Red);
-                    }
-                    for (int i = 0; i < height; i++)
-                    {//draw left line
-                        tx = startX;
-                        ty = startY + i;
-                        if (tx < 0)
-                            continue;
-                        if (tx >= targetDraw.Width)
-                            continue;
-                        if (ty < 0)
-                            continue;
-                        if (ty >= targetDraw.Height)
-                            continue;
-                        targetDraw.SetPixel(tx, ty, Color.Red);
-                    }
-                    for (int i = 0; i < height; i++)
-                    {//draw right line
-                        tx = startX + width;
-                        ty = startY + i;
-                        if (tx < 0)
-                            continue;
-                        if (tx >= targetDraw.Width)
-                            continue;
-                        if (ty < 0)
-                            continue;
-                        if (ty >= targetDraw.Height)
-                            continue;
-                        targetDraw.SetPixel(tx, ty, Color.Red);
+                        }
+                        break;
                     }
                     MyDeal.tryDraw(viewer, targetDraw);
                     
