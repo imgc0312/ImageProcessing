@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -57,6 +58,7 @@ namespace HW2_video
                 if (compresser != null)
                     compresser.shutDown();
                 compresser = new MyCompresser(player, pictureBox2);
+                Debug.Print("compress mode : " + compressMethod.ToString());
                 compresser.setCompressMethod(compressMethod);
                 compresser.setCriteriaMethod(criteria);
                 compresser.connect(pictureBoxFeature, MyCompresser.CONNECT.PICTURE_FEATURE);

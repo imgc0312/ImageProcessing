@@ -228,10 +228,24 @@ namespace HW2_video
 
                     RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(i - 1, MyPlayer.PlayState.KEEP));//flash ref frame view
                     CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0));//flash current frame view
-
+                    
                     //clear motion view
-                    Bitmap motionBlock = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
-                    Bitmap motionVector = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
+                    Bitmap motionBlock = null;
+                    Bitmap motionVector = null;
+                    for(int t = 0; t < 5; t++)
+                    {
+                        try
+                        {
+                            motionBlock = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
+                            motionVector = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(29);
+                            continue;
+                        }
+                        break;
+                    }
                     MyDeal.tryDraw(MotionViewer, motionVector);
                     MyDeal.tryDrawBack(MotionViewer, motionBlock);
                     Graphics graphicMotionBlock = Graphics.FromImage(motionBlock);
@@ -345,9 +359,9 @@ namespace HW2_video
         ///
         public double findMatchAll(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int targetX, ref int targetY)
         {// all seach
-            int i = -1;
-            int j = -1;
-            return findMatchNormal(search, refData, RefPlayer,ref i, ref j);
+            targetX = -1;
+            targetY = -1;
+            return findMatchNormal(search, refData, RefPlayer,ref targetX, ref targetY);
         }
 
         public double findMatchLocal(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int targetX, ref int targetY)

@@ -51,6 +51,8 @@ namespace HW2_video
             {
                 case MyCompressTiffDefine.TYPE.MOTION:
                     return decodeMotion(myct, monitor);
+                case MyCompressTiffDefine.TYPE.SUBSAMPLE:
+                    return decodeSubsample(myct, monitor);
             }
             return null;
         }
@@ -70,6 +72,29 @@ namespace HW2_video
                 {
                     targetMotion = myct.motionTiff.ElementAt(i);
                     baseImg = MyMotionTiff.decode(baseImg, targetMotion);
+                    decodeTiff.views.Add(baseImg);
+                }
+                if (monitor != null)
+                    monitor.OnValueChanged(new MyDeal.ValueEventArgs() { value = (double)i / myct.baseImg.Count });
+            }
+            return decodeTiff;
+        }
+
+        private static MyTiff decodeSubsample(MyCompressTiff myct, MyDeal.ProgressMonitor monitor)
+        {
+            MyTiff decodeTiff = new MyTiff();
+            Bitmap baseImg = null;
+            for (int i = 0; i < myct.baseImg.Count; i++)
+            {
+                if (myct.baseImg.ElementAt(i) != null)
+                {
+                    decodeTiff.views.Add(baseImg = new Bitmap(myct.baseImg.ElementAt(i)));
+                }
+                else
+                {
+                    Bitmap left = (Bitmap)decodeTiff.views.Last();
+                    Bitmap right = new Bitmap(myct.baseImg.ElementAt(i + 1));
+                    baseImg = MyDeal.Interpolation(left, right);
                     decodeTiff.views.Add(baseImg);
                 }
                 if (monitor != null)

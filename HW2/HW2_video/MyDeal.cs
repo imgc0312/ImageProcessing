@@ -115,6 +115,50 @@ namespace HW2_video
             }
         }
 
+        public static Bitmap Interpolation(Bitmap left, Bitmap right)
+        {
+            if (left == null)
+                return null;
+            if (right == null)
+                return left;
+            Bitmap dst = new Bitmap(left.Width, left.Height);
+            BitmapData dstData = dst.LockBits(boundB(dst), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            BitmapData leftData = left.LockBits(boundB(left), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData rightData = right.LockBits(boundB(right), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                byte* dstPtr = (byte*)dstData.Scan0;
+                byte* leftPtr = (byte*)leftData.Scan0;
+                byte* rightPtr = (byte*)rightData.Scan0;
+                int skipByte = dstData.Stride - 3 * dstData.Width;
+                int temp = 0;
+                for (int j = 0; j < dstData.Height; j++)
+                {
+                    for (int i = 0; i < dstData.Width; i++)
+                    {
+                        for (int c = 0; c < 3; c++)
+                        {
+                            temp = ((*leftPtr) + (*rightPtr))/2;
+                            if (temp < 0)
+                                temp = 0;
+                            else if (temp > 255)
+                                temp = 255;
+                            *dstPtr = Convert.ToByte(temp);
+                            dstPtr += 1;
+                            leftPtr += 1;
+                            rightPtr += 1;
+                        }
+                    }
+                    dstPtr += skipByte;
+                    leftPtr += skipByte;
+                    rightPtr += skipByte;
+                }
+            }
+            dst.UnlockBits(dstData);
+            left.UnlockBits(leftData);
+            right.UnlockBits(rightData);
+            return dst;
+        }
 
         /// <summary>
         /// other class-->
