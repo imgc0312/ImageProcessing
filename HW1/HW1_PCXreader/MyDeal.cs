@@ -797,6 +797,11 @@ namespace HW1_PCXreader
 
         public static Bitmap opacity(Bitmap fore, Bitmap back, int rate)
         {
+            return opacity(fore, back, rate, null);
+        }
+
+        public static Bitmap opacity(Bitmap fore, Bitmap back, int rate, OpacityMask mask)
+        {
             Bitmap dst = null;
             int newWidth = 0;
             int newHeight = 0;
@@ -820,13 +825,21 @@ namespace HW1_PCXreader
                 {
                     for (int i = 0; i < newWidth; i++)
                     {
-
-                        useFore = getPixel(foreData, i, j, valueMethod.Nearly);
-                        useBack = getPixel(backData, i, j, valueMethod.Nearly);
-                        dstPtr[0] = Convert.ToByte(((int)useFore[0] * rate + (int)useBack[0] * (100 - rate)) / 100);
-                        dstPtr[1] = Convert.ToByte(((int)useFore[1] * rate + (int)useBack[1] * (100 - rate)) / 100);
-                        dstPtr[2] = Convert.ToByte(((int)useFore[2] * rate + (int)useBack[2] * (100 - rate)) / 100);
-
+                        if((mask == null) || (mask.inRange(i,j) != 0))
+                        {
+                            useFore = getPixel(foreData, i, j, valueMethod.Nearly);
+                            useBack = getPixel(backData, i, j, valueMethod.Nearly);
+                            dstPtr[0] = Convert.ToByte(((int)useFore[0] * rate + (int)useBack[0] * (100 - rate)) / 100);
+                            dstPtr[1] = Convert.ToByte(((int)useFore[1] * rate + (int)useBack[1] * (100 - rate)) / 100);
+                            dstPtr[2] = Convert.ToByte(((int)useFore[2] * rate + (int)useBack[2] * (100 - rate)) / 100);
+                        }
+                        else
+                        {
+                            useBack = getPixel(backData, i, j, valueMethod.Nearly);
+                            dstPtr[0] = useBack[0];
+                            dstPtr[1] = useBack[1];
+                            dstPtr[2] = useBack[2];
+                        }
                         dstPtr += 3;
                     }
                     dstPtr += skipByte;
@@ -1527,5 +1540,43 @@ namespace HW1_PCXreader
                 output = 255;
             return output;
         }
-    } 
+    }
+
+    // for opacity
+    public class OpacityMask
+    {
+        byte[,] mask = null;
+        public int Size { get { return mask.GetLength(0); } }
+
+        public OpacityMask(int size)
+        {
+            mask = new byte[size, size];
+        }
+
+        public byte inRange(int x, int y)
+        {
+            if((x >= 0) && (x < Size) && (y >= 0) && (y < Size))
+            {
+                return mask[x, y];
+            }
+            return 0;
+        }
+
+        public static OpacityMask CircleMask(int radious)
+        {
+            OpacityMask nMask = new OpacityMask(2 * radious);
+            double radiousD = Math.Pow(radious, 2);
+            for(int j = 0; j < nMask.Size; j++)
+            {
+                for(int i = 0; i < nMask.Size; i++)
+                {
+                    if((Math.Pow(radious - i, 2) + Math.Pow(radious - j , 2)) < radiousD)
+                        nMask.mask[i, j] = 255;
+                    else
+                        nMask.mask[i, j] = 0;
+                }
+            }
+            return nMask;
+        }
+    }
 }

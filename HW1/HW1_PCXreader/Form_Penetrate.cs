@@ -50,6 +50,7 @@ namespace HW1_PCXreader
                 pictureBox3.Image = output;
             }
         }
+        OpacityMask useMask = null;
 
         /// <summary>
         /// function-->
@@ -61,6 +62,7 @@ namespace HW1_PCXreader
             mode = (int)imgMode.ORI;
             toolStripStatusLabel3.Visible = true;
             toolStripStatusLabel3.Text = SNRText;
+            comboBox1.SelectedIndex = 0;
         }
 
         public Form_Penetrate(Form1 form1) : base(form1)
@@ -70,6 +72,7 @@ namespace HW1_PCXreader
             mode = (int)imgMode.ORI;
             toolStripStatusLabel3.Visible = true;
             toolStripStatusLabel3.Text = SNRText;
+            comboBox1.SelectedIndex = 0;
         }
 
         private void textBox_TextChanged(object sender, EventArgs e)
@@ -148,8 +151,23 @@ namespace HW1_PCXreader
 
         private void count()
         {
-            Output = MyDeal.opacity(Input1, Input2, trackBar1.Value);
+            Output = MyDeal.opacity(Input1, Input2, trackBar1.Value, useMask);
             toolStripStatusLabel3.Text = SNRText + MyDeal.SNR(Input1, Output).ToString("0.00");
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox here = (ComboBox)sender;
+            switch (here.SelectedIndex)
+            {
+                case 0:
+                    useMask = null;
+                    break;
+                case 1:
+                    useMask = OpacityMask.CircleMask(70);
+                    break;
+            }
+            count();
         }
     }
 }
