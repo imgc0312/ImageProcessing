@@ -1374,13 +1374,20 @@ namespace HW1_PCXreader
     public class ValueEventArgs : EventArgs //for progressbar
     {
         public double value { set; get; }
-        public int percent { get { return Convert.ToInt32(value * 100); } }
+        public int percent { get {
+                if (value > 1.0)
+                    value = 1.0;
+                else if (value < 0)
+                    value = 0;
+                return Convert.ToInt32(value * 100); } }
     }
 
     public delegate void ValueChangedEventHandler(object sender, ValueEventArgs e);
 
     public class ProgressMonitor
     {
+        delegate void changeViewHandle(int value);
+        delegate void changeVisHandle(bool value);
         private event ValueChangedEventHandler ValueChanged; //change event
         public double current = 0;
         public ProgressBar view { get; set; }
@@ -1402,8 +1409,8 @@ namespace HW1_PCXreader
             current = 0;
             if (view != null)
             {
-                view.Value = 0;
-                view.Visible = true;
+                view.Invoke(new changeViewHandle(changeValue), 0);
+                view.Invoke(new changeVisHandle(changeVisable), true);
                 //Debug.Print("progress : start" + tryTime);
             }          
         }
@@ -1413,8 +1420,8 @@ namespace HW1_PCXreader
             current = 1.0;
             if (view != null)
             {
-                view.Value = 100;
-                view.Visible = false;
+                view.Invoke(new changeViewHandle(changeValue), 100);
+                view.Invoke(new changeVisHandle(changeVisable), false);
                 //Debug.Print("progress : fine" + tryTime);
                 //tryTime++;
             }  
@@ -1433,11 +1440,21 @@ namespace HW1_PCXreader
             current = e.value;
             if (view != null)
             {
-                view.Value = e.percent;
+                view.Invoke(new changeViewHandle(changeValue), e.percent);
                 //Debug.Print("progress : " + view.Value);
             }
             //Debug.Print("progress : change");
         }
+
+        private void changeVisable(bool v)
+        {
+            view.Visible = v;
+        }
+
+        private void changeValue(int value)
+        {
+            view.Value = value;
+        } 
     }
 
     // for stretch

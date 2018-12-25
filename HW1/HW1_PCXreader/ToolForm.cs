@@ -28,7 +28,7 @@ namespace HW1_PCXreader
             menuStrip1.Enabled = false;
         }
 
-        protected new void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        protected virtual new void pictureBox_MouseMove(object sender, MouseEventArgs e)
         {
             base.pictureBox_MouseMove(sender, e);
         }
@@ -38,7 +38,7 @@ namespace HW1_PCXreader
             base.pictureBox_MouseLeave(sender, e);
         }
 
-        protected new void pictureBox_DoubleClick(object sender, EventArgs e)
+        protected virtual new void pictureBox_DoubleClick(object sender, EventArgs e)
         {
             base.pictureBox_DoubleClick(sender, e);
         }

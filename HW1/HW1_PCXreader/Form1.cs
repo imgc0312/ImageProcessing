@@ -581,5 +581,11 @@ namespace HW1_PCXreader
             Form_EdgeCrispen form2 = new Form_EdgeCrispen(this);
             form2.ShowDialog();
         }
+
+        private void fractalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_FractalFile form2 = new Form_FractalFile(this);
+            form2.ShowDialog();
+        }
     }
 }

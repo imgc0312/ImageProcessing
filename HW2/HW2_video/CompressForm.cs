@@ -217,6 +217,27 @@ namespace HW2_video
                 compresser.shutDown();
             }
         }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox3.Checked)
+            {
+                if (compresser != null)
+                {
+                    compresser.CurrentPlayer.flashIgnore = true;
+                    compresser.CurrentPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1));
+                }
+                pictureBoxFeature.Visible = false;
+            }
+            else
+            {
+                if (compresser != null)
+                {
+                    compresser.CurrentPlayer.flashIgnore = false;
+                }
+                pictureBoxFeature.Visible = true;
+            }
+        }
     }
 
 }

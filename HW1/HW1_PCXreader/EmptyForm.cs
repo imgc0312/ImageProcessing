@@ -364,7 +364,7 @@ namespace HW1_PCXreader
             }
         }
 
-        protected void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        protected virtual void pictureBox_MouseMove(object sender, MouseEventArgs e)
         {
             PictureBox here = (PictureBox)sender;
             int X, Y;   //location in image
@@ -416,7 +416,7 @@ namespace HW1_PCXreader
             toolStripStatusLabel2.Text = colorLabel;
         }
 
-        protected void pictureBox_DoubleClick(object sender, EventArgs e)
+        protected virtual void pictureBox_DoubleClick(object sender, EventArgs e)
         {
             PictureBox here = (PictureBox)sender;
             Form_ImageView form2 = new Form_ImageView(here.Image, mode);

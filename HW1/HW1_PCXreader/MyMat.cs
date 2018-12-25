@@ -17,6 +17,23 @@ namespace HW1_PCXreader
         {
             return new Rectangle(0, 0, src.Width, src.Height);
         }
+
+        public static byte[] boundP(double[] p)
+        {
+            if (p == null)
+                return null;
+            byte[] np = new byte[3];
+            for(int i = 0; i < 3; i++)
+            {
+                double v = p[i];
+                if (v < 0)
+                    v = 0;
+                else if (v > 255)
+                    v = 255;
+                np[i] = Convert.ToByte(v);
+            }
+            return np;
+        }
     }
 
     class BitPlanes

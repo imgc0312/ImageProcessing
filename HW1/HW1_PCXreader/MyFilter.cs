@@ -369,7 +369,7 @@ namespace HW1_PCXreader
             }
         }
 
-        private static byte[] getPixel(BitmapData data, int x, int y, BorderMethod method)
+        public static byte[] getPixel(BitmapData data, int x, int y, BorderMethod method)
         {
             byte[] output = new byte[3];
             switch (method)
@@ -430,7 +430,7 @@ namespace HW1_PCXreader
             return output;
         }
 
-        private static double[] getPixel(BitmapData data, int x, int y, BorderMethod method, double rate)
+        public static double[] getPixel(BitmapData data, int x, int y, BorderMethod method, double rate)
         {
             if(rate == Double.NegativeInfinity)
             {//不須對該欄位值取值
@@ -493,6 +493,27 @@ namespace HW1_PCXreader
                     return output;
             }
             return output;
+        }
+
+        public static void setPixel(BitmapData data, int x, int y, double[] value)
+        {
+            byte[] input = MyF.boundP(value);
+            if (x < 0 || x >= data.Width || y < 0 || y >= data.Height)
+            {
+                return;
+            }
+            else
+            {
+                unsafe
+                {
+                    byte* target = (byte*)data.Scan0;
+                    target += y * data.Stride + x * 3;
+                    target[0] = input[0];
+                    target[1] = input[1];
+                    target[2] = input[2];
+                }
+                return;
+            }
         }
 
         public static byte[] meanBlur(BitmapData data, int x, int y, BorderMethod borderMethod, MyFilter filter)

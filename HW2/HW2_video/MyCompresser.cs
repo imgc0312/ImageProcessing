@@ -300,22 +300,25 @@ namespace HW2_video
                                     return;
                             }
                             //draw target
-                            if (freq % 2 == 0)
-                            { // reduce flash freq
-                                freq = 0;
-                                CurPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, intraSubSize, intraSubSize));
+                            if (!this.CurrentPlayer.flashIgnore)
+                            {
+                                if (freq % 2 == 0)
+                                { // reduce flash freq
+                                    freq = 0;
+                                    CurPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, intraSubSize, intraSubSize));
+                                }
+                                else
+                                    freq++;
                             }
-                            else
-                                freq++;
                             CurKernelGet.fill(curData, x, y, MyFilter.BorderMethod.ZERO, intraSubFilter);
                             //MyDeal.tryDraw(featureViewer, CurKernelGet.transToBitmap());
                             byte[] subSample = CurKernelGet.count(subWeight);
                             //Debug.Print("in " + x + " , " + y + " : " + subSample[2] + " " + subSample[1] + " " + subSample[0]);
                             Color sampleColor = Color.FromArgb(subSample[2], subSample[1], subSample[0]);
                             Brush sample = new SolidBrush(sampleColor);
-                            //afterSubViewG.Clear(sampleColor);
                             dstBitmapG.FillRectangle(sample, x - subSizeHalf, y - subSizeHalf, intraSubSize, intraSubSize);
-                            MotionViewer.Invalidate();
+                            if(!this.CurrentPlayer.flashIgnore)
+                                MotionViewer.Invalidate();
                             //MatchViewer.Invalidate();
                             Thread.Sleep(sleepTime);
                             //Debug.Print("in frame " + i + " in " + x + " , "+ y + "find target " + targetX + " , " + targetY);
@@ -453,20 +456,29 @@ namespace HW2_video
                                     return;
                             }
                             //draw target
-                            CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
+                            if(!CurrentPlayer.flashIgnore)
+                                CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
                             CurKernelGet.fill(curData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
-                            MyDeal.tryDraw(featureViewer, CurKernelGet.transToBitmap());
-                            //draw motion
                             penColor = Color.FromArgb(colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound, colorLowBound + random.Next() % colorHighBound);
-                            graphicMotionBlock.FillRectangle(new SolidBrush(penColor), x - MyCompresser.compressKernelSize / 4, y - MyCompresser.compressKernelSize / 4, MyCompresser.compressKernelSize / 2, MyCompresser.compressKernelSize / 2);
-                            MotionViewer.Invalidate();
+
+                            if (!this.CurrentPlayer.flashIgnore)
+                            {
+                                MyDeal.tryDraw(featureViewer, CurKernelGet.transToBitmap());
+                                //draw motion
+                                graphicMotionBlock.FillRectangle(new SolidBrush(penColor), x - MyCompresser.compressKernelSize / 4, y - MyCompresser.compressKernelSize / 4, MyCompresser.compressKernelSize / 2, MyCompresser.compressKernelSize / 2);
+                                MotionViewer.Invalidate();
+                            }
+                            
                             //find match
                             int targetX = x;
                             int targetY = y;
                             findMatch(CurKernelGet, refData, RefPlayer, ref targetX, ref targetY);
                             theMotion[x, y] = new int[] { targetX, targetY };
-                            //draw match vector
-                            graphicMotionVector.DrawLine(new Pen(Color.FromArgb(128, penColor), 2.0f), x, y, targetX, targetY);
+                            if (!this.CurrentPlayer.flashIgnore)
+                            {
+                                //draw match vector
+                                graphicMotionVector.DrawLine(new Pen(Color.FromArgb(128, penColor), 2.0f), x, y, targetX, targetY);
+                            }
 
                             //Debug.Print("in frame " + i + " in " + x + " , "+ y + "find target " + targetX + " , " + targetY);
                         }
@@ -533,7 +545,7 @@ namespace HW2_video
                 {
                     for (int x = 0 + compressKernelSize / 2; x < refData.Width; x += 1)
                     {
-                        if (x % 3 == 0)// reduce the reflash view frequence
+                        if ((!RefPlayer.flashIgnore) && (x % 3 == 0))// reduce the reflash view frequence
                             RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
                         refKernelGet.fill(refData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
                         double distance = MyFilterData.compare(search, refKernelGet, criteria);
@@ -542,7 +554,8 @@ namespace HW2_video
                             dataRecord.rate = distance;
                             dataRecord.x = x;
                             dataRecord.y = y;
-                            MyDeal.tryDraw(MatchViewer, refKernelGet.transToBitmap());
+                            if (!RefPlayer.flashIgnore)
+                                MyDeal.tryDraw(MatchViewer, refKernelGet.transToBitmap());
                         }
                         Thread.Sleep(sleepTime);
                     }
@@ -624,7 +637,8 @@ namespace HW2_video
 
         private void compareBlock(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, int x, int y, matchRatePair dataRecord)
         {// compare the (x , y) similar rate && flash dataRecord & view
-            RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
+            if(!RefPlayer.flashIgnore)
+                RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
             MyFilterData refKernelGet = new MyFilterData();
             refKernelGet.fill(refData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
             double distance = MyFilterData.compare(search, refKernelGet, criteria);
@@ -633,7 +647,8 @@ namespace HW2_video
                 dataRecord.rate = distance;
                 dataRecord.x = x;
                 dataRecord.y = y;
-                MyDeal.tryDraw(MatchViewer, refKernelGet.transToBitmap());
+                if(!RefPlayer.flashIgnore)
+                    MyDeal.tryDraw(MatchViewer, refKernelGet.transToBitmap());
             }
             Thread.Sleep(sleepTime);
         }

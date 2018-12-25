@@ -67,6 +67,12 @@
     <Compile Include="Form_EdgeCrispen.Designer.cs">
       <DependentUpon>Form_EdgeCrispen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_FractalFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_FractalFile.Designer.cs">
+      <DependentUpon>Form_FractalFile.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_Outlier.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -145,6 +151,8 @@
     <Compile Include="Form_Threshold.Designer.cs">
       <DependentUpon>Form_Threshold.cs</DependentUpon>
     </Compile>
+    <Compile Include="Fractal.cs" />
+    <Compile Include="FractalFile.cs" />
     <Compile Include="MyFilter.cs" />
     <Compile Include="MyMat.cs" />
     <Compile Include="OperationForm.cs">
@@ -171,6 +179,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_EdgeCrispen.resx">
       <DependentUpon>Form_EdgeCrispen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_FractalFile.resx">
+      <DependentUpon>Form_FractalFile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Outlier.resx">
       <DependentUpon>Form_Outlier.cs</DependentUpon>
