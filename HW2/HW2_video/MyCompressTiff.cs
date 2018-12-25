@@ -13,7 +13,7 @@ namespace HW2_video
 {
     public class MyCompressTiffDefine
     {
-        public enum TYPE { SUBSAMPLE, MOTION }
+        public enum TYPE { SUBSAMPLE, MOTION, BLOCKBASE }
     }
     [Serializable]
     public class MyCompressTiff
@@ -53,6 +53,8 @@ namespace HW2_video
                     return decodeMotion(myct, monitor);
                 case MyCompressTiffDefine.TYPE.SUBSAMPLE:
                     return decodeSubsample(myct, monitor);
+                case MyCompressTiffDefine.TYPE.BLOCKBASE:
+                    return decodeBB(myct, monitor);
             }
             return null;
         }
@@ -96,6 +98,54 @@ namespace HW2_video
                     Bitmap right = new Bitmap(myct.baseImg.ElementAt(i + 1));
                     baseImg = MyDeal.Interpolation(left, right);
                     decodeTiff.views.Add(baseImg);
+                }
+                if (monitor != null)
+                    monitor.OnValueChanged(new MyDeal.ValueEventArgs() { value = (double)i / myct.baseImg.Count });
+            }
+            return decodeTiff;
+        }
+
+        private static MyTiff decodeBB(MyCompressTiff myct, MyDeal.ProgressMonitor monitor)
+        {
+            MyTiff decodeTiff = new MyTiff();
+            Bitmap dst = null;
+            for (int i = 0; i < myct.baseImg.Count; i++)
+            {
+                if (i == 0)
+                {
+                    decodeTiff.views.Add(dst = new Bitmap(myct.baseImg.ElementAt(i)));
+                }
+                else
+                {
+                    Bitmap left = (Bitmap)decodeTiff.views.Last();
+                    dst = (Bitmap)myct.baseImg.ElementAt(i).Clone();
+                    BitmapData leftData = left.LockBits(MyDeal.boundB(left), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    BitmapData dstData = dst.LockBits(MyDeal.boundB(dst), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                    unsafe
+                    {
+                        byte* leftPtr = (byte*)leftData.Scan0;
+                        byte* dstPtr = (byte*)dstData.Scan0;
+                        int skipByte = dstData.Stride - 3 * dstData.Width;
+                        for(int y = 0; y < dstData.Height; y++)
+                        {
+                            for(int x = 0; x < dstData.Width; x++)
+                            {
+                                if((dstPtr[0] != dstPtr[1]) || (dstPtr[1] != dstPtr[2]))
+                                {
+                                    dstPtr[0] = leftPtr[0];
+                                    dstPtr[1] = leftPtr[1];
+                                    dstPtr[2] = leftPtr[2];
+                                }
+                                dstPtr += 3;
+                                leftPtr += 3;
+                            }
+                            dstPtr += skipByte;
+                            leftPtr += skipByte;
+                        }
+                    }
+                    left.UnlockBits(leftData);
+                    dst.UnlockBits(dstData);
+                    decodeTiff.views.Add(dst);
                 }
                 if (monitor != null)
                     monitor.OnValueChanged(new MyDeal.ValueEventArgs() { value = (double)i / myct.baseImg.Count });

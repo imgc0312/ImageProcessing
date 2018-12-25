@@ -47,15 +47,34 @@ namespace HW2_video
         {
             this.Enabled = false;
             base.openToolStripMenuItem_Click(sender, e);
-            if(myCompressTiff != null)
+            if(myCompressTiff != null )
             {
-                motionVector = new MyTiff();
-                foreach(MyMotionTiff  motionTiff in myCompressTiff.motionTiff)
+                switch (myCompressTiff.type)
                 {
-                    motionVector.views.Add(MyMotionTiff.drawVector(motionTiff));
-                }
-                motionPlayer.open(motionVector);
-                groupBox3.Text = "motion Vector";
+                    case MyCompressTiffDefine.TYPE.MOTION:
+                        motionVector = new MyTiff();
+                        foreach (MyMotionTiff motionTiff in myCompressTiff.motionTiff)
+                        {
+                            motionVector.views.Add(MyMotionTiff.drawVector(motionTiff));
+                        }
+                        motionPlayer.open(motionVector);
+                        groupBox3.Text = "motion Vector";
+                        break;
+                    case MyCompressTiffDefine.TYPE.BLOCKBASE:
+                        motionVector = new MyTiff();
+                        foreach (Image tiff in myCompressTiff.baseImg)
+                        {
+                            motionVector.views.Add(tiff);
+                        }
+                        motionPlayer.open(motionVector);
+                        groupBox3.Text = "Block Base diff";
+                        break;
+                    default:
+                        motionVector = null;
+                        motionPlayer.Tiff = null;
+                        groupBox3.Text = "not use";
+                        break;
+                }   
             }
             else
             {

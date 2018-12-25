@@ -14,8 +14,21 @@ namespace HW2_video
     public class MyCompresser
     {
         public enum CONNECT { PICTURE_MOTION, PICTURE_FEATURE, PICTURE_MATCH }// for connect form control
-        public enum COMPRESS_METHOD { ALL, LOCAL, TSS, INTER_SUB, INTRA_SUB }// compress method
-        
+        public enum COMPRESS_METHOD { ALL, LOCAL, TSS, INTER_SUB, INTRA_SUB, BLOCKBASE }// compress method
+        double _BBthreshold = 50;
+        double _BBthresholdSQ = 50 * 50 ;
+        public double BB_THRESHOLD
+        {
+            get
+            {
+                return _BBthreshold;
+            }
+            set
+            {
+                _BBthreshold = value;
+                _BBthresholdSQ = value * value ;
+            }
+        }
         public delegate double findMatchDelegate(MyFilterData search, BitmapData refData, MyPlayer RefPlayer, ref int x, ref int y);
         private delegate void threadHandler();//for save
         private delegate void threadHandler2(int value);//for track
@@ -56,7 +69,7 @@ namespace HW2_video
         public MyPlayer CurrentPlayer { get { return CurPlayer; } }
         MyCompressTiff compressFile = null;//encode file
         public static int compressKernelSize = 8; // compress Kernel Size
-        
+        public static int compressKernelSizeHalf = compressKernelSize / 2;
         public static int sleepShort = 0; // sleepTime short ver
         public static int sleepLong = 50; // sleepTime long ver
         public static int sleepTime = sleepShort; // if too low the ref viewer would be error
@@ -115,6 +128,9 @@ namespace HW2_video
                     break;
                 case COMPRESS_METHOD.INTRA_SUB:
                     Debug.Print("OOXX**in INTRA_SUB");
+                    break;
+                case COMPRESS_METHOD.BLOCKBASE:
+                    Debug.Print("OOXX**in BLOCKBASE");
                     break;
             }
             this.compressMethod = method;
@@ -201,6 +217,9 @@ namespace HW2_video
                             break;
                         case COMPRESS_METHOD.INTER_SUB:
                             interSubsample();
+                            break;
+                        case COMPRESS_METHOD.BLOCKBASE:
+                            blockBaseMethod();
                             break;
                         case COMPRESS_METHOD.ALL:
                         case COMPRESS_METHOD.LOCAL:
@@ -360,6 +379,150 @@ namespace HW2_video
                         compressFile.motionTiff.Add(null);
                         continue;
                     }
+                }
+
+                if (activeFrom != null)
+                    activeFrom.Invoke(new threadHandler(saveFile));// save the result
+            }
+        }
+
+        protected void blockBaseMethod()
+        {
+            compressFile.type = MyCompressTiffDefine.TYPE.BLOCKBASE;
+            if (RefPlayer != null)
+            {
+                Rectangle cutRect = new Rectangle(0, 0, compressKernelSize, compressKernelSize);
+                MyFilterData CurKernelGet = new MyFilterData();// the data copy from cur frame of kernel 
+                MyFilterData RefKernelGet = new MyFilterData();
+                for (int i = 0; i < RefPlayer.Tiff.Size; i++)
+                {//run frames
+                 //Debug.Print("in frame " + i);
+                    trackBar.Invoke(new threadHandler2(progressTrack), i);// reflash progress view
+
+                    RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(i - 1, MyPlayer.PlayState.KEEP));//flash ref frame view
+                    CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0));//flash current frame view
+
+                    //clear motion view
+                    Bitmap motionBlock = null;
+                    while (true)
+                    {
+                        try
+                        {
+                            motionBlock = new Bitmap(RefPlayer.NextView.Width, RefPlayer.NextView.Height);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(29);
+                            continue;
+                        }
+                        break;
+                    }
+                    MyDeal.tryDrawBack(MotionViewer, motionBlock);
+                    Graphics graphicMotionBlock = Graphics.FromImage(motionBlock);
+                    Brush redPen = new SolidBrush(Color.Red);
+
+                    if (i == 0)
+                    {//uncompress frame number
+                        compressFile.baseImg.Add((Image)RefPlayer.Tiff[i].Clone());// add ref imge
+                        compressFile.motionTiff.Add(null);
+                        continue;
+                    }
+
+                    Bitmap refBitmapCp;// the copy Bitmap for ref frame
+                    Bitmap curBitmapCp;// the copy Bitmap for cur frame
+                    while (true)
+                    {
+                        try
+                        {
+                            refBitmapCp = new Bitmap((Image)RefPlayer.PredictView.Clone());// the copy Bitmap for ref frame
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(33);
+                            continue;
+                        }
+                        break;
+                    }
+                    while (true)
+                    {
+                        try
+                        {
+                            curBitmapCp = new Bitmap((Image)RefPlayer.NextView.Clone());// the copy Bitmap for cur frame
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Thread.Sleep(33);
+                            continue;
+                        }
+                        break;
+                    }
+                    BitmapData refData = refBitmapCp.LockBits(MyDeal.boundB(refBitmapCp), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    BitmapData curData = curBitmapCp.LockBits(MyDeal.boundB(curBitmapCp), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    
+                    for (int y = 0 + compressKernelSizeHalf; y < curBitmapCp.Height; y += compressKernelSize)
+                    {
+                        for (int x = 0 + compressKernelSizeHalf; x < curBitmapCp.Width; x += compressKernelSize)
+                        {
+                            if (activeFrom != null)
+                            {
+                                if (activeFrom.IsDisposed)//form be dispose
+                                    return;
+                            }
+                            //draw target
+                            if (!CurrentPlayer.flashIgnore)
+                                CurPlayer.OnPlay(RefPlayer.NextView, new MyPlayer.PlayEventArgs(0, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
+                            if (!RefPlayer.flashIgnore)
+                                RefPlayer.OnPlay(new MyPlayer.PlayEventArgs(-1, MyPlayer.PlayState.KEEP, x, y, compressKernelSize, compressKernelSize));
+
+                            CurKernelGet.fill(curData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
+                            RefKernelGet.fill(refData, x, y, MyFilter.BorderMethod.ZERO, CompressKernel);
+                            switch (criteria)
+                            {
+                                case MyFilterData.CRITERIA_METHOD.ABSOLUTE:
+                                    if (_BBthreshold < MyFilterData.compare(CurKernelGet, RefKernelGet, criteria))
+                                    {
+                                        graphicMotionBlock.DrawImage(CurKernelGet.transToBitmap(), x - compressKernelSizeHalf, y - compressKernelSizeHalf);
+                                        //graphicMotionBlock.DrawImage(curBitmapCp, cutRect, x - compressKernelSizeHalf, y - compressKernelSizeHalf, compressKernelSize, compressKernelSize, GraphicsUnit.Pixel);
+                                    }
+                                    else
+                                    {
+                                        graphicMotionBlock.FillRectangle(redPen, x - compressKernelSizeHalf, y - compressKernelSizeHalf, MyCompresser.compressKernelSize , MyCompresser.compressKernelSize );
+                                    }
+                                    break;
+                                case MyFilterData.CRITERIA_METHOD.SQUARE:
+                                    if (_BBthresholdSQ < MyFilterData.compare(CurKernelGet, RefKernelGet, criteria))
+                                    {
+                                        graphicMotionBlock.DrawImage(CurKernelGet.transToBitmap(), x - compressKernelSizeHalf, y - compressKernelSizeHalf);
+                                        //graphicMotionBlock.DrawImage(curBitmapCp, cutRect, x - compressKernelSizeHalf, y - compressKernelSizeHalf, compressKernelSize, compressKernelSize, GraphicsUnit.Pixel);
+                                    }
+                                    else
+                                    {
+                                        graphicMotionBlock.FillRectangle(redPen, x - compressKernelSizeHalf, y - compressKernelSizeHalf, MyCompresser.compressKernelSize , MyCompresser.compressKernelSize );
+                                    }
+                                    break;
+                            }
+                            
+
+                            if (!this.RefPlayer.flashIgnore)
+                            {
+                                MyDeal.tryDraw(MatchViewer, RefKernelGet.transToBitmap());
+                            }
+                            if (!this.CurrentPlayer.flashIgnore)
+                            {
+                                MyDeal.tryDraw(featureViewer, CurKernelGet.transToBitmap());
+                                //draw motion
+                                MotionViewer.Invalidate();
+                            }
+                            Thread.Sleep(sleepTime);
+                            //Debug.Print("in frame " + i + " in " + x + " , "+ y + "find target " + targetX + " , " + targetY);
+                        }
+                    }
+
+                    compressFile.baseImg.Add(motionBlock);// add ref imge
+                    compressFile.motionTiff.Add(null);
+
+                    refBitmapCp.UnlockBits(refData);
+                    curBitmapCp.UnlockBits(curData);
                 }
 
                 if (activeFrom != null)

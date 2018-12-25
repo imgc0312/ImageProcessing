@@ -84,6 +84,7 @@ namespace HW2_video
                 button1.Enabled = true;
                 groupBox3.Enabled = true;
                 textBox_progress.Text = "0 / " + (myTiff.Size - 1);
+                compresser.BB_THRESHOLD = trackBar2.Value;
             }
         }
 
@@ -163,22 +164,32 @@ namespace HW2_video
                     case "radioButton1":
                         compressMethod = MyCompresser.COMPRESS_METHOD.ALL;
                         groupBox4.Visible = true;
+                        groupBox5.Visible = false;
                         break;
                     case "radioButton2":
                         compressMethod = MyCompresser.COMPRESS_METHOD.LOCAL;
                         groupBox4.Visible = true;
+                        groupBox5.Visible = false;
                         break;
                     case "radioButton3":
                         compressMethod = MyCompresser.COMPRESS_METHOD.TSS;
                         groupBox4.Visible = true;
+                        groupBox5.Visible = false;
                         break;
                     case "radioButton4":
                         compressMethod = MyCompresser.COMPRESS_METHOD.INTER_SUB;
                         groupBox4.Visible = false;
+                        groupBox5.Visible = false;
                         break;
                     case "radioButton5":
                         compressMethod = MyCompresser.COMPRESS_METHOD.INTRA_SUB;
                         groupBox4.Visible = false;
+                        groupBox5.Visible = false;
+                        break;
+                    case "radioButton6":
+                        compressMethod = MyCompresser.COMPRESS_METHOD.BLOCKBASE;
+                        groupBox4.Visible = true;
+                        groupBox5.Visible = true;
                         break;
                 }
                 if (compresser != null)
@@ -236,6 +247,35 @@ namespace HW2_video
                     compresser.CurrentPlayer.flashIgnore = false;
                 }
                 pictureBoxFeature.Visible = true;
+            }
+        }
+
+        private void trackBar2_ValueChanged(object sender, EventArgs e)
+        {
+            if (compresser != null)
+            {
+                compresser.BB_THRESHOLD = trackBar2.Value;
+            }
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            textBox1.Text = trackBar2.Value.ToString();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            int value = 0;
+            if (!Int32.TryParse(textBox1.Text, out value))
+                value = Int32.MinValue;//no value
+            if ((value < trackBar2.Minimum) || (value > trackBar2.Maximum))
+            {// illegal number
+                MessageBox.Show("Please input an integer number(" + trackBar2.Minimum + "~" + trackBar2.Maximum + ")");
+                textBox1.Text = trackBar2.Value.ToString();
+            }
+            else
+            {
+                trackBar2.Value = value;
             }
         }
     }
